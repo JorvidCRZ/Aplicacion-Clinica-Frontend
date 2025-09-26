@@ -1,0 +1,125 @@
+/* Cita Card Styles */
+.cita-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.cita-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.cita-card.proxima {
+    border-left: 4px solid var(--azul);
+}
+
+.cita-card.historial {
+    border-left: 4px solid var(--gris);
+}
+
+.cita-header {
+    margin-bottom: 1rem;
+}
+
+.cita-mascota {
+    color: var(--azul-oscuro);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.cita-servicio {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+.cita-details {
+    margin-bottom: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gris-oscuro);
+}
+
+.detail-row i {
+    color: var(--azul);
+    width: 16px;
+    flex-shrink: 0;
+}
+
+.detail-row .text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.cita-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cita-actions .btn {
+    flex: 1;
+    min-width: 100px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.btn-outline-primary {
+    border-color: var(--azul);
+    color: var(--azul);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--azul);
+    border-color: var(--azul);
+    color: white;
+}
+
+.btn-outline-secondary {
+    border-color: var(--gris);
+    color: var(--gris-oscuro);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--gris);
+    border-color: var(--gris);
+    color: var(--azul);
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .cita-card {
+        padding: 1rem;
+    }
+
+    .cita-actions {
+        flex-direction: column;
+    }
+
+    .cita-actions .btn {
+        min-width: unset;
+    }
+
+    .detail-row .text-truncate {
+        max-width: 150px;
+    }
+}

@@ -1,0 +1,146 @@
+/* Perfil Styles */
+.perfil {
+    padding: 0;
+}
+
+.page-header {
+    border-bottom: 1px solid var(--gris);
+    padding-bottom: 1rem;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    border-bottom: 1px solid var(--gris);
+    padding: 1.25rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: var(--negro);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 1px solid var(--gris);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 0.2rem rgba(26, 78, 141, 0.25);
+}
+
+.btn-guardar {
+    background: var(--blanco);
+    color: var(--azul);
+    border-color: var(--azul);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+}
+
+.btn-guardar:hover {
+    background: var(--azul);
+    color: var(--blanco);
+}
+
+/* Profile Avatar */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, var(--azul), var(--azul-claro));
+    border-radius: 50%;
+    color: white;
+}
+
+.profile-avatar i {
+    font-size: 3rem;
+}
+
+/* Profile Stats */
+.profile-stats {
+    margin-top: 1rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gris-oscuro);
+    margin-top: 0.25rem;
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-success {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: var(--verde);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .profile-avatar i {
+        font-size: 2rem;
+    }
+}
+
+/* Espaciado para resoluciones menores a 1200px (apilado vertical) */
+@media (max-width: 1199.98px) {
+    .row.g-3 {
+        --bs-gutter-y: 1.5rem;
+    }
+}
+
+/* Desktop 1200px+ (xl breakpoint) - layout lado a lado */
+@media (min-width: 1200px) {
+    .row.g-3 {
+        --bs-gutter-x: 1.5rem;
+        --bs-gutter-y: 0;
+    }
+
+    /* Ajuste de altura para que ambos cards tengan la misma altura */
+    .col-xl-8 .card,
+    .col-xl-4 .card {
+        height: 100%;
+    }
+}

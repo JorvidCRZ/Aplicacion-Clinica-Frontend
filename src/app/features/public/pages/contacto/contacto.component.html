@@ -1,0 +1,108 @@
+<div>
+  <div class="container my-5 contenido-contacto">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+
+        <!-- 🔹 Encabezado fuera del form -->
+        <div class="text-center mb-4">
+          <h2 class="fw-bold" style="color: var(--azul-oscuro);">Contáctanos</h2>
+          <p class="text-muted mb-0">¿Tienes dudas o sugerencias? ¡Escríbenos!</p>
+        </div>
+        <div class="card p-3 shadow-sm">
+          <div class="d-flex align-items-center gap-2 mb-3 contact-heading">
+            <!-- Icono mensaje -->
+            <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" stroke="currentColor"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <!-- Bloque de texto -->
+            <div>
+              <h5 class="mb-0 fw-bold" style="color: var(--azul-oscuro);">Envíanos un mensaje</h5>
+              <small class="d-block contact-subtitle">
+                Completa el formulario y te responderemos lo antes posible
+              </small>
+            </div>
+          </div>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre</label>
+              <input class="form-control" formControlName="nombre" placeholder="Tu nombre completo">
+              <div class="invalid-feedback d-block" *ngIf="nombre.touched && nombre.invalid">
+                El nombre es obligatorio (mínimo 2 caracteres).
+              </div>
+            </div>
+
+            <!-- Correo -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Correo electrónico</label>
+              <input type="email" class="form-control" formControlName="correo" placeholder="tu@correo.com">
+              <div class="invalid-feedback d-block" *ngIf="correo.touched && correo.invalid">
+                Ingresa un correo válido.
+              </div>
+            </div>
+
+            <!-- Teléfono (opcional) -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Teléfono (opcional)</label>
+              <input type="tel" class="form-control" formControlName="telefono" placeholder="987654321">
+              <div class="invalid-feedback d-block" *ngIf="telefono.touched && telefono.invalid">
+                Teléfono inválido.
+              </div>
+            </div>
+
+            <!-- Tipo de consulta -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tipo de consulta</label>
+              <select class="form-select" formControlName="tipoConsulta">
+                <option value="" disabled>Selecciona el tipo</option>
+                <option *ngFor="let t of tiposConsulta" [value]="t">{{ t }}</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="tipoConsulta.touched && tipoConsulta.invalid">
+                Selecciona el tipo de consulta.
+              </div>
+            </div>
+
+            <!-- Asunto -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Asunto</label>
+              <input class="form-control" formControlName="asunto" placeholder="¿En qué podemos ayudarte?">
+              <div class="invalid-feedback d-block" *ngIf="asunto.touched && asunto.invalid">
+                El asunto es obligatorio (mínimo 3 caracteres).
+              </div>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Mensaje</label>
+              <textarea rows="4" class="form-control" formControlName="mensaje"
+                placeholder="Describe tu consulta con el mayor detalle posible..."></textarea>
+              <div class="invalid-feedback d-block" *ngIf="mensaje.touched && mensaje.invalid">
+                El mensaje es obligatorio (10–1000 caracteres).
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-lg btn-warning w-100">
+                <i class="bi bi-calendar-check"></i>
+                {{ sending ? 'Enviando…' : 'Enviar mensaje' }}
+              </button>
+            </div>
+
+            <!-- Estados -->
+            <div class="alert alert-success mt-3" *ngIf="sentOk === true">
+              ¡Gracias! Tu mensaje fue enviado correctamente.
+            </div>
+            <div class="alert alert-danger mt-3" *ngIf="sentOk === false">
+              Ocurrió un error. Inténtalo nuevamente.
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="mis-pedidos-container">
+    <div class="header-section">
+        <h2><i class="fas fa-shopping-bag me-2"></i>Mis Pedidos</h2>
+        <p class="text-muted">Gestiona y consulta el estado de tus pedidos</p>
+    </div>
+
+    <!-- Lista de pedidos -->
+    <div class="row" *ngIf="pedidos.length > 0; else noPedidos">
+        <div class="col-12 col-md-6 col-lg-6 col-xl-4 mb-4" *ngFor="let pedido of pedidos">
+            <app-mi-pedido-card [pedido]="transformPedido(pedido)" (verDetalles)="verDetallesPedido($event)">
+            </app-mi-pedido-card>
+        </div>
+    </div>
+
+    <!-- Mensaje cuando no hay pedidos -->
+    <ng-template #noPedidos>
+        <div class="row">
+            <div class="col-12">
+                <div class="empty-state text-center py-5">
+                    <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No tienes pedidos aún</h4>
+                    <p class="text-muted">¡Explora nuestra tienda y realiza tu primer pedido!</p>
+                    <button class="btn btn-primary mt-3">
+                        <i class="fas fa-shopping-cart me-2"></i>Ir a la Tienda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

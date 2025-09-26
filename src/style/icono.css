@@ -1,0 +1,24 @@
+.icono {
+    color: var(--azul-medio);
+    font-size: 25px;
+    transition: color 0.3s;
+
+    &:hover {
+        color: var(--azul-claro);
+    }
+}
+
+.iconos {
+    color: var(--blanco);
+    font-size: 25px;
+    transition: color 0.3s;
+
+    &:hover {
+        color: var(--azul-claro);
+    }
+}
+
+a {
+    text-decoration: none;
+}
+

@@ -1,0 +1,18 @@
+.icono_fijo img {
+    width: 7rem;
+    right: 25px;
+    bottom: 65px;
+    z-index: 100;
+    position: fixed;
+    cursor: pointer;
+
+    &:hover {
+        filter: drop-shadow(2px 4px 6px black);
+    }
+
+    @media screen and (max-width: 768px) {
+        width: 5rem;
+        right: 10px;
+        bottom: 10px;
+    }
+}

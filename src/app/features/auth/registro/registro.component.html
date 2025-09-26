@@ -1,0 +1,111 @@
+<div class="container d-flex align-items-center justify-content-center min-vh-100 contenido-general my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+
+                <div class="text-center mb-4">
+                    <img src="assets/general/logo-pets.webp" alt="Logo" width="70" class="mb-2">
+                    <h3 class="fw-bold">Registro</h3>
+                    <p class="text-muted small">Crea tu cuenta en segundos</p>
+                </div>
+
+                <form (submit)="onSubmit($event)">
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control form-control-lg" id="nombre"
+                            placeholder="Ingresa tu nombre" [(ngModel)]="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Celular</label>
+                        <input type="tel" class="form-control form-control-lg" id="telefono"
+                            placeholder="Ej: 5512345678" [(ngModel)]="telefono" name="telefono" required
+                            [ngClass]="{'is-valid': isPhoneValid(telefono), 'is-invalid': telefono && !isPhoneValid(telefono)}">
+                        <div *ngIf="telefono && !isPhoneValid(telefono)" class="invalid-feedback">
+                            Ingresa un número de celular válido (9 dígitos).
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control form-control-lg" id="email"
+                            placeholder="Ingresa tu correo" [(ngModel)]="email" name="email" required
+                            (blur)="validateEmail()"
+                            (input)="validateEmail()"
+                            [ngClass]="{'is-valid': emailTouched && isEmailValid, 'is-invalid': emailTouched && !isEmailValid}">
+                        <div *ngIf="emailTouched && !isEmailValid" class="invalid-feedback">
+                            Ingresa un correo electrónico válido (ejemplo: usuario&#64;dominio.com)
+                        </div>
+                        <div *ngIf="emailTouched && isEmailValid" class="valid-feedback">
+                            Correo electrónico válido
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                            <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control-lg"
+                                id="password" placeholder="Crea una contraseña" [(ngModel)]="password" name="password"
+                                required (blur)="validatePassword()" (input)="validatePassword()"
+                                [ngClass]="{'is-valid': passwordTouched && isPasswordValid, 'is-invalid': passwordTouched && !isPasswordValid}">
+                            <button type="button" class="btn btn-outline-secondary"
+                                (click)="showPassword = !showPassword">
+                                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                            </button>
+                        </div>
+                        <small class="d-block mt-1" [ngClass]="passwordStrengthClass">{{ passwordStrengthMsg }}</small>
+                        <div *ngIf="passwordTouched && !isPasswordValid" class="invalid-feedback d-block">
+                            La contraseña debe tener al menos 6 caracteres
+                        </div>
+                        <div *ngIf="passwordTouched && isPasswordValid" class="valid-feedback d-block">
+                            Contraseña válida
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+                        <div class="input-group">
+                            <input [type]="showConfirm ? 'text' : 'password'" class="form-control form-control-lg"
+                                id="confirmPassword" placeholder="Repite tu contraseña" [(ngModel)]="confirmPassword"
+                                name="confirmPassword" required (blur)="validateConfirmPassword()" (input)="validateConfirmPassword()"
+                                [ngClass]="{'is-valid': confirmPasswordTouched && isConfirmPasswordValid, 'is-invalid': confirmPasswordTouched && !isConfirmPasswordValid}">
+                            <button type="button" class="btn btn-outline-secondary"
+                                (click)="showConfirm = !showConfirm">
+                                <i class="bi" [ngClass]="showConfirm ? 'bi-eye-slash' : 'bi-eye'"></i>
+                            </button>
+                        </div>
+
+                        <div *ngIf="confirmPasswordTouched && !isConfirmPasswordValid" class="invalid-feedback d-block">
+                            <span *ngIf="confirmPassword.length === 0">Confirma tu contraseña</span>
+                            <span *ngIf="confirmPassword.length > 0 && password !== confirmPassword">Las contraseñas no coinciden</span>
+                        </div>
+                        <div *ngIf="confirmPasswordTouched && isConfirmPasswordValid" class="valid-feedback d-block">
+                            Contraseñas coinciden
+                        </div>
+                    </div>
+
+                    <div class="form-check mt-3 mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" [(ngModel)]="acceptedTerms"
+                            name="terms" required>
+                        <label class="form-check-label small" for="terms">
+                            Acepto los <a>términos y condiciones</a>
+                        </label>
+                    </div>
+                    <button type="submit" class="boton btn btn-lg w-100 mt-3 shadow-sm"
+                        [disabled]="password !== confirmPassword || !acceptedTerms">
+                        Registrarse
+                    </button>
+                    <div *ngIf="error" class="alert alert-danger mt-3 text-center">{{ error }}</div>
+                    <div *ngIf="success" class="alert alert-success mt-3 text-center">
+                        ¡Registro exitoso! Redirigiendo al login...
+                    </div>
+                </form>
+                <div class="mt-4 text-center">
+                    <span>¿Ya tienes cuenta?</span>
+                    <a routerLink="/login" class="fw-semibold text-decoration-none">Inicia sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+<div class="admin-panel">
+    <!-- Header del Panel -->
+    <div class="panel-header mb-4">
+        <h2 class="panel-title">Panel de Administración</h2>
+        <p class="panel-subtitle text-muted">Bienvenido de vuelta, {{ currentUser?.nombre }}</p>
+    </div>
+
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row g-4 mb-5">
+        <!-- Usuarios Registrados -->
+        <div class="col-xxl-3  col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4  shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Usuarios Registrados</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.usuariosRegistrados }}</h3>
+                        <small class="text-success">+12% desde el mes pasado</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mascotas en Adopción -->
+        <div class="col-xxl-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Mascotas en Adopción</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.mascotasAdopcion }}</h3>
+                        <small class="text-info">8 nuevas esta semana</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-heart fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pedidos Pendientes -->
+        <div class="col-xxl-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos Pendientes</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.pedidosPendientes }}</h3>
+                        <small class="text-warning">5 requieren atención</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-bag fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Citas Hoy -->
+        <div class="col-xxl-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Citas Hoy</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.citasHoy }}</h3>
+                        <small class="text-success">3 pendientes de confirmar</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-calendar-event fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda fila de estadísticas -->
+    <div class="row g-4">
+        <!-- Productos en Stock -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Productos en Stock</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.productosStock }}</h3>
+                        <small class="text-info">12 con stock bajo</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-box-seam fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Valor Inventario -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Valor Inventario</h6>
+                        <h3 class="fw-bold mb-0">S/{{ stats.valorInventario }}</h3>
+                        <small class="text-success">Actualizado hoy</small>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-cash fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

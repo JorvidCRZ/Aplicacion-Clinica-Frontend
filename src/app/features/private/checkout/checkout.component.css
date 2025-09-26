@@ -1,0 +1,41 @@
+body, .container {
+  background: var(--bs-body-bg);
+}
+.card {
+  border-radius: 1rem;
+  background: var(--blanco);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.btn-primary {
+  background-color:  var(--azul);
+  border: none;
+  font-size: 1.2rem;
+  color: var(--blanco) !important;
+  text-shadow: none !important;
+  user-select: none;
+}
+.fw-bold {
+  color: var(--azul);
+}
+.form-control {
+  font-size: 1rem;
+  border-radius: 0.5rem;
+}
+.sticky-top {
+  z-index: 2;
+}
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+}
+.rounded-3 {
+  border-radius: 1rem !important;
+}
+.border-primary {
+  border: 2px solid var(--azul) !important;
+}
+.border-success {
+  border: 2px solid var(--verde) !important;
+}
+.bg-light {
+  background-color: var(--gris) !important;
+}

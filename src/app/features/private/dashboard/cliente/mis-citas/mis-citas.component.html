@@ -1,0 +1,63 @@
+<div class="mis-citas">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="header-content">
+                        <h1 class="h2 fw-bold mb-1">Mis Citas</h1>
+                        <p class="text-muted mb-0">Gestiona tus citas veterinarias</p>
+                    </div>
+                    <div class="header-actions">
+                        <a routerLink="/servicio-formulario" class="btn btn-primary">
+                            <i class="bi bi-calendar-plus me-2"></i>
+                            <span class="btn-text">Agendar Nueva Cita</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Próximas Citas -->
+    <div class="row mb-5" *ngIf="citasProximas.length > 0">
+        <div class="col-12">
+            <h3 class="h4 fw-bold mb-3">Próximas Citas</h3>
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-6 col-xl-4 mb-3" *ngFor="let cita of citasProximas">
+                    <app-mi-cita-card [cita]="transformCita(cita)" tipo="proxima"
+                        (verDetalles)="verDetallesCita($event)" (cancelar)="cancelarCita($event)">
+                    </app-mi-cita-card>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial de Citas -->
+    <div class="row" *ngIf="historialCitas.length > 0">
+        <div class="col-12">
+            <h3 class="h4 fw-bold mb-3">Historial de Citas</h3>
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-6 col-xl-4 mb-3" *ngFor="let cita of historialCitas">
+                    <app-mi-cita-card [cita]="transformCita(cita)" tipo="historial"
+                        (verDetalles)="verDetallesCita($event)" (cancelar)="cancelarCita($event)">
+                    </app-mi-cita-card>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" *ngIf="citas.length === 0">
+        <div class="col-12">
+            <div class="empty-state text-center py-5">
+                <i class="bi bi-calendar-x display-1 text-muted mb-3"></i>
+                <h3 class="fw-bold mb-3">No tienes citas programadas</h3>
+                <p class="text-muted mb-4">Agenda tu primera cita veterinaria para el cuidado de tus mascotas</p>
+                <a routerLink="/servicio-formulario" class="btn btn-primary">
+                    <i class="bi bi-calendar-plus me-2"></i>
+                    Agendar Mi Primera Cita
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

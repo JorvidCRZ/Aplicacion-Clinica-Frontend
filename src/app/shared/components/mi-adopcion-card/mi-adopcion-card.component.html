@@ -1,0 +1,46 @@
+<div class="adopcion-card">
+    <div class="adopcion-image">
+        <img [src]="adopcion.foto" [alt]="adopcion.nombreMascota" class="img-fluid">
+        <div class="adopcion-status">
+            <span class="badge" [class]="getEstadoClass(adopcion.estado)">
+                {{ getEstadoLabel(adopcion.estado) }}
+            </span>
+        </div>
+    </div>
+
+    <div class="adopcion-info">
+        <h5 class="adopcion-nombre">{{ adopcion.nombreMascota }}</h5>
+        <p class="adopcion-raza">{{ adopcion.raza }} • {{ adopcion.edad }} años</p>
+
+        <div class="adopcion-details">
+            <div class="detail-row">
+                <i class="bi bi-calendar3 me-2"></i>
+                <span>Solicitado: {{ adopcion.fechaSolicitud | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="adopcion.fechaAprobacion">
+                <i class="bi bi-check-circle me-2"></i>
+                <span>Aprobado: {{ adopcion.fechaAprobacion | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="adopcion.fechaEntrega">
+                <i class="bi bi-heart me-2"></i>
+                <span>Entregado: {{ adopcion.fechaEntrega | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="adopcion.observaciones">
+                <i class="bi bi-chat-left-text me-2"></i>
+                <span class="text-truncate">{{ adopcion.observaciones }}</span>
+            </div>
+        </div>
+
+        <div class="adopcion-actions mt-3">
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="onVerDetalles()">
+                <i class="bi bi-eye me-1"></i>
+                Ver Detalles
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" *ngIf="adopcion.estado === 'pendiente'"
+                (click)="onCancelar()">
+                <i class="bi bi-x-circle me-1"></i>
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>

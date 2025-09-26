@@ -1,0 +1,85 @@
+<div class="mis-adopciones">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 fw-bold">Mis Adopciones</h1>
+                        <p class="text-muted">Seguimiento de tus solicitudes de adopción</p>
+                    </div>
+                    <a routerLink="/adopcion" class="btn btn-primary">
+                        <i class="bi bi-heart me-2"></i>
+                        Ver Mascotas Disponibles
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="adopciones.length > 0; else noAdopciones">
+        <div class="col-12 col-md-6 col-lg-4 mb-4" *ngFor="let adopcion of adopciones">
+            <app-mi-adopcion-card [adopcion]="transformAdopcion(adopcion)" (verDetalles)="verDetallesAdopcion($event)"
+                (cancelar)="cancelarSolicitudAdopcion($event)">
+            </app-mi-adopcion-card>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <ng-template #noAdopciones>
+        <div class="row">
+            <div class="col-12">
+                <div class="empty-state text-center py-5">
+                    <i class="bi bi-heart display-1 text-muted mb-3"></i>
+                    <h3 class="fw-bold mb-3">No tienes solicitudes de adopción</h3>
+                    <p class="text-muted mb-4">Explora nuestras mascotas disponibles y encuentra a tu compañero ideal
+                    </p>
+                    <a routerLink="/adopcion" class="btn btn-primary">
+                        <i class="bi bi-heart me-2"></i>
+                        Explorar Mascotas para Adopción
+                    </a>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Información adicional -->
+    <div class="row mt-5" *ngIf="adopciones.length > 0">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-info-circle me-2 text-primary"></i>
+                            Información sobre el proceso de adopción
+                        </h5>
+                        <div class="row">
+                            <div class="col-12 col-md-4 mb-3">
+                                <div class="info-item">
+                                    <div class="info-step">1</div>
+                                    <h6>Envía tu solicitud</h6>
+                                    <p class="text-muted small">Completa el formulario con tus datos y preferencias</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-3">
+                                <div class="info-item">
+                                    <div class="info-step">2</div>
+                                    <h6>Evaluación</h6>
+                                    <p class="text-muted small">Nuestro equipo revisa tu solicitud en 2-3 días hábiles
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-3">
+                                <div class="info-item">
+                                    <div class="info-step">3</div>
+                                    <h6>¡Adopción!</h6>
+                                    <p class="text-muted small">Si es aprobada, coordinaremos la entrega de tu nueva
+                                        mascota</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

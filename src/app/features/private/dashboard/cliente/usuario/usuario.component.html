@@ -1,0 +1,51 @@
+<div class="dashboard-wrapper">
+    <div class="dashboard-content d-flex">
+        <!-- Sidebar -->
+        <aside class="sidebar bg-white border-end" [class.sidebar-open]="sidebarOpen">
+            <div class="sidebar-header p-3 border-bottom">
+                <!-- Botón móvil para toggle del sidebar -->
+                <div class="d-flex justify-content-between align-items-center mb-3 d-lg-none">
+                    <span class="fw-bold">Menú</span>
+                    <button class="btn btn-link p-0" (click)="toggleSidebar()">
+                        <i class="bi bi-x fs-4"></i>
+                    </button>
+                </div>
+
+                <div class="user-info d-flex align-items-center">
+                    <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 50px; height: 50px;">
+                        <i class="bi bi-person fs-5"></i>
+                    </div>
+                    <div class="user-details">
+                        <h6 class="mb-0 fw-bold">{{ currentUser?.nombre }}</h6>
+                        <small class="text-muted">{{ currentUser?.email }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav p-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-3" *ngFor="let item of sidebarItems">
+                        <a class="nav-link rounded px-3 py-2 text-decoration-none" [routerLink]="item.route"
+                            routerLinkActive="active"
+                            [routerLinkActiveOptions]="{exact: item.route === '/usuario/resumen'}"
+                            (click)="sidebarOpen = false">
+                            <i class="{{ item.icon }} me-2"></i>
+                            {{ item.title }}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content flex-fill">
+            <div class="container-fluid p-4">
+                <router-outlet></router-outlet>
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" [class.show]="sidebarOpen" (click)="sidebarOpen = false"></div>
+</div>

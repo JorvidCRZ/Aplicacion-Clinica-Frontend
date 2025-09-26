@@ -1,0 +1,120 @@
+<div class="usuarios-management">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h2 class="page-title">Gestión de Usuarios</h2>
+                <p class="page-subtitle">Administra los usuarios registrados en la plataforma</p>
+            </div>
+            <button class="btn-nuevo" (click)="abrirModalNuevo()">
+                <i class="bi bi-plus"></i>
+                Nuevo Usuario
+            </button>
+        </div>
+    </div>
+
+    <!-- Sección Usuarios Registrados -->
+    <div class="content-section">
+        <div class="section-header">
+            <h3 class="section-title">Usuarios Registrados</h3>
+            <p class="section-subtitle">Lista de todos los usuarios con sus detalles y estado</p>
+        </div>
+
+        <!-- Buscador -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar usuarios..." [(ngModel)]="searchTerm"
+                    (input)="filtrarUsuarios()">
+            </div>
+        </div>
+
+        <!-- Tabla de Usuarios -->
+        <div class="table-container">
+            <table class="usuarios-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let usuario of usuariosFiltrados" class="usuario-row">
+                        <td class="usuario-cell">{{ usuario.nombre }}</td>
+                        <td class="email-cell">{{ usuario.email }}</td>
+                        <td class="telefono-cell">{{ usuario.telefono }}</td>
+                        <td class="rol-cell">
+                            <span class="rol-badge" [class]="'rol-' + usuario.rol">
+                                {{ usuario.rol === 'admin' ? 'ADMIN' : 'USER' }}
+                            </span>
+                        </td>
+                        <td class="acciones-cell">
+                            <div class="acciones-container">
+                                <button class="btn-accion btn-editar" (click)="editarUsuario(usuario)" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-accion btn-eliminar" (click)="eliminarUsuario(usuario)"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Nuevo/Editar Usuario -->
+<div class="modal-overlay" [class.show]="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ usuarioEditando ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+            <button class="btn-cerrar" (click)="cerrarModal()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form class="usuario-form" (ngSubmit)="guardarUsuario()">
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" [(ngModel)]="usuarioForm.nombre" name="nombre"
+                        placeholder="Ingresa nombre de usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" [(ngModel)]="usuarioForm.email" name="email"
+                        placeholder="Ingresa email de usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" [(ngModel)]="usuarioForm.telefono" name="telefono"
+                        placeholder="Ingresa teléfono de usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" [(ngModel)]="usuarioForm.password" name="password"
+                        placeholder="Ingresa contraseña de usuario" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select [(ngModel)]="usuarioForm.rol" name="rol">
+                        <option value="usuario">Usuario</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn-guardar">
+                        {{ usuarioEditando ? 'Actualizar' : 'Crear' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

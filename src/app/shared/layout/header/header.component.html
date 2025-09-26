@@ -1,0 +1,137 @@
+<header class="py-3 px-0 py-md-1" id="enlaces-inicio">
+    <div class="contenedor container d-flex align-items-center py-3">
+
+        <div class="brand d-flex align-items-center me-auto">
+            <a href="inicio"><img routerLink="inicio" src="assets/general/logo-clinica.webp" class="logo me-2"></a>
+        </div>
+
+        <nav class="menu d-none d-lg-flex position-absolute start-50 translate-middle-x">
+            <ul class="nav">
+                <li *ngFor="let item of menuItems" class="nav-item px-3">
+                    <a class="nav-link" [routerLink]="item.route" routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: item.exact || false }">{{ item.label }}</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Desktop: Carrito y Usuario -->
+        <div class="d-none d-lg-flex align-items-center me-4">
+            <div class="dropdown" *ngIf="logueado; else loginLink">
+                <button class="btn btn-link p-0 border-0 dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="icono fa fa-user-circle fa-2x"></i>
+                </button>
+                
+                <!-- Menú Dropdown para Cliente -->
+                <!-- <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="userDropdown" style="min-width: 220px;" *ngIf="!isAdmin">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold small mb-1">{{ nombreUsuario }}</div>
+                        <div class="text-muted small">{{ getUserEmail() }}</div>
+                    </li>
+                    <li><a class="dropdown-item" routerLink="/usuario/resumen"><i class="fa fa-tachometer-alt me-2"></i> Resumen</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/pedidos"><i class="fa fa-shopping-bag me-2"></i> Mis Pedidos</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/perfil"><i class="fa fa-user me-2"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/mascotas"><i class="fa fa-paw me-2"></i> Mis Mascotas</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/adopciones"><i class="fa fa-heart me-2"></i> Mis Adopciones</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/citas"><i class="fa fa-calendar me-2"></i> Mis Citas</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" (click)="cerrarSesion()"><i class="fa fa-sign-out me-2"></i> Cerrar Sesión</a></li>
+                </ul> -->
+
+                <!-- Menú Dropdown para Administrador -->
+                <!-- <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="userDropdown" style="min-width: 220px;" *ngIf="isAdmin">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold small mb-1">{{ nombreUsuario }}</div>
+                        <div class="text-muted small">{{ getUserEmail() }}</div>
+                        <div class="badge bg-warning text-dark mt-1">Administrador</div>
+                    </li>
+                    <li><a class="dropdown-item" routerLink="/admin/panel"><i class="fa fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/usuarios"><i class="fa fa-users me-2"></i> Gestión de Usuarios</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/mascotas"><i class="fa fa-paw me-2"></i> Gestión de Adopciones</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/productos"><i class="fa fa-box me-2"></i> Gestión de Productos</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/pedidos"><i class="fa fa-shopping-bag me-2"></i> Gestión de Pedidos</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/citas"><i class="fa fa-calendar me-2"></i> Gestión de Citas</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" (click)="cerrarSesion()"><i class="fa fa-sign-out me-2"></i> Cerrar Sesión</a></li>
+                </ul> -->
+
+
+            </div>
+            <ng-template #loginLink>
+                <a routerLink="/login" title="Mi cuenta"><i class="icono fa fa-user fa-lg"></i></a>
+            </ng-template>
+        </div>
+
+        <!-- Mobile/Tablet: Carrito, Usuario y Hamburguesa en línea -->
+        <div class="d-flex d-lg-none align-items-center gap-3">
+            <div class="dropdown" *ngIf="logueado; else loginLinkMobile">
+                <button class="btn btn-link p-0 border-0 dropdown-toggle d-flex align-items-center" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="iconos fa fa-user-circle fa-lg"></i>
+                </button>
+                
+                <!-- Menú Dropdown para Cliente (Mobile) -->
+                <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="userDropdownMobile" style="min-width: 200px;" *ngIf="!isAdmin">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold small mb-1">{{ nombreUsuario }}</div>
+                        <div class="text-muted small">{{ getUserEmail() }}</div>
+                    </li>
+                    <li><a class="dropdown-item" routerLink="/usuario/resumen"><i class="fa fa-tachometer-alt me-2"></i> Resumen</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/pedidos"><i class="fa fa-shopping-bag me-2"></i> Mis Pedidos</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/perfil"><i class="fa fa-user me-2"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/mascotas"><i class="fa fa-paw me-2"></i> Mis Mascotas</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/adopciones"><i class="fa fa-heart me-2"></i> Mis Adopciones</a></li>
+                    <li><a class="dropdown-item" routerLink="/usuario/citas"><i class="fa fa-calendar me-2"></i> Mis Citas</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" (click)="cerrarSesion()"><i class="fa fa-sign-out me-2"></i> Cerrar Sesión</a></li>
+                </ul>
+
+                <!-- Menú Dropdown para Administrador (Mobile) -->
+                <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" aria-labelledby="userDropdownMobile" style="min-width: 200px;" *ngIf="!isAdmin">
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-bold small mb-1">{{ nombreUsuario }}</div>
+                        <div class="text-muted small">{{ getUserEmail() }}</div>
+                        <div class="badge bg-warning text-dark mt-1">Admin</div>
+                    </li>
+                    <li><a class="dropdown-item" routerLink="/admin/dashboard"><i class="fa fa-tachometer-alt me-2"></i> Dashboard</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/usuarios"><i class="fa fa-users me-2"></i> Gestión de Usuarios</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/mascotas"><i class="fa fa-paw me-2"></i> Gestión de Adopciones</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/productos"><i class="fa fa-box me-2"></i> Gestión de Productos</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/pedidos"><i class="fa fa-shopping-bag me-2"></i> Gestión de Pedidos</a></li>
+                    <li><a class="dropdown-item" routerLink="/admin/citas"><i class="fa fa-calendar me-2"></i> Gestión de Citas</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" (click)="cerrarSesion()"><i class="fa fa-sign-out me-2"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
+            <ng-template #loginLinkMobile>
+                <a routerLink="/login" title="Mi cuenta"><i class="iconos fa fa-user fa-lg"></i></a>
+            </ng-template>
+            <button class="btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuMobile" aria-controls="menuMobile">
+                <i class="iconos fa fa-bars fa-lg"></i>
+            </button>
+        </div>
+
+
+        <!-- para mobiles -->
+<!-- 
+        <div class="contenedor-mobile offcanvas offcanvas-start " tabindex="-1" id="menuMobile"
+            aria-labelledby="menuMobileLabel">
+            <div class="brand offcanvas-header">
+                <div routerLink="inicio" class="contenedor-logo d-flex align-items-center me-auto">
+                    <img routerLink="/inicio" src="assets/general/logo-pets.webp" class="logo me-2">
+                    <span routerLink="/inicio" class="span h5 mb-0 ">Pets Secretz</span>
+                </div>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-0">
+                <ul class="menu-mobile nav flex-column mb-2 text-center">
+                    <li *ngFor="let item of menuItems" class="nav-item m-0">
+                        <a class="nav-link" [routerLink]="item.route" routerLinkActive="active"
+                            [routerLinkActiveOptions]="{ exact: item.exact || false }"> {{ item.label }}</a>
+                    </li>
+                </ul>
+            </div>
+        </div> -->
+
+    </div>
+</header>
+

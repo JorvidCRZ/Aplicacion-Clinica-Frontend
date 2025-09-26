@@ -1,0 +1,240 @@
+<div class="productos-container">
+    <!-- Header -->
+    <div class="productos-header">
+        <div class="header-content">
+            <h1 class="titulo">Gestión de Productos</h1>
+            <p class="subtitulo">Administra el inventario de productos de la tienda</p>
+        </div>
+        <button class="btn-nuevo" (click)="abrirModalNuevo()">
+            <i class="bi bi-plus"></i>
+            Nuevo Producto
+        </button>
+    </div>
+
+    <!-- Estadísticas -->
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row g-4 mb-3">
+        <!-- Total Productos -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4  shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total productos</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.totalProductos }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-bag-check fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- sin stock -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Sin Stock</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.sinStock }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-heart fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Segunda fila de estadísticas -->
+    <div class="row g-4 mb-3">
+        <!-- Stock Bajo -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Stock Bajo</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.stockBajo }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-box-seam fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Valor inventario -->
+        <div class="col-lg-6 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Valor Inventario</h6>
+                        <h3 class="fw-bold mb-0">{{ formatPrice(stats.valorInventario) }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-cash fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de inventario -->
+    <div class="inventario-section">
+        <div class="section-header">
+            <div class="section-title">
+                <h2>Inventario de Productos</h2>
+                <p>Lista de todos los productos con información de stock y precios</p>
+            </div>
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar productos..." [(ngModel)]="searchTerm"
+                    (input)="filtrarProductos()">
+            </div>
+        </div>
+
+        <!-- Tabla de Productos -->
+        <div class="table-container">
+            <table class="productos-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Valor Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let producto of productosFiltrados" class="producto-row">
+                        <td class="producto-cell">
+                            <div class="producto-info">
+                                <div class="producto-imagen">
+                                    <img [src]="producto.image" [alt]="producto.name"
+                                        *ngIf="producto.image; else defaultImage">
+                                    <ng-template #defaultImage>
+                                        <i class="bi bi-box-seam"></i>
+                                    </ng-template>
+                                </div>
+                                <div class="producto-details">
+                                    <span class="producto-nombre">{{ producto.name }}</span>
+                                    <span class="producto-descripcion">{{ producto.description }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="categoria-cell">
+                            <span class="categoria-badge" [class]="getCategoryBadgeClass(producto.category)">
+                                {{ producto.category }}
+                            </span>
+                        </td>
+                        <td class="precio-cell">{{ formatPrice(producto.price) }}</td>
+                        <td class="stock-cell">{{ producto.stock }}</td>
+                        <td class="estado-cell">
+                            <span class="estado-badge" [class]="getStockBadgeClass(producto.stock)">
+                                {{ getStockText(producto.stock) }}
+                            </span>
+                        </td>
+                        <td class="valor-cell">{{ formatPrice(producto.price * producto.stock) }}</td>
+                        <td class="acciones-cell">
+                            <div class="acciones-container">
+                                <button class="btn-accion btn-editar" (click)="editarProducto(producto)" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-accion btn-eliminar" (click)="eliminarProducto(producto)"
+                                    title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensaje cuando no hay productos -->
+        <div *ngIf="productosFiltrados.length === 0" class="no-productos">
+            <i class="bi bi-box-seam"></i>
+            <h3>No se encontraron productos</h3>
+            <p>{{ searchTerm ? 'Intenta con otros términos de búsqueda' : 'Comienza agregando tu primer producto' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar producto -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ productoEditando ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+            <button class="btn-cerrar" (click)="cerrarModal()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <form class="modal-form" (ngSubmit)="guardarProducto()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto</label>
+                    <input type="text" id="nombre" [(ngModel)]="productoForm.name" name="nombre" required
+                        placeholder="Ej. Alimento Premium para Perros">
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" [(ngModel)]="productoForm.category" name="categoria" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option *ngFor="let categoria of categorias" [value]="categoria">{{ categoria }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" [(ngModel)]="productoForm.description" name="descripcion" rows="3"
+                    placeholder="Describe las características del producto"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="precio">Precio (S/)</label>
+                    <input type="number" id="precio" [(ngModel)]="productoForm.price" name="precio" min="0" step="0.01"
+                        required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" [(ngModel)]="productoForm.stock" name="stock" min="0" required
+                        placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="imagen">URL de Imagen</label>
+                <input type="text" id="imagen" [(ngModel)]="productoForm.image" name="imagen"
+                    placeholder="https://ejemplo.com/imagen.jpg">
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" [(ngModel)]="productoForm.inStock" name="disponible">
+                    <span class="checkmark"></span>
+                    Producto disponible para venta
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" (click)="cerrarModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-guardar">
+                    {{ productoEditando ? 'Actualizar' : 'Crear' }} Producto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

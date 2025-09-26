@@ -1,0 +1,72 @@
+/* Estilos para el formulario de cita */
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+h1 {
+  color: var(--azul);
+  font-weight: 800;
+}
+
+h5, h6 {
+  color: var(--azul);
+  font-weight: 600;
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--negro);
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 0.2rem rgba(78, 150, 237, 0.25);
+}
+
+.btn-warning {
+  background-color: var(--azul);
+  border-color: var(--azul);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+hr {
+  border-color: #dee2e6;
+  margin: 2rem 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Iconos */
+.bi {
+  margin-right: 0.5rem;
+}

@@ -1,0 +1,56 @@
+<div class="pedido-card">
+  <div class="pedido-header">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h5 class="pedido-id">Pedido #{{ pedido.id }}</h5>
+        <p class="pedido-fecha text-muted">{{ pedido.fechaPedido | date:'dd/MM/yyyy' }}</p>
+      </div>
+      <span class="badge" [class]="getEstadoClass(pedido.estado)">
+        {{ getEstadoLabel(pedido.estado) }}
+      </span>
+    </div>
+  </div>
+  
+  <div class="pedido-details">
+    <div class="detail-row">
+      <i class="bi bi-box me-2"></i>
+      <span>{{ pedido.productos.length }} producto(s)</span>
+    </div>
+    <div class="detail-row">
+      <i class="bi bi-cash-coin me-2"></i>
+      <span class="fw-bold">S/ {{ pedido.total | number:'1.2-2' }}</span>
+    </div>
+    <div class="detail-row">
+      <i class="bi bi-credit-card me-2"></i>
+      <span>{{ pedido.metodoPago }}</span>
+    </div>
+    <div class="detail-row">
+      <i class="bi bi-geo-alt me-2"></i>
+      <span class="text-truncate">{{ pedido.direccionEntrega }}</span>
+    </div>
+    <div class="detail-row" *ngIf="pedido.fechaEntrega">
+      <i class="bi bi-truck me-2"></i>
+      <span>Entrega: {{ pedido.fechaEntrega | date:'dd/MM/yyyy' }}</span>
+    </div>
+  </div>
+  
+  <div class="pedido-productos">
+    <h6 class="productos-title">Productos:</h6>
+    <div class="productos-list">
+      <div *ngFor="let producto of pedido.productos.slice(0, 2)" class="producto-item">
+        <span class="producto-nombre">{{ producto.nombre }}</span>
+        <span class="producto-cantidad">x{{ producto.cantidad }}</span>
+      </div>
+      <div *ngIf="pedido.productos.length > 2" class="producto-item text-muted">
+        + {{ pedido.productos.length - 2 }} más...
+      </div>
+    </div>
+  </div>
+  
+  <div class="pedido-actions mt-3">
+    <button class="btn btn-outline-primary btn-sm" (click)="onVerDetalles()">
+      <i class="bi bi-eye me-1"></i>
+      Ver Detalles
+    </button>
+  </div>
+</div>

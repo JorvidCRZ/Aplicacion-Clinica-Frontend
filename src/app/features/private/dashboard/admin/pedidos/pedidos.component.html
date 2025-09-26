@@ -1,0 +1,297 @@
+<div class="pedidos-container">
+    <!-- Header -->
+    <div class="pedidos-header">
+        <div class="header-content">
+            <h1 class="titulo">Gestión de Pedidos</h1>
+            <p class="subtitulo">Administra los pedidos de la tienda</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-exportar" (click)="exportarPedidos()">
+                <i class="bi bi-download"></i>
+                Exportar
+            </button>
+            <button class="btn-nuevo" (click)="abrirModalNuevo()">
+                <i class="bi bi-plus"></i>
+                Nuevo Pedido
+            </button>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row g-4 mb-4">
+        <!-- Pedidos pendientes -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos pendientes</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.pendiente }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-box-seam fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Enviados -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos enviados</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.enviados }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-heart fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Entregados -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos entregados</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.entregados }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-truck fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Procesando -->
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos procesando</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.procesados }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-arrow-clockwise fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda fila de estadísticas -->
+    <div class="row g-4 mb-4">
+        <!-- Cancelados -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Pedidos cancelados</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.cancelados }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-x-circle fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Total Pedidos -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4  shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Total pedidos</h6>
+                        <h3 class="fw-bold mb-0">{{ stats.totalPedidos }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-bag-check fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Valor total -->
+        <div class="col-lg-4 col-md-6">
+            <div class="stat-card bg-white rounded-3 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">Valor Total</h6>
+                        <h3 class="fw-bold mb-0">{{ formatPrice(stats.valorTotal) }}</h3>
+                    </div>
+                    <div
+                        class="stat-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-cash fs-5"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filtros-section">
+        <div class="filtros-header">
+            <div class="filtros-toggle">
+                <i class="bi bi-funnel"></i>
+                <span>Filtros</span>
+            </div>
+            <div class="filtros-actions">
+                <button class="btn-limpiar" (click)="limpiarFiltros()">
+                    Limpiar Filtros
+                </button>
+            </div>
+        </div>
+
+        <div class="filtros-content">
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar por ID, cliente o email..."
+                    [(ngModel)]="searchTerm" (input)="filtrarPedidos()">
+            </div>
+
+            <div class="filtro-estado">
+                <select class="estado-select" [(ngModel)]="filtroEstado" (change)="filtrarPedidos()">
+                    <option value="">Todos los estados</option>
+                    <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Pedidos -->
+    <div class="pedidos-section">
+        <div class="pedido-card" *ngFor="let pedido of pedidosFiltrados">
+            <div class="pedido-header">
+                <div class="pedido-id-section">
+                    <div class="cliente-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="pedido-info">
+                        <div class="pedido-id">{{ pedido.id }}</div>
+                        <div class="cliente-nombre">{{ pedido.direccionEntrega.split('@')[0] | titlecase }}</div>
+                    </div>
+                </div>
+
+                <div class="pedido-meta">
+                    <div class="pedido-fecha">
+                        <i class="bi bi-calendar3"></i>
+                        {{ formatearFecha(pedido.fechaPedido) }}
+                    </div>
+                    <div class="pedido-contacto">
+                        <i class="bi bi-envelope"></i>
+                        {{ pedido.direccionEntrega }}
+                    </div>
+                    <div class="pedido-total">
+                        <i class="bi bi-cash"></i>
+                        {{ formatPrice(pedido.total) }}
+                    </div>
+                </div>
+
+                <div class="pedido-estado">
+                    <span class="estado-badge" [class]="getEstadoBadgeClass(pedido.estado)">
+                        {{ pedido.estado }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="pedido-productos">
+                <div class="productos-label">Productos ({{ pedido.productos.length }})</div>
+                <div class="productos-list">
+                    <div class="producto-item" *ngFor="let producto of pedido.productos">
+                        <span class="producto-nombre">{{ producto.nombre }}</span>
+                        <span class="producto-cantidad">x{{ producto.cantidad }}</span>
+                        <span class="producto-precio">{{ formatPrice(producto.precio) }}</span>
+                    </div>
+                </div>
+                <div class="productos-total">
+                    <strong>{{ formatPrice(pedido.total) }}</strong>
+                    <span class="precio-unitario">{{ formatPrice(calcularPrecioUnitario(pedido)) }}</span>
+                </div>
+            </div>
+
+            <div class="pedido-actions">
+                <button class="btn-accion btn-ver" title="Ver Detalles">
+                    <i class="bi bi-eye"></i>
+                    Ver Detalles
+                </button>
+                <button class="btn-accion btn-editar" (click)="editarPedido(pedido)" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                    Editar
+                </button>
+                <div class="estado-dropdown">
+                    <select class="estado-quick-select" [value]="pedido.estado"
+                        (change)="cambiarEstado(pedido, $any($event.target).value)">
+                        <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay pedidos -->
+        <div *ngIf="pedidosFiltrados.length === 0" class="no-pedidos">
+            <i class="bi bi-bag-x"></i>
+            <h3>No se encontraron pedidos</h3>
+            <p>{{ searchTerm || filtroEstado ? 'Intenta con otros términos de búsqueda o filtros' : 'Aún no hay pedidos
+                registrados' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar pedido -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ pedidoEditando ? 'Editar Pedido' : 'Nuevo Pedido' }}</h2>
+            <button class="btn-cerrar" (click)="cerrarModal()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <div class="modal-form">
+            <div class="form-group">
+                <label>ID del Pedido</label>
+                <input type="text" [value]="pedidoEditando?.id || generarNuevoId()" readonly class="input-readonly">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Estado</label>
+                    <select [value]="pedidoEditando?.estado || 'Pendiente'">
+                        <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Total</label>
+                    <input type="number" [value]="pedidoEditando?.total || 0" step="0.01" placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email del Cliente</label>
+                <input type="email" [value]="pedidoEditando?.direccionEntrega || ''" placeholder="cliente@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Método de Pago</label>
+                <select [value]="pedidoEditando?.metodoPago || 'Tarjeta de Crédito'">
+                    <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                    <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                    <option value="Yape">Yape</option>
+                    <option value="Efectivo">Efectivo</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" (click)="cerrarModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-guardar">
+                    {{ pedidoEditando ? 'Actualizar' : 'Crear' }} Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

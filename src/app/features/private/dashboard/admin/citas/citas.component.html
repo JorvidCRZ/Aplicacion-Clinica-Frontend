@@ -1,0 +1,238 @@
+<div class="citas-container">
+    <!-- Header -->
+    <div class="citas-header">
+        <div class="header-content">
+            <h1 class="titulo">Gestión de Citas</h1>
+            <p class="subtitulo">Administra las citas veterinarias</p>
+        </div>
+        <button class="btn-nueva-cita" (click)="abrirModalNuevo()">
+            <i class="bi bi-plus"></i>
+            Nueva Cita
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-section">
+        <div class="filtros-header">
+            <div class="filtros-toggle">
+                <i class="bi bi-funnel"></i>
+                <span>Filtros</span>
+            </div>
+            <div class="filtros-actions">
+                <button class="btn-limpiar" (click)="limpiarFiltros()">
+                    Limpiar Filtros
+                </button>
+            </div>
+        </div>
+
+        <div class="filtros-content">
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Buscar por mascota, dueño o email..."
+                    [(ngModel)]="searchTerm" (input)="filtrarCitas()">
+            </div>
+
+            <div class="filtros-row">
+                <div class="filtro-estado">
+                    <select class="estado-select" [(ngModel)]="filtroEstado" (change)="filtrarCitas()">
+                        <option value="">Todos los estados</option>
+                        <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+                    </select>
+                </div>
+
+                <div class="filtro-fecha">
+                    <input type="date" class="fecha-input" [(ngModel)]="filtroFecha" (change)="filtrarCitas()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Citas -->
+    <div class="citas-section">
+        <div class="cita-card" *ngFor="let cita of citasFiltradas">
+            <div class="cita-header">
+                <div class="cliente-info">
+                    <div class="cliente-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="cliente-datos">
+                        <div class="nombre-mascota">{{ cita.nombreMascota }}</div>
+                        <div class="nombre-cliente">{{ cita.nombreCliente }}</div>
+                    </div>
+                </div>
+
+                <div class="cita-estado">
+                    <span class="estado-badge" [class]="getEstadoBadgeClass(cita.estado)">
+                        {{ cita.estado }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="cita-detalles">
+                <div class="detalle-item">
+                    <i class="bi bi-calendar3"></i>
+                    <span>{{ formatearFecha(cita.fechaCita) }}</span>
+                </div>
+                <div class="detalle-item">
+                    <i class="bi bi-clock"></i>
+                    <span>{{ cita.horaCita }}</span>
+                </div>
+                <div class="detalle-item">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ cita.telefono }}</span>
+                </div>
+                <div class="detalle-item">
+                    <i class="bi bi-envelope"></i>
+                    <span>{{ cita.emailCliente }}</span>
+                </div>
+            </div>
+
+            <div class="cita-servicio">
+                <div class="servicio-label">Servicio:</div>
+                <div class="servicio-nombre">{{ cita.servicioRequerido }}</div>
+                <div class="veterinario-info">
+                    <i class="bi bi-person-badge"></i>
+                    <span>{{ cita.veterinario }}</span>
+                </div>
+            </div>
+
+            <div class="cita-observaciones" *ngIf="cita.observaciones">
+                <div class="observaciones-label">Notas:</div>
+                <div class="observaciones-texto">{{ cita.observaciones }}</div>
+            </div>
+
+            <div class="cita-actions">
+                <button class="btn-accion btn-ver" title="Ver Detalles">
+                    <i class="bi bi-eye"></i>
+                    Ver Detalles
+                </button>
+                <button class="btn-accion btn-editar" (click)="editarCita(cita)" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                    Editar
+                </button>
+                <button class="btn-accion btn-confirmar" (click)="confirmarCita(cita)"
+                    *ngIf="cita.estado === 'Pendiente'" title="Confirmar">
+                    <i class="bi bi-check"></i>
+                    Confirmar
+                </button>
+                <button class="btn-accion btn-cancelar" (click)="cancelarCita(cita)"
+                    *ngIf="cita.estado !== 'Cancelada' && cita.estado !== 'Completada'" title="Cancelar">
+                    <i class="bi bi-x"></i>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay citas -->
+        <div *ngIf="citasFiltradas.length === 0" class="no-citas">
+            <i class="bi bi-calendar-x"></i>
+            <h3>No se encontraron citas</h3>
+            <p>{{ searchTerm || filtroEstado || filtroFecha ? 'Intenta con otros términos de búsqueda o filtros' : 'Aún
+                no hay citas programadas' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar cita -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ citaEditando ? 'Editar Cita' : 'Nueva Cita' }}</h2>
+            <button class="btn-cerrar" (click)="cerrarModal()">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <form class="modal-form" (ngSubmit)="guardarCita()">
+            <!-- Información del Cliente -->
+            <div class="form-section">
+                <h3>Información del Cliente</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombreCliente">Nombre del Cliente</label>
+                        <input type="text" id="nombreCliente" [(ngModel)]="citaForm.nombreCliente" name="nombreCliente"
+                            required placeholder="Ej. María García">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailCliente">Email</label>
+                        <input type="email" id="emailCliente" [(ngModel)]="citaForm.emailCliente" name="emailCliente"
+                            required placeholder="cliente@email.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" [(ngModel)]="citaForm.telefono" name="telefono" required
+                            placeholder="+1 555-0000">
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreMascota">Nombre de la Mascota</label>
+                        <input type="text" id="nombreMascota" [(ngModel)]="citaForm.nombreMascota" name="nombreMascota"
+                            required placeholder="Ej. Max">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la Cita -->
+            <div class="form-section">
+                <h3>Información de la Cita</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="servicioRequerido">Servicio</label>
+                        <select id="servicioRequerido" [(ngModel)]="citaForm.servicioRequerido" name="servicioRequerido"
+                            required>
+                            <option value="">Seleccionar servicio</option>
+                            <option *ngFor="let servicio of servicios" [value]="servicio">{{ servicio }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="veterinario">Veterinario</label>
+                        <select id="veterinario" [(ngModel)]="citaForm.veterinario" name="veterinario" required>
+                            <option value="">Seleccionar veterinario</option>
+                            <option *ngFor="let vet of veterinarios" [value]="vet">{{ vet }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechaCita">Fecha</label>
+                        <input type="date" id="fechaCita" [(ngModel)]="citaForm.fechaCita" name="fechaCita" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="horaCita">Hora</label>
+                        <input type="time" id="horaCita" [(ngModel)]="citaForm.horaCita" name="horaCita" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" [(ngModel)]="citaForm.estado" name="estado" required>
+                            <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" [(ngModel)]="citaForm.observaciones" name="observaciones" rows="3"
+                        placeholder="Notas adicionales sobre la cita..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar-modal" (click)="cerrarModal()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-guardar">
+                    {{ citaEditando ? 'Actualizar' : 'Crear' }} Cita
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

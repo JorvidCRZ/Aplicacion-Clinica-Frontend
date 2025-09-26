@@ -1,0 +1,26 @@
+.card { border-radius: 16px; }
+.form-label { color: var(--azul-oscuro); }
+/* remarcar inválidos como en otros formularios */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched { border-color: #dc3545; }
+.btn-warning {
+  background-color: var(--azul);
+  border-color: var(--azul);
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.contact-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--azul-oscuro); /* azul del proyecto */
+}

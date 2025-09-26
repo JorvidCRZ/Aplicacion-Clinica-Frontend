@@ -1,0 +1,126 @@
+<div class="overview">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h2 fw-bold mb-1">¡Hola, {{ userName }}!</h1>
+            <p class="text-muted">Aquí tienes un resumen de tu actividad en Pets Secretz</p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary-subtle">
+                    <i class="bi bi-heart text-primary"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-title">Mis Mascotas</div>
+                    <div class="stat-value">{{ stats.mascotas }}</div>
+                    <div class="stat-desc">Mascotas registradas</div>
+                    <a routerLink="/usuario/mascotas" class="stat-link">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-danger-subtle">
+                    <i class="bi bi-heart-fill text-danger"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-title">Adopciones</div>
+                    <div class="stat-value">{{ stats.adopciones }}</div>
+                    <div class="stat-desc">Solicitud pendiente</div>
+                    <a routerLink="/usuario/adopciones" class="stat-link">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-success-subtle">
+                    <i class="bi bi-bag text-success"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-title">Pedidos</div>
+                    <div class="stat-value">{{ stats.pedidos }}</div>
+                    <div class="stat-desc">Pedidos realizados</div>
+                    <a routerLink="/usuario/pedidos" class="stat-link">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon bg-warning-subtle">
+                    <i class="bi bi-calendar-event text-warning"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-title">Citas</div>
+                    <div class="stat-value">{{ stats.citas }}</div>
+                    <div class="stat-desc">Próxima cita</div>
+                    <a routerLink="/usuario/citas" class="stat-link">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-clock me-2"></i>Próximas Citas</h5>
+                    <p class="card-subtitle text-muted mb-0">Tus citas programadas</p>
+                </div>
+                <div class="card-body">
+                    <div class="citas-list">
+                        <div class="cita-item" *ngFor="let cita of proximasCitas">
+                            <div class="cita-content">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ cita.servicio }}</h6>
+                                        <p class="text-muted mb-1">{{ cita.doctor }}</p>
+                                        <small class="text-primary fw-bold">{{ cita.fecha }}</small>
+                                    </div>
+                                    <span class="badge bg-success">
+                                        Confirmada
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a routerLink="/usuario/citas" class="btn btn-ver">Ver Todas las Citas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a routerLink="/servicios" class="quick-action-btn mb-3">
+                            <i class="bi bi-calendar-plus me-2"></i>
+                            Agendar Cita
+                        </a>
+                        <a routerLink="/adopcion" class="quick-action-btn mb-3">
+                            <i class="bi bi-heart me-2"></i>
+                            Ver Mascotas en Adopción
+                        </a>
+                        <a routerLink="/productos" class="quick-action-btn mb-3">
+                            <i class="bi bi-bag-plus me-2"></i>
+                            Comprar Productos
+                        </a>
+                        <a routerLink="/usuario/perfil" class="quick-action-btn">
+                            <i class="bi bi-person-gear me-2"></i>
+                            Actualizar Perfil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="container d-flex align-items-center justify-content-center min-vh-100 contenido-general my-5">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <img src="assets/general/logo-pets.webp" alt="Logo" width="70" class="mb-2">
+                    <h3 class="fw-bold">Iniciar Sesión</h3>
+                </div>
+                <form (submit)="onSubmit($event)">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control form-control-lg" id="email"
+                            placeholder="Ingresa tu correo" [(ngModel)]="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control form-control-lg" id="password"
+                            placeholder="Ingresa tu contraseña" [(ngModel)]="password" name="password" required>
+                    </div>
+                    <button type="submit" class="boton btn btn-primary btn-lg w-100 mt-3 shadow-sm">Ingresar</button>
+                </form>
+                <div *ngIf="error" class="alert alert-danger mt-3 text-center">{{ error }}</div>
+                <div class="mt-4 text-center">
+                    <span>¿No tienes cuenta?</span>
+                    <a routerLink="/registro" class="fw-semibold text-decoration-none">Regístrate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

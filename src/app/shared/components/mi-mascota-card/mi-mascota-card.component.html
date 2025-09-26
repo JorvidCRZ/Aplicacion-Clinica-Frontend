@@ -1,0 +1,37 @@
+<div class="mascota-card">
+  <div class="mascota-image">
+    <img [src]="mascota.foto" [alt]="mascota.nombre" class="img-fluid">
+    <div class="mascota-status">
+      <span class="badge" [class]="getEstadoClass(mascota.estado)">
+        {{ getEstadoLabel(mascota.estado) }}
+      </span>
+    </div>
+  </div>
+  
+  <div class="mascota-info">
+    <h5 class="mascota-name">{{ mascota.nombre }}</h5>
+    <p class="mascota-breed">{{ mascota.raza }} • {{ mascota.edad }} años</p>
+    
+    <div class="mascota-details">
+      <div class="detail-item">
+        <i class="bi bi-calendar3 me-2 text-muted"></i>
+        <span class="text-muted">Registrado: {{ mascota.fechaRegistro | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <div class="detail-item" *ngIf="mascota.proximaCita">
+        <i class="bi bi-clock me-2 text-muted"></i>
+        <span class="text-muted">Próxima cita: {{ mascota.proximaCita | date:'dd/MM/yyyy' }}</span>
+      </div>
+    </div>
+    
+    <div class="mascota-actions mt-3">
+      <button class="btn btn-outline-primary btn-sm me-2" (click)="onAgendarCita()">
+        <i class="bi bi-calendar-plus me-1"></i>
+        Agendar Cita
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="onEditar()">
+        <i class="bi bi-pencil me-1"></i>
+        Editar
+      </button>
+    </div>
+  </div>
+</div>
