@@ -1,0 +1,123 @@
+    <div class="contenedor-nosotros container py-5">
+    <section>
+        <div class="container contenido">
+            <h2 class="text-center mb-4">Nuestra Historia</h2>
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-3 mb-lg-0">
+                    <img src="assets/nosotros/historia.webp" alt="Historia de la Clínica" class="img-fluid shadow-sm"
+                        loading="lazy">
+                </div>
+
+                <div class="col-lg-6">
+                    <p>
+                        Desde su fundación el <strong>12 de abril de 2005</strong>, la
+                        <span>Clínica Tu Salud</span>
+                        nació con el propósito de brindar atención médica accesible, cálida y
+                        profesional a la comunidad. A lo largo de los años, hemos crecido no solo en
+                        infraestructura y servicios, sino también en el compromiso con la salud y el
+                        bienestar de las familias que confían en nosotros. Nuestra visión es
+                        consolidarnos como una institución de referencia en el país, destacando por la
+                        calidad humana de nuestro equipo, la innovación tecnológica y el enfoque
+                        integral que ofrecemos a cada paciente.
+                        <br><br>
+                        Miramos al futuro con la esperanza de seguir expandiéndonos, sin perder nunca
+                        el espíritu cercano y familiar que nos ha caracterizado desde el primer día.
+                    </p>
+
+                    <p>
+                        <span>Además,</span> nos dedicamos con pasión al
+                        cuidado integral de tus mascotas, ofreciendo servicios de
+                        <em>cirugía, consultas, vacunas, farmacia y más</em>, siempre con el compromiso
+                        de garantizar su bienestar.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Misión -->
+                <div class="col-md-6">
+                    <div class="contenido-seccion h-100 p-4 d-flex flex-column justify-content-between">
+                        <h2 class="text-center">Nuestra Misión</h2>
+                        <div>
+                            <p class="m-0">
+                                Brindar atención médica integral y de calidad, con un enfoque humano y accesible,
+                                apoyados en tecnología moderna que facilite la prevención, el diagnóstico y el
+                                tratamiento oportuno. Nuestro compromiso es garantizar el bienestar físico, emocional y
+                                social de cada paciente, optimizando los procesos de atención mediante un equipo
+                                profesional altamente capacitado
+                            </p>
+                            <ul class="list-unstyled m-0">
+                                <li>✓ Atención veterinaria integral</li>
+                                <li>✓ Productos de calidad</li>
+                                <li>✓ Servicio personalizado</li>
+                                <li>✓ Compromiso con el bienestar animal</li>
+                            </ul>
+                        </div>
+                        <div class="text-center">
+                            <img src="assets/nosotros/mision.webp" alt="Nuestra Misión"
+                                class="img-fluid rounded shadow-sm mt-3">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visión -->
+                <div class="col-md-6">
+                    <div class="contenido-seccion h-100 p-4 d-flex flex-column justify-content-between">
+                        <h2 class="text-center">Nuestra Visión</h2>
+                        <div>
+                            <p class="m-0">
+                                Ser una clínica líder y referente a nivel regional y nacional por ofrecer servicios de
+                                salud innovadores, accesibles y humanizados, respaldados por el uso de tecnologías
+                                digitales y un equipo comprometido con la excelencia, la calidez y la confianza de
+                                nuestros pacientes.
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <img src="assets/nosotros/vision.webp" alt="Nuestra Visión"
+                                class="img-fluid rounded shadow-sm mt-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="titulo text-center my-4">Nuestra Sede</h2>
+
+        <section *ngFor="let sede of sedes" class="contenedor-sede container my-4 p-0  rounded-5 shadow">
+            <div class="card border-0 rounded-5  overflow-hidden p-4">
+                <div class="row g-3 align-items-center p-3">
+
+                    <!-- Columna izquierda -->
+                    <div class="col-md-6 d-flex flex-column">
+                        <img [src]="sede.imagen" [alt]="sede.nombre" class="img-fluid rounded mb-3 shadow-sm"
+                            loading="lazy">
+
+                        <div class="px-2">
+                            <h3 class="fw-bold">{{ sede.nombre }}</h3>
+                            <p class="p-0"><strong>Dirección:</strong> {{ sede.direccion }}</p>
+                            <p class="p-0"><strong>Teléfono:</strong> {{ sede.telefono }}</p>
+                            <p class="p-0"><strong>Correo:</strong> {{ sede.correo }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha -->
+                    <div class="col-md-6">
+                        <div class="ratio ratio-4x3">
+                            <iframe [src]="sede.mapa | safeUrl" class="rounded" style="border:0;" allowfullscreen
+                                loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </section>
+
+</div>

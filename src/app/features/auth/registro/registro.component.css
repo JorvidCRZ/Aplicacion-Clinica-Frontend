@@ -1,0 +1,44 @@
+.container {
+	background-color: var(--gris);
+}
+
+.card {
+	border-radius: 2rem;
+	box-shadow: 0 8px 32px 0 var(--azul);
+	background: var(--blanco);
+	backdrop-filter: blur(4px);
+	border: 1px solid var(--negro);
+	transition: transform 0.2s, box-shadow 0.2s;
+
+	&:hover {
+		transform: translateY(-4px) scale(1.01);
+		box-shadow: 0 16px 40px 0 var(--azul);
+	}
+}
+
+.boton {
+	height: 3rem;
+	font-size: 1rem;
+	background-color: var(--azul);
+	color: var(--blanco);
+}
+
+.form-control:focus {
+	border-color: var(--verde);
+	box-shadow: 0 0 0 0.2rem var(--blanco);
+}
+
+.form-control-lg {
+	font-size: 1rem;
+}
+
+.alert-success {
+	border-radius: 1rem;
+}
+
+.card-title,
+.fw-bold {
+	color: var(--azul);
+	font-weight: 700 !important;
+	letter-spacing: 1px;
+}

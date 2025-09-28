@@ -1,0 +1,64 @@
+<div class="container my-4">
+    <div class="row mb-3">
+        <div class="col">
+            <h1 class="text-center">Nuestras Citas Médicas</h1>
+            <p class="text-center text-muted">Encuentra y reserva citas con nuestros especialistas de manera rápida y
+                sencilla.</p>
+        </div>
+    </div>
+
+    <div class="row mb-4 ">
+        <!-- Buscador por Doctor -->
+        <div class="col-12 col-md-6 mb-2">
+            <app-buscador placeholder="Buscar por doctor..." [data]="citas" key="doctor" (resultado)="citas = $event">
+            </app-buscador>
+        </div>
+
+        <!-- Buscador por Especialidad -->
+        <div class="col-12 col-md-6 mb-2">
+            <app-buscador placeholder="Buscar por especialidad..." [data]="citas" key="especialidad"
+                (resultado)="citas = $event">
+            </app-buscador>
+        </div>
+    </div>
+
+
+    <!-- Cards de doctores -->
+   <div class="row">
+    @for (cita of citasFiltradas; track cita.doctor) {
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card shadow doctor-card h-100 border-0">
+                <div class="card-body d-flex flex-column text-center">
+                    <div class="mb-3">
+                        <img 
+                            src="https://vivamas.aviva.pe/professionals/default.png" 
+                            style="width:10vw;" 
+                            alt="Doctor" 
+                            class="rounded-circle border shadow-sm">
+                    </div>
+
+                    <h5 class="card-title text-primary fw-bold">{{ cita.doctor }}</h5>
+                    <p class="card-subtitle mb-2 text-muted">{{ cita.especialidad }}</p>
+
+                    <div class="mt-auto">
+                        <h6 class="text-secondary">Disponibilidad:</h6>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
+                            @for (horario of cita.disponibilidad; track horario) {
+                                <button 
+                                    class="btn btn-outline-primary btn-sm px-3 py-1 rounded-pill"
+                                    (click)="seleccionarHorario(cita, horario)">
+                                    {{ horario }}
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-center">
+                    <button class="btn btn-success btn-sm w-100">Reservar Cita</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+</div>

@@ -1,0 +1,107 @@
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <!-- Paso 1: Información de Envío -->
+            <div class="card rounded-3 shadow-sm mb-4 p-4">
+                <h4 class="fw-bold mb-4">1. Información de Envío</h4>
+                <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPago()">
+                    <!-- ... campos del formulario ... -->
+
+                    <!-- Paso 2: Método de Pago -->
+                    <div class="card rounded-3 shadow-sm mb-4 p-4">
+                        <h4 class="fw-bold mb-4">2. Método de Pago</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 p-3 shadow-sm rounded-3 border-primary"
+                                    [class.bg-light]="checkoutForm.get('metodoPago')?.value === 'Tarjeta'">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="tarjeta" value="Tarjeta"
+                                            formControlName="metodoPago">
+                                        <label class="form-check-label fw-semibold" for="tarjeta">Tarjeta de
+                                            crédito/débito</label>
+                                    </div>
+                                    @if (mostrarTarjeta) {
+                                    <div class="mt-3">
+                                        <input type="text" id="numeroTarjeta" class="form-control mb-2"
+                                            formControlName="numeroTarjeta" maxlength="16"
+                                            placeholder="Número de tarjeta">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <input type="text" id="fechaVencimiento" class="form-control mb-2"
+                                                    formControlName="fechaVencimiento" maxlength="5"
+                                                    placeholder="MM/AA">
+                                            </div>
+                                            <div class="col-6">
+                                                <input type="text" id="cvv" class="form-control mb-2"
+                                                    formControlName="cvv" maxlength="3" placeholder="CVV">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 p-3 shadow-sm rounded-3 border-success"
+                                    [class.bg-light]="checkoutForm.get('metodoPago')?.value === 'YAPE'">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="yape" value="YAPE"
+                                            formControlName="metodoPago">
+                                        <label class="form-check-label fw-semibold" for="yape">Yape</label>
+                                    </div>
+                                    @if (mostrarYape) {
+                                    <div class="mt-3">
+                                        <input type="text" id="numeroYape" class="form-control mb-2"
+                                            formControlName="numeroYape" maxlength="9" placeholder="Número de Yape">
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">Confirmar Pedido</button>
+                </form>
+
+                <!-- Estado del pago -->
+                @if (pagoExitoso === true) {
+                <div class="alert alert-success mt-3" role="alert">
+                    Pago realizado correctamente
+                </div>
+                }
+                @else if (pagoExitoso === false) {
+                <div class="alert alert-danger mt-3" role="alert">
+                    Datos incompletos o incorrectos
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Resumen del Pedido -->
+        @if (pagoExitoso !== true) {
+        <div class="col-md-5">
+            <div class="card rounded-3 shadow-sm p-4 sticky-top" style="top: 2rem;">
+                <h4 class="fw-bold mb-4">Resumen del Pedido</h4>
+
+                @if (carrito.length > 0) {
+                @for (item of carrito; track item.nombre) {
+                <div class="mb-2 d-flex justify-content-between">
+                    <span class="fw-semibold">{{ item.nombre }} <span class="text-muted">x{{ item.cantidad
+                            }}</span></span>
+                    <span>S/ {{ (item.precio * item.cantidad) | number:'1.2-2' }}</span>
+                </div>
+                }
+                <hr>
+                <div class="mb-2 d-flex justify-content-between">
+                    <span class="fw-bold">Total</span>
+                    <span class="fw-bold">S/ {{ total | number:'1.2-2' }}</span>
+                </div>
+                }
+                @else {
+                <div class="text-center text-muted">No hay productos en el carrito.</div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+</div>

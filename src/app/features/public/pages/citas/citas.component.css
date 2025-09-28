@@ -1,0 +1,22 @@
+.doctor-card {
+    border: 1px solid var(--plomo);
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px var(--negro-sombra);
+}
+
+.horario-btn {
+    background-color: var(--azul);
+    color: var(--blanco);
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.horario-btn:hover {
+    background-color: var(--azul-medio);
+    color: var(--blanco);
+}

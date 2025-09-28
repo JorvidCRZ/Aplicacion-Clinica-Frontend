@@ -1,0 +1,12 @@
+<div class="card-container container py-5">
+    <h2 class="titulo text-center mb-4">{{ title }}</h2>
+    <div class="row g-4">
+        @for (card of items; track $index) {
+        <div class="col-12 col-md-6 col-lg-3">
+            <app-card class="card-estilo" [title]="card.title" [description]="card.description" [image]="card.image"
+                [link]="card.link">
+            </app-card>
+        </div>
+        }
+    </div>
+</div>

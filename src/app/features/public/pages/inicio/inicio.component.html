@@ -1,0 +1,62 @@
+<div>
+    <app-banner></app-banner>
+
+    <section class="py-5 bg-light  container" id="bienvenidos">
+        <div class="contenido-seccion container text-center">
+            <div class="row justify-content-center ">
+                <div class="col-lg-8 col-md-10">
+                    <h1 class="titulo">Clínica Tu Salud</h1>
+                    <h5 class="subtitulo">Tu salud es nuestra prioridad</h5>
+                    <h2>Bienvenido a la Clínica Salud y Vida</h2>
+                    <p class="descripcion">
+                        Brindamos atención médica integral con profesionales altamente
+                        calificados y tecnología moderna.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="especialidades" class="contenido-especialidades d-flex justify-content-center">
+        <app-card-gallery [items]="servicios" [title]="title" id="especialidades"></app-card-gallery>
+    </section>
+
+    <section class="py-5 container" id="conocer">
+        <div class="container">
+            <div class="row align-items-center contenido-seccion ">
+                <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0 ps-lg-5 pb-lg-5">
+                    <h2>¡Conócenos!</h2>
+                    <p>
+                        En Clínica Tu Salud llevamos años de experiencia en el sector médico. Somos una clínica
+                        referente gracias a nuestro amplio catálogo de servicios de salud para todas las personas. En
+                        nuestra clínica ofrecemos una atención cercana a todos nuestros pacientes y sus familias. Todos
+                        nuestros profesionales cuentan con la formación y experiencia para informar con total claridad
+                        acerca de su estado de salud. Trabajamos para garantizar un buen análisis clínico,
+                        diagnosticando correctamente a nuestros pacientes y, finalmente, resolviendo cualquier tipo de
+                        dolencia. En Clínica Tu Salud utilizamos la mejor tecnología médica para trabajar en nuestro día
+                        a día.
+                    </p>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img routerLink="/contacto" src="assets/general/servicios.webp" alt="Conócenos - imagen mascota"
+                        class="img-fluid" loading="lazy">
+                </div>
+                <div class="seccion-contacto row text-center align-items-center">
+                    <div class="col-12 col-md-6 mb-4 mb-md-0">
+                        <h3 class="mb-3">Agenda tu cita:</h3>
+                        <button routerLink="/contacto" class="boton">Contáctanos</button>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <h3 class="mb-3">¿Por qué elegirnos?</h3>
+                        <ul class="list-unstyled fs-5">
+                            <li class="mb-2">✔ Atención 24/7</li>
+                            <li class="mb-2">✔ Médicos especialistas</li>
+                            <li class="mb-2">✔ Consultas presenciales y virtuales</li>
+                            <li class="mb-2">✔ Tecnología avanzada en diagnóstico</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

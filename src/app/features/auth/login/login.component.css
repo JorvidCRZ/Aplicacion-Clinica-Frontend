@@ -1,0 +1,52 @@
+.container {
+    background: var(--gris);
+}
+
+.lista{
+    cursor: pointer;
+}
+
+.card {
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 var(--azul-oscuro);
+    background: var(--blanco);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--blanco);
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-4px) scale(1.001);
+        box-shadow: 0 16px 40px 0 var(--azul-oscuro);
+    }
+}
+
+.form-control:focus {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15);
+}
+
+.form-control-lg {
+    font-size: 1rem;
+}
+
+.alert-danger {
+    border-radius: 1rem;
+}
+
+.card-title {
+    color: var(--azul-claro);
+    letter-spacing: 1px;
+}
+
+.fw-bold {
+    font-weight: 700 !important;
+}
+
+.boton {
+    height: 3rem;
+    font-size: 1rem;
+}
+
+a{
+    cursor: pointer;
+}

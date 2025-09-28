@@ -1,0 +1,59 @@
+<section class="padded d-flex justify-center page-safe">
+    <div class="container carrito-container">
+        <div class="carrito-wrapper">
+            <table class="tabla cart-table table-sm">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (item of carrito; track $index) {
+                    <tr>
+                        <td data-label="Código">{{ item.idproducto }}</td>
+                        <td data-label="Descripción">{{ item.nombre }}</td>
+
+                        <td data-label="Precio" class="text-end">
+                            <span class="precio-inline"> S/ {{ item.precio | number:'1.2-2' }}</span>
+                        </td>
+
+                        <td data-label="Cantidad" class="text-center">
+                            <input type="number" [(ngModel)]="item.cantidad" (change)="actualizarCantidad()" step="1"
+                                min="1" class="form-control form-control-sm w-100" />
+                        </td>
+
+                        <td data-label="Subtotal" class="text-end fw-semibold">
+                            S/ {{ (item.precio * item.cantidad) | number:'1.2-2' }}
+                        </td>
+
+                        <td data-label="Acciones" class="text-center">
+                            <button class="boton btn btn-outline-danger btn-sm" (click)="eliminarItem($index)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+
+                <tfoot>
+                    <tr class="bg-light fw-semibold">
+                        <td colspan="4" class="text-end">Total</td>
+                        <td id="total" class="text-end">S/ {{ total | number:'1.2-2' }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="acciones mt-5 d-flex gap-3 flex-wrap justify-content-center justify-content-md-between">
+                <button class="boton btn btn-primary px-4" (click)="pagar()" [disabled]="!puedePagar()">Pagar</button>
+                <button class="boton btn btn-outline-primary px-4" (click)="vaciarCarrito()">Vaciar carrito</button>
+            </div>
+        </div>
+    </div>
+</section>
