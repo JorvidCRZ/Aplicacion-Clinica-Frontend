@@ -58,6 +58,17 @@
                             </a>
                         </li>
                     </ul>
+                    }@else {
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/login']">
+                                <i class="fa fa-user me-2"></i> Iniciar Sesión
+                            </a>
+                            <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/registro']">
+                                <i class="fa fa-sign-in me-2"></i> Registrarse
+                            </a>
+                        </li>
+                    </ul>
                     }
                 </div>
             </div>

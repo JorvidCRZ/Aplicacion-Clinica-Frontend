@@ -1,52 +1,262 @@
-.container {
-    background: var(--gris);
+a,
+span,p{
+    color: var(--blanco) !important;
 }
 
-.lista{
-    cursor: pointer;
+.login-container{
+    justify-content: center;
+    background: white;
+    min-height: 90vh;
+    max-width: 1200px;
+    margin: 2rem auto;
+    box-shadow: 0 8px 32px rgba(13, 71, 161, 0.15);
+    overflow: hidden;
+    border-radius: 1.5rem !important;
 }
 
-.card {
-    border-radius: 2rem;
-    box-shadow: 0 8px 32px 0 var(--azul-oscuro);
-    background: var(--blanco);
-    backdrop-filter: blur(4px);
-    border: 1px solid var(--blanco);
-    transition: transform 0.2s, box-shadow 0.2s;
+.imagen-section {
+    flex: 0 0 40%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem 0 0 1.5rem;
+}
 
-    &:hover {
-        transform: translateY(-4px) scale(1.001);
-        box-shadow: 0 16px 40px 0 var(--azul-oscuro);
+.imagen-fondo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media screen and (max-width: 767.98px) {
+    .imagen-fondo {
+        height: auto;
     }
 }
 
-.form-control:focus {
-    border-color: var(--verde);
-    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15);
+.overlay-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(13, 72, 161, 0.226) 0%, rgba(7, 107, 207, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    color: white;
 }
 
-.form-control-lg {
-    font-size: 1rem;
+.logo-overlay {
+    width: 120px;
+    margin-bottom: 2rem;
+    filter: brightness(0) invert(1);
 }
 
-.alert-danger {
-    border-radius: 1rem;
+.texto-bienvenida {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-align: center;
 }
 
-.card-title {
-    color: var(--azul-claro);
-    letter-spacing: 1px;
+.subtexto-bienvenida {
+    font-size: 1.1rem;
+    text-align: center;
+    opacity: 0.9;
+    max-width: 300px;
+    line-height: 1.5;
 }
 
-.fw-bold {
-    font-weight: 700 !important;
+/* 📝 SECCIÓN DEL FORMULARIO - 60% */
+.formulario-section {
+    flex: 0 0 55%;
+    background: linear-gradient(90deg, var(--azul-medio) 0%, var(--azul-claro) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    border-radius: 0 1.5rem 1.5rem 0;
 }
 
-.boton {
-    height: 3rem;
-    font-size: 1rem;
+.formulario-content {
+    width: 100%;
+    max-width: 450px;
 }
 
-a{
-    cursor: pointer;
+/* 🎯 TÍTULOS */
+.titulo-login {
+    color: var(--azul-oscuro);
+    font-weight: bold;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitulo-login {
+    color: var(--azul-medio);
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+
+/* 🔗 ENLACES */
+.link-recuperar {
+    color: var(--azul-oscuro);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+        color: var(--azul-medio);
+        text-decoration: underline;
+    }
+}
+
+.texto-registro {
+    color: var(--azul-medio);
+    margin-right: 0.5rem;
+}
+
+.link-registro {
+    color: var(--azul-oscuro);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+        color: var(--azul-medio);
+        text-decoration: underline;
+    }
+}
+
+/* 📱 LOGO MÓVIL */
+.logo-movil {
+    width: 80px;
+    height: auto;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 767.98px) {
+    .login-container {
+        flex-direction: column !important;
+    }
+
+    .imagen-section {
+        flex: 0 0 40% !important;
+        border-radius: 1.5rem 1.5rem 0 0 !important;
+        display: flex !important;
+        min-height: 40vh !important;
+    }
+
+    .formulario-section {
+        flex: 0 0 60% !important;
+        padding: 2rem 1rem !important;
+        border-radius: 0 0 1.5rem 1.5rem !important;
+    }
+
+    .formulario-content {
+        max-width: 100% !important;
+    }
+
+    .titulo-login {
+        font-size: 2rem !important;
+    }
+
+    .subtitulo-login {
+        font-size: 1rem !important;
+    }
+
+    /* Ajustes para texto del overlay en móvil */
+    .overlay-content {
+        padding: 1rem !important;
+        justify-content: center !important;
+    }
+
+    .texto-bienvenida {
+        font-size: 1.4rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .subtexto-bienvenida {
+        font-size: 0.85rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    .logo-overlay {
+        width: 60px !important;
+        margin-bottom: 0.8rem !important;
+    }
+}
+
+
+
+/* 💻 TABLET Y DESKTOP PEQUEÑO */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .imagen-section {
+        flex: 0 0 35% !important;
+    }
+
+    .formulario-section {
+        flex: 0 0 65% !important;
+        padding: 2rem !important;
+    }
+
+    .texto-bienvenida {
+        font-size: 1.9rem;
+    }
+}
+
+/* 🖥️ DESKTOP GRANDE */
+@media (min-width: 1200px) {
+    .formulario-content {
+        max-width: 500px;
+    }
+
+    .titulo-login {
+        font-size: 2.8rem;
+    }
+}
+
+/* 🎨 FONDO GENERAL PARA HACER VISIBLE EL BORDER RADIUS */
+:host {
+    display: block;
+    background: var(--gris-claro);
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+/* 📱 MÓVIL 375px - Sin padding */
+@media (max-width: 375px) {
+    :host {
+        padding: 0 !important;
+    }
+    
+    .login-container {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        min-height: 100vh !important;
+    }
+    
+    .imagen-section {
+        border-radius: 0 !important;
+        flex: 0 0 35% !important;
+    }
+    
+    .formulario-section {
+        border-radius: 0 !important;
+        padding: 1.5rem 1rem !important;
+        flex: 0 0 65% !important;
+    }
+
+    .logo-overlay {
+        width: 50px !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .texto-bienvenida {
+        font-size: 1.2rem !important;
+    }
+
+    .subtexto-bienvenida {
+        font-size: 0.8rem !important;
+    }
 }

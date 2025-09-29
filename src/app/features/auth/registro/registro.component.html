@@ -1,111 +1,368 @@
-<div class="container d-flex align-items-center justify-content-center min-vh-100 contenido-general my-5">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="col-lg-12 col-md-10 col-sm-8">
+        <mat-card class="registro-card my-5 p-3 rounded-4 shadow-lg">
+            <h2 class="text-center mb-4">Registro de Paciente</h2>
+            
 
-                <div class="text-center mb-4">
-                    <img src="assets/general/logo-clinica.webp" alt="Logo" width="70" class="mb-2">
-                    <h3 class="fw-bold">Registro</h3>
-                    <p class="text-muted small">Crea tu cuenta en segundos</p>
-                </div>
+            
+            <h4>Ingrese sus datos</h4>
 
-                <form (submit)="onSubmit($event)">
+            @if (datosForm && personalesForm && credencialesForm) {
+            <mat-horizontal-stepper [linear]="true" #stepper>
+                <!-- Step 1 -->
+                <mat-step [stepControl]="datosForm">
+                    <form [formGroup]="datosForm">
+                        <ng-template matStepLabel>Datos Básicos</ng-template>
 
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control form-control-lg" id="nombre"
-                            placeholder="Ingresa tu nombre" [(ngModel)]="nombre" name="nombre" required>
-                    </div>
+                        <!-- Tipo de documento -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Tipo de documento</mat-label>
+                            <mat-select formControlName="tipoDocumento">
+                                @for (tipo of tiposDocumento; track tipo.codigo) {
+                                <mat-option [value]="tipo.codigo">
+                                    {{ tipo.codigo }} - {{ tipo.nombre }}
+                                </mat-option>
+                                }
+                            </mat-select>
 
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Celular</label>
-                        <input type="tel" class="form-control form-control-lg" id="telefono"
-                            placeholder="Ej: 5512345678" [(ngModel)]="telefono" name="telefono" required
-                            [ngClass]="{'is-valid': isPhoneValid(telefono), 'is-invalid': telefono && !isPhoneValid(telefono)}">
-                        <div *ngIf="telefono && !isPhoneValid(telefono)" class="invalid-feedback">
-                            Ingresa un número de celular válido (9 dígitos).
+                            @if (datosForm.get('tipoDocumento')?.hasError('required')) {
+                            <mat-error>
+                                El tipo de documento es obligatorio
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Número de documento -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>{{ getNombreTipoDocumento() }}</mat-label>
+                            <mat-icon matPrefix>badge</mat-icon>
+                            <input matInput formControlName="dni" [placeholder]="getPlaceholderDocumento()" />
+
+                            @if (datosForm.get('dni')?.hasError('required')) {
+                            <mat-error>
+                                El número de documento es obligatorio
+                            </mat-error>
+                            }
+                            @if (datosForm.get('dni')?.hasError('minlength') ||
+                            datosForm.get('dni')?.hasError('maxlength') ||
+                            datosForm.get('dni')?.hasError('pattern')) {
+                            <mat-error>
+                                {{ getMensajeError() }}
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Fecha de nacimiento -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Fecha de nacimiento</mat-label>
+                            <mat-datepicker-toggle matPrefix [for]="picker"></mat-datepicker-toggle>
+
+                            <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" [min]="minDate"
+                                [max]="maxDate" placeholder="Seleccione fecha" />
+
+                            <mat-datepicker #picker startView="multi-year" [startAt]="startDate"></mat-datepicker>
+                            @if (datosForm.get('fechaNacimiento')?.hasError('required')) {
+                            <mat-error>
+                                La fecha de nacimiento es obligatoria
+                            </mat-error>
+                            }
+                            @if (datosForm.get('fechaNacimiento')?.hasError('fechaInvalida')) {
+                            <mat-error>
+                                Fecha fuera del rango permitido
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-checkbox formControlName="terminos">
+                            He leído y acepto los Términos y Condiciones y declaro conocer la Política de Privacidad
+                        </mat-checkbox>
+
+                        <mat-checkbox formControlName="autorizacion">
+                            Autorizo el uso de mis datos para fines adicionales, incluyendo beneficios, promociones y
+                            descuentos personalizados
+                        </mat-checkbox>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button mat-raised-button color="primary" matStepperNext
+                                [disabled]="datosForm.invalid">Siguiente</button>
                         </div>
-                    </div>
+                    </form>
+                </mat-step>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control form-control-lg" id="email"
-                            placeholder="Ingresa tu correo" [(ngModel)]="email" name="email" required
-                            (blur)="validateEmail()"
-                            (input)="validateEmail()"
-                            [ngClass]="{'is-valid': emailTouched && isEmailValid, 'is-invalid': emailTouched && !isEmailValid}">
-                        <div *ngIf="emailTouched && !isEmailValid" class="invalid-feedback">
-                            Ingresa un correo electrónico válido (ejemplo: usuario&#64;dominio.com)
-                        </div>
-                        <div *ngIf="emailTouched && isEmailValid" class="valid-feedback">
-                            Correo electrónico válido
-                        </div>
-                    </div>
+                <!-- Step 2 -->
+                <mat-step [stepControl]="personalesForm">
+                    <form [formGroup]="personalesForm">
+                        <ng-template matStepLabel>Datos Personales</ng-template>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <div class="input-group">
-                            <input [type]="showPassword ? 'text' : 'password'" class="form-control form-control-lg"
-                                id="password" placeholder="Crea una contraseña" [(ngModel)]="password" name="password"
-                                required (blur)="validatePassword()" (input)="validatePassword()"
-                                [ngClass]="{'is-valid': passwordTouched && isPasswordValid, 'is-invalid': passwordTouched && !isPasswordValid}">
-                            <button type="button" class="btn btn-outline-secondary"
-                                (click)="showPassword = !showPassword">
-                                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Nombres</mat-label>
+                            <mat-icon matPrefix>person</mat-icon>
+                            <input matInput formControlName="nombre" />
+                            @if (personalesForm.get('nombre')?.hasError('required')) {
+                            <mat-error>
+                                Los nombres son obligatorios
+                            </mat-error>
+                            }
+                            @if (personalesForm.get('nombre')?.hasError('minlength')) {
+                            <mat-error>
+                                Los nombres deben tener al menos 2 caracteres
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Apellido Paterno</mat-label>
+                            <mat-icon matPrefix>person</mat-icon>
+                            <input matInput formControlName="apellidoPaterno" />
+                            @if (personalesForm.get('apellidoPaterno')?.hasError('required')) {
+                            <mat-error>
+                                El apellido paterno es obligatorio
+                            </mat-error>
+                            }
+                            @if (personalesForm.get('apellidoPaterno')?.hasError('minlength')) {
+                            <mat-error>
+                                El apellido paterno debe tener al menos 2 caracteres
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Apellido Materno</mat-label>
+                            <mat-icon matPrefix>person</mat-icon>
+                            <input matInput formControlName="apellidoMaterno" />
+                            @if (personalesForm.get('apellidoMaterno')?.hasError('required')) {
+                            <mat-error>
+                                El apellido materno es obligatorio
+                            </mat-error>
+                            }
+                            @if (personalesForm.get('apellidoMaterno')?.hasError('minlength')) {
+                            <mat-error>
+                                El apellido materno debe tener al menos 2 caracteres
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Género</mat-label>
+                            <mat-icon matPrefix>wc</mat-icon>
+                            <mat-select formControlName="genero">
+                                <mat-option value="masculino">Masculino</mat-option>
+                                <mat-option value="femenino">Femenino</mat-option>
+                                <mat-option value="otro">Otro</mat-option>
+                            </mat-select>
+                            @if (personalesForm.get('genero')?.hasError('required')) {
+                            <mat-error>
+                                Debe seleccionar un género
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>País</mat-label>
+                            <mat-icon matPrefix>public</mat-icon>
+                            <mat-select formControlName="pais">
+                                <mat-option value="peru">Perú</mat-option>
+                                <mat-option value="mexico">México</mat-option>
+                                <mat-option value="chile">Chile</mat-option>
+                            </mat-select>
+                            @if (personalesForm.get('pais')?.hasError('required')) {
+                            <mat-error>
+                                Debe seleccionar un país
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Departamento -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Departamento</mat-label>
+                            <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange($event)">
+                                @for (dept of departamentos; track dept.codigo) {
+                                <mat-option [value]="dept.codigo">
+                                    {{ dept.nombre }}
+                                </mat-option>
+                                }
+                            </mat-select>
+                            @if (personalesForm.get('departamento')?.hasError('required')) {
+                            <mat-error>
+                                Debe seleccionar un departamento
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Provincia -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Provincia</mat-label>
+                            <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
+                                @for (prov of provincias; track prov.codigo) {
+                                <mat-option [value]="prov.codigo">
+                                    {{ prov.nombre }}
+                                </mat-option>
+                                }
+                            </mat-select>
+                            @if (personalesForm.get('provincia')?.hasError('required')) {
+                            <mat-error>
+                                Debe seleccionar una provincia
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Distrito -->
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Distrito</mat-label>
+                            <mat-select formControlName="distrito">
+                                @for (dist of distritos; track dist.codigo) {
+                                <mat-option [value]="dist.codigo">
+                                    {{ dist.nombre }}
+                                </mat-option>
+                                }
+                            </mat-select>
+                            @if (personalesForm.get('distrito')?.hasError('required')) {
+                            <mat-error>
+                                Debe seleccionar un distrito
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Domicilio</mat-label>
+                            <mat-icon matPrefix>home</mat-icon>
+                            <input matInput formControlName="domicilio" />
+                            @if (personalesForm.get('domicilio')?.hasError('required')) {
+                            <mat-error>
+                                El domicilio es obligatorio
+                            </mat-error>
+                            }
+                            @if (personalesForm.get('domicilio')?.hasError('minlength')) {
+                            <mat-error>
+                                El domicilio debe tener al menos 5 caracteres
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <button mat-button matStepperPrevious>Atrás</button>
+                            <button mat-raised-button color="primary" matStepperNext
+                                [disabled]="personalesForm.invalid">Siguiente</button>
+                        </div>
+                    </form>
+                </mat-step>
+
+                <!-- Step 3 -->
+                <mat-step [stepControl]="credencialesForm">
+                    <form [formGroup]="credencialesForm">
+                        <ng-template matStepLabel>Credenciales</ng-template>
+
+                        <h4>Credenciales de acceso</h4>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Número de Celular</mat-label>
+                            <mat-icon matPrefix>phone</mat-icon>
+                            <input matInput formControlName="celular" />
+                            @if (credencialesForm.get('celular')?.hasError('required')) {
+                            <mat-error>
+                                El número de celular es obligatorio
+                            </mat-error>
+                            }
+                            @if (credencialesForm.get('celular')?.hasError('pattern')) {
+                            <mat-error>
+                                El número de celular debe tener 9 dígitos
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Correo Electrónico</mat-label>
+                            <mat-icon matPrefix>email</mat-icon>
+                            <input matInput formControlName="correo" />
+                            @if (credencialesForm.get('correo')?.hasError('required')) {
+                            <mat-error>
+                                El correo electrónico es obligatorio
+                            </mat-error>
+                            }
+                            @if (credencialesForm.get('correo')?.hasError('email')) {
+                            <mat-error>
+                                Ingrese un correo electrónico válido
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Crear Contraseña</mat-label>
+                            <input matInput [type]="mostrarPassword ? 'text' : 'password'" formControlName="password"
+                                placeholder="Contraseña" required />
+                            <button mat-icon-button matSuffix type="button" (click)="verContrasena()">
+                                <mat-icon>{{ mostrarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                             </button>
-                        </div>
-                        <small class="d-block mt-1" [ngClass]="passwordStrengthClass">{{ passwordStrengthMsg }}</small>
-                        <div *ngIf="passwordTouched && !isPasswordValid" class="invalid-feedback d-block">
-                            La contraseña debe tener al menos 6 caracteres
-                        </div>
-                        <div *ngIf="passwordTouched && isPasswordValid" class="valid-feedback d-block">
-                            Contraseña válida
-                        </div>
-                    </div>
+                            @if (credencialesForm.get('password')?.hasError('required')) {
+                            <mat-error>
+                                La contraseña es obligatoria
+                            </mat-error>
+                            }
+                            @if (credencialesForm.get('password')?.hasError('pattern')) {
+                            <mat-error>
+                                La contraseña debe cumplir con los requisitos de seguridad
+                            </mat-error>
+                            }
+                        </mat-form-field>
 
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
-                        <div class="input-group">
-                            <input [type]="showConfirm ? 'text' : 'password'" class="form-control form-control-lg"
-                                id="confirmPassword" placeholder="Repite tu contraseña" [(ngModel)]="confirmPassword"
-                                name="confirmPassword" required (blur)="validateConfirmPassword()" (input)="validateConfirmPassword()"
-                                [ngClass]="{'is-valid': confirmPasswordTouched && isConfirmPasswordValid, 'is-invalid': confirmPasswordTouched && !isConfirmPasswordValid}">
-                            <button type="button" class="btn btn-outline-secondary"
-                                (click)="showConfirm = !showConfirm">
-                                <i class="bi" [ngClass]="showConfirm ? 'bi-eye-slash' : 'bi-eye'"></i>
+                        <p class="text-muted small">
+                            ✅ 1 minúscula<br>
+                            ✅ 1 mayúscula<br>
+                            ✅ 1 número<br>
+                            ✅ 1 carácter especial (@, %, $, etc.)<br>
+                            ✅ 8 caracteres mínimo y 12 máximo
+                        </p>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Confirmar Contraseña</mat-label>
+                            <mat-icon matPrefix>lock</mat-icon>
+                            <input matInput [type]="mostrarConfirmarPassword ? 'text' : 'password'"
+                                formControlName="confirmPassword" placeholder="Contraseña" required />
+                            <button mat-icon-button matSuffix type="button" (click)="verConfirmarContrasena()">
+                                <mat-icon>{{ mostrarConfirmarPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                             </button>
-                        </div>
+                            @if (credencialesForm.get('confirmPassword')?.hasError('required')) {
+                            <mat-error>
+                                Debe confirmar la contraseña
+                            </mat-error>
+                            }
+                            @if (credencialesForm.get('confirmPassword')?.hasError('passwordMismatch')) {
+                            <mat-error>
+                                Las contraseñas no coinciden
+                            </mat-error>
+                            }
+                        </mat-form-field>
 
-                        <div *ngIf="confirmPasswordTouched && !isConfirmPasswordValid" class="invalid-feedback d-block">
-                            <span *ngIf="confirmPassword.length === 0">Confirma tu contraseña</span>
-                            <span *ngIf="confirmPassword.length > 0 && password !== confirmPassword">Las contraseñas no coinciden</span>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button mat-button matStepperPrevious>Atrás</button>
+                            <button mat-raised-button color="accent" (click)="registrar()"
+                                [disabled]="credencialesForm.invalid">Finalizar</button>
                         </div>
-                        <div *ngIf="confirmPasswordTouched && isConfirmPasswordValid" class="valid-feedback d-block">
-                            Contraseñas coinciden
-                        </div>
-                    </div>
+                    </form>
+                </mat-step>
+            </mat-horizontal-stepper>
+            }
+        </mat-card>
+    </div>
+</div>
 
-                    <div class="form-check mt-3 mb-3">
-                        <input class="form-check-input" type="checkbox" id="terms" [(ngModel)]="acceptedTerms"
-                            name="terms" required>
-                        <label class="form-check-label small" for="terms">
-                            Acepto los <a>términos y condiciones</a>
-                        </label>
-                    </div>
-                    <button type="submit" class="boton btn btn-lg w-100 mt-3 shadow-sm"
-                        [disabled]="password !== confirmPassword || !acceptedTerms">
-                        Registrarse
-                    </button>
-                    <div *ngIf="error" class="alert alert-danger mt-3 text-center">{{ error }}</div>
-                    <div *ngIf="success" class="alert alert-success mt-3 text-center">
-                        ¡Registro exitoso! Redirigiendo al login...
-                    </div>
-                </form>
-                <div class="mt-4 text-center">
-                    <span>¿Ya tienes cuenta?</span>
-                    <a routerLink="/login" class="fw-semibold text-decoration-none">Inicia sesión</a>
-                </div>
+<!-- 🎉 MENSAJE FLOTANTE DE ÉXITO -->
+@if (mostrarMensajeExito) {
+<div class="mensaje-flotante-overlay">
+    <div class="mensaje-flotante">
+        <div class="mensaje-contenido">
+            <div class="icono-exito">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="titulo-exito">¡Registro Exitoso!</h3>
+            <p class="texto-exito">
+                Tu cuenta ha sido creada correctamente.<br>
+                Serás redirigido al login en <span class="contador">3</span> segundos...
+            </p>
+            <div class="progress-container">
+                <div class="progress-bar-flotante" style="animation: countdownFloating 3s linear forwards;"></div>
             </div>
         </div>
     </div>
 </div>
+}

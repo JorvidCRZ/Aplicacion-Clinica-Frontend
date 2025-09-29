@@ -1,31 +1,73 @@
-<div class="container d-flex align-items-center justify-content-center min-vh-100 contenido-general my-5">
-    <div class="col-md-5 col-lg-4">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <img src="assets/general/logo-clinica.webp" alt="Logo" width="70" class="mb-2">
-                    <h3 class="fw-bold">Iniciar Sesión</h3>
-                </div>
-                <form (submit)="onSubmit($event)">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control form-control-lg" id="email"
-                            placeholder="Ingresa tu correo" [(ngModel)]="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control form-control-lg" id="password"
-                            placeholder="Ingresa tu contraseña" [(ngModel)]="password" name="password" required>
-                    </div>
-                    <button type="submit" class="boton btn btn-primary btn-lg w-100 mt-3 shadow-sm">Ingresar</button>
-                </form>
-                @if (error) {
-                <div class="alert alert-danger">{{ error }}</div>
-                }
-                <div class="mt-4 text-center">
-                    <span>¿No tienes cuenta?</span>
-                    <a [routerLink]="['/registro']" class="fw-semibold text-decoration-none">Regístrate</a>
-                </div>
+<div class="login-container d-flex flex-column flex-md-row py-2 px-0 rounded-4 px-md-3 py-md-5 ">
+    <!-- Imagen - 40% desktop / arriba en móvil -->
+    <div class="imagen-section">
+        <img src="assets/login/login-fondo.webp" alt="Fondo de Clínica" class="imagen-fondo" />
+        <div class="overlay-content">
+            <img src="assets/general/icono-clinica.webp" alt="Logo" class="logo-overlay" />
+            <h3 class="texto-bienvenida">Bienvenido de vuelta</h3>
+            <p class="subtexto-bienvenida">Accede a tu cuenta para gestionar tus citas médicas</p>
+        </div>
+    </div>
+
+    <!-- Formulario - 60% -->
+    <div class="formulario-section" >
+        <div class="formulario-content px-md-5">
+            <!-- Logo móvil ya no necesario - la imagen está arriba -->
+            
+            <!-- Logo y título -->
+            <div class="text-center mb-5">
+                <h2 class="titulo-login">Iniciar Sesión</h2>
+                <p class="subtitulo-login">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <form (ngSubmit)="onSubmit($event)" [formGroup]="loginForm">
+
+                <mat-form-field appearance="outline" class="w-100 mb-3">
+                    <mat-label>Correo electrónico</mat-label>
+                    <mat-icon matPrefix>mail</mat-icon>
+                    <input matInput formControlName="email" placeholder="Ingresa tu correo" type="email" required />
+
+                    @if (loginForm.get('email')?.hasError('required')) {
+                    <mat-error> El correo es obligatorio </mat-error>
+                    }
+                    @if (loginForm.get('email')?.hasError('email')) {
+                    <mat-error> Ingresa un correo válido </mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Contraseña -->
+                <mat-form-field appearance="outline" class="w-100 mb-3">
+                    <mat-label>Contraseña</mat-label>
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <input matInput formControlName="password" [type]="hide ? 'password' : 'text'"
+                        placeholder="Ingresa tu contraseña" required />
+                    <button mat-icon-button matSuffix type="button" (click)="hide = !hide">
+                        <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+
+                    @if (loginForm.get('password')?.hasError('required')) {
+                    <mat-error> La contraseña es obligatoria </mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Botón -->
+                <button mat-flat-button color="boton" class="w-100 mt-3" type="submit">
+                    Ingresar
+                </button>
+            </form>
+
+            <!-- Error -->
+            @if (error) {
+            <mat-error class="d-block mt-3 text-center">
+                {{ error }}
+            </mat-error>
+            }
+
+            <!-- Links -->
+            <div class="mt-4 text-center">
+                <a [routerLink]="['/recuperar']" class="link-recuperar d-block mb-2">¿Olvidaste tu contraseña?</a>
+                <span class="texto-registro">¿No tienes cuenta?</span>
+                <a [routerLink]="['/registro']" class="link-registro" style="font-weight: 900; color: var(--negro) !important;"> Regístrate </a>
             </div>
         </div>
     </div>

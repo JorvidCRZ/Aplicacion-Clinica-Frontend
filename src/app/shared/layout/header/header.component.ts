@@ -6,6 +6,8 @@ import { MenuItem } from '../../../core/models/common/menu-items';
 import { LogoComponent } from './logo/logo.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AccountMenuComponent } from './account-menu/account-menu.component';
+import { MENU_PUBLIC } from '../../../core/config/menu-public.config';
+import { MENU_DASHBOARD } from '../../../core/config/menu-dasboard.config';
 
 @Component({
   selector: 'app-header',
@@ -15,14 +17,7 @@ import { AccountMenuComponent } from './account-menu/account-menu.component';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  menuItems: MenuItem[] = [
-    { label: 'Inicio', route: '/inicio', exact: true },
-    { label: 'Especialidades', route: '/especialidades' },
-    { label: 'Nosotros', route: '/nosotros' },
-    { label: 'Citas', route: '/citas' },
-    { label: 'Blog/Noticias', route: '/blog' },
-    { label: 'Contacto', route: '/contacto' }
-  ];
+  menuItems = MENU_PUBLIC;
 
   constructor(public authService: AuthService) { }
 
@@ -30,31 +25,14 @@ export class HeaderComponent {
     if (!this.authService.isLoggedIn()) return [];
     const rol = this.authService.currentUser?.rol;
     if (rol === 'admin') {
-      return [
-        { label: 'Resumen', route: '/admin/resumen', icon: 'fa fa-tachometer-alt' },
-        { label: 'Gestión Citas', route: '/admin/gestion-citas', icon: 'fa fa-calendar' },
-        { label: 'Gestión Doctores', route: '/admin/gestion-doctores', icon: 'fa fa-user-md' },
-        { label: 'Gestión Pacientes', route: '/admin/gestion-pacientes', icon: 'fa fa-users' },
-        { label: 'Gestión Usuarios', route: '/admin/gestion-usuarios', icon: 'fa fa-user-cog' },
-        { label: 'Reportes', route: '/admin/reportes', icon: 'fa fa-chart-line' }
-      ];
+      const rol = this.authService.currentUser?.rol ?? 'paciente';
+      return MENU_DASHBOARD[rol] || [];
     } else if (rol === 'doctor') {
-      return [
-        { label: 'Resumen', route: '/doctor/resumen', icon: 'fa fa-tachometer-alt' },
-        { label: 'Mi Perfil', route: '/doctor/perfil', icon: 'fa fa-user' },
-        { label: 'Citas', route: '/doctor/citas', icon: 'fa fa-calendar' },
-        { label: 'Reporte Personal', route: '/doctor/reporte-personal', icon: 'fa fa-file-alt' },
-        { label: 'Horarios', route: '/doctor/horarios', icon: 'fa fa-clock' },
-        { label: 'Pacientes', route: '/doctor/pacientes', icon: 'fa fa-users' }
-      ];
+      const rol = this.authService.currentUser?.rol ?? 'doctor';
+      return MENU_DASHBOARD[rol] || [];
     } else { // paciente
-      return [
-        { label: 'Resumen', route: '/paciente', icon: 'fa fa-tachometer-alt' },
-        { label: 'Mi Perfil', route: '/paciente/mi-perfil', icon: 'fa fa-user' },
-        { label: 'Mis Citas', route: '/paciente/mis-citas', icon: 'fa fa-calendar' },
-        { label: 'Historial Médico', route: '/paciente/historial-medico', icon: 'fa fa-notes-medical' },
-        { label: 'Pagos', route: '/paciente/pagos', icon: 'fa fa-credit-card' }
-      ];
+      const rol = this.authService.currentUser?.rol ?? 'admin';
+      return MENU_DASHBOARD[rol] || [];
     }
   }
 
@@ -73,7 +51,7 @@ export class HeaderComponent {
   get isAdmin(): boolean {
     return this.authService.currentUser?.rol === 'admin';
   }
-  
+
   cerrarSesion() {
     this.authService.logout();
   }
