@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MenuItem } from '../../../core/models/common/menu-items';
 import { LogoComponent } from './logo/logo.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AccountMenuComponent } from './account-menu/account-menu.component';
@@ -30,7 +29,7 @@ export class HeaderComponent {
     } else if (rol === 'doctor') {
       const rol = this.authService.currentUser?.rol ?? 'doctor';
       return MENU_DASHBOARD[rol] || [];
-    } else { // paciente
+    } else { 
       const rol = this.authService.currentUser?.rol ?? 'admin';
       return MENU_DASHBOARD[rol] || [];
     }

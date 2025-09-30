@@ -1,1 +1,310 @@
-<p>pagos.component works!</p>
+<div class="pagos-container">
+    <!-- Header -->
+    <div class="pagos-header">
+        <div class="titulo-seccion">
+            <h1 class="titulo">💳 Sistema de Pagos Médicos</h1>
+            <p class="subtitulo">Gestión de facturas, pagos y métodos de pago seguros</p>
+        </div>
+
+        <!-- Estadísticas Financieras -->
+        <div class="estadisticas-financieras">
+            <div class="stat-card pendiente">
+                <div class="stat-icono">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-valor">S/ {{ totalPendiente.toFixed(2) }}</span>
+                    <span class="stat-label">Pendientes</span>
+                </div>
+            </div>
+
+            <div class="stat-card pagado">
+                <div class="stat-icono">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-valor">S/ {{ totalPagado.toFixed(2) }}</span>
+                    <span class="stat-label">Pagado</span>
+                </div>
+            </div>
+
+            <div class="stat-card vencido">
+                <div class="stat-icono">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-valor">S/ {{ totalVencido.toFixed(2) }}</span>
+                    <span class="stat-label">Vencidos</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación de Pestañas -->
+    <div class="pestanas-navegacion">
+        <button class="pestana" [class.activa]="vistaActiva === 'facturas'" (click)="vistaActiva = 'facturas'">
+            <i class="fas fa-file-invoice"></i>
+            Mis Facturas
+        </button>
+        <button class="pestana" [class.activa]="vistaActiva === 'historial'" (click)="vistaActiva = 'historial'">
+            <i class="fas fa-history"></i>
+            Historial de Pagos
+        </button>
+    </div>
+
+    <!-- Vista de Facturas -->
+    @if (vistaActiva === 'facturas') {
+    <div class="vista-facturas">
+        <!-- Filtros -->
+        <div class="controles-facturas">
+            <div class="filtros">
+                <div class="filtro-grupo">
+                    <label for="filtroEstado">Estado:</label>
+                    <select id="filtroEstado" [(ngModel)]="filtroEstado" class="filtro-select">
+                        <option value="todos">📋 Todas las facturas</option>
+                        <option value="pendiente">⏳ Pendientes</option>
+                        <option value="pagado">✅ Pagadas</option>
+                        <option value="vencido">⚠️ Vencidas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="info-facturas">
+                <span class="total-facturas">{{ facturasFiltradas.length }} facturas encontradas</span>
+            </div>
+        </div>
+
+        <!-- Lista de Facturas -->
+        <div class="facturas-lista">
+            @if (facturasFiltradas.length === 0) {
+            <div class="sin-facturas">
+                <i class="fas fa-file-invoice"></i>
+                <h3>No se encontraron facturas</h3>
+                <p>No hay facturas que coincidan con los filtros seleccionados.</p>
+            </div>
+            } @else {
+            @for (factura of facturasFiltradas; track factura.id) {
+            <div class="factura-card" [class]="factura.estado" (click)="seleccionarFactura(factura)">
+                <div class="factura-header">
+                    <div class="factura-numero">
+                        <h3>{{ factura.numeroFactura }}</h3>
+                        <span class="fecha-emision">{{ factura.fecha | date:'dd/MM/yyyy' }}</span>
+                    </div>
+
+                    <div class="estado-badge">
+                        <span class="estado" [style.background-color]="obtenerColorEstado(factura.estado)">
+                            <i [class]="obtenerIconoEstado(factura.estado)"></i>
+                            {{ factura.estado | titlecase }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="factura-contenido">
+                    <div class="servicio-info">
+                        <h4>{{ factura.concepto }}</h4>
+                        <p>{{ factura.descripcion }}</p>
+                        <div class="doctor-info">
+                            <i class="fas fa-user-md"></i>
+                            <span>{{ factura.doctor }} - {{ factura.especialidad }}</span>
+                        </div>
+                    </div>
+
+                    <div class="montos">
+                        <div class="subtotal">
+                            <span class="label">Subtotal:</span>
+                            <span class="valor">S/ {{ factura.subtotal.toFixed(2) }}</span>
+                        </div>
+                        <div class="igv">
+                            <span class="label">IGV (18%):</span>
+                            <span class="valor">S/ {{ factura.igv.toFixed(2) }}</span>
+                        </div>
+                        <div class="total">
+                            <span class="label">Total:</span>
+                            <span class="valor">S/ {{ factura.total.toFixed(2) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="factura-footer">
+                    <div class="vencimiento">
+                        @if (factura.estado === 'pendiente' || factura.estado === 'vencido') {
+                        <span class="fecha-vencimiento" [class.vencido]="factura.estado === 'vencido'">
+                            <i class="fas fa-calendar-alt"></i>
+                            Vence: {{ factura.fechaVencimiento | date:'dd/MM/yyyy' }}
+                        </span>
+                        } @else if (factura.estado === 'pagado') {
+                        <span class="fecha-pago">
+                            <i class="fas fa-check"></i>
+                            Pagado: {{ factura.fechaPago | date:'dd/MM/yyyy' }}
+                        </span>
+                        }
+                    </div>
+
+                    <div class="acciones">
+                        @if (factura.estado === 'pendiente' || factura.estado === 'vencido') {
+                        <button class="btn-pagar" (click)="seleccionarFactura(factura); $event.stopPropagation()">
+                            <i class="fas fa-credit-card"></i> Pagar Ahora
+                        </button>
+                        }
+                        <button class="btn-descargar" (click)="descargarFactura(factura); $event.stopPropagation()">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            }
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Vista de Pago -->
+    @if (vistaActiva === 'pagar' && facturaSeleccionada) {
+    <div class="vista-pago">
+        <div class="pago-container">
+            <!-- Resumen de Factura -->
+            <div class="resumen-factura">
+                <div class="resumen-header">
+                    <h2>💳 Procesar Pago</h2>
+                    <button class="btn-volver" (click)="cancelarPago()">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
+
+                <div class="factura-detalle">
+                    <h3>{{ facturaSeleccionada.numeroFactura }}</h3>
+                    <p class="concepto">{{ facturaSeleccionada.concepto }}</p>
+                    <p class="descripcion">{{ facturaSeleccionada.descripcion }}</p>
+
+                    <div class="montos-detalle">
+                        <div class="monto-linea">
+                            <span>Subtotal:</span>
+                            <span>S/ {{ facturaSeleccionada.subtotal.toFixed(2) }}</span>
+                        </div>
+                        <div class="monto-linea">
+                            <span>IGV (18%):</span>
+                            <span>S/ {{ facturaSeleccionada.igv.toFixed(2) }}</span>
+                        </div>
+                        <div class="monto-total">
+                            <span>Total a Pagar:</span>
+                            <span>S/ {{ facturaSeleccionada.total.toFixed(2) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selección de Plan de Pago -->
+            <div class="seccion-pago">
+                <h3>📅 Seleccionar Plan de Pago</h3>
+                <div class="planes-pago">
+                    @for (plan of planesPago; track plan.id) {
+                    <div class="plan-card" [class.seleccionado]="planPagoSeleccionado?.id === plan.id"
+                        (click)="seleccionarPlanPago(plan)">
+                        <div class="plan-header">
+                            <h4>{{ plan.nombre }}</h4>
+                            @if (plan.interes > 0) {
+                            <span class="interes">+{{ (plan.interes * 100).toFixed(0) }}%</span>
+                            } @else {
+                            <span class="sin-interes">Sin interés</span>
+                            }
+                        </div>
+                        <p class="plan-descripcion">{{ plan.descripcion }}</p>
+                        @if (planPagoSeleccionado?.id === plan.id) {
+                        <div class="plan-detalle">
+                            <div class="cuota-info">
+                                <span class="label">Total con interés:</span>
+                                <span class="valor">S/ {{ calcularTotalConInteres().toFixed(2) }}</span>
+                            </div>
+                            @if (plan.cuotas > 1) {
+                            <div class="cuota-info">
+                                <span class="label">Cuota mensual:</span>
+                                <span class="valor">S/ {{ calcularCuotaMensual().toFixed(2) }}</span>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Selección de Método de Pago -->
+            <div class="seccion-pago">
+                <h3>💰 Seleccionar Método de Pago</h3>
+                <div class="metodos-pago">
+                    @for (metodo of metodosPago; track metodo.id) {
+                    <div class="metodo-card" [class.seleccionado]="metodoPagoSeleccionado?.id === metodo.id"
+                        [class.no-disponible]="!metodo.disponible"
+                        (click)="metodo.disponible && seleccionarMetodoPago(metodo)">
+                        <div class="metodo-icono">
+                            <i [class]="metodo.icono"></i>
+                        </div>
+                        <div class="metodo-info">
+                            <h4>{{ metodo.nombre }}</h4>
+                            @if (metodo.comision > 0) {
+                            <span class="comision">Comisión: {{ (metodo.comision * 100).toFixed(1) }}%</span>
+                            } @else {
+                            <span class="sin-comision">Sin comisión</span>
+                            }
+                        </div>
+                        @if (metodoPagoSeleccionado?.id === metodo.id) {
+                        <div class="seleccionado-check">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Botón de Pago -->
+            <div class="procesar-pago">
+                @if (procesandoPago) {
+                <div class="procesando">
+                    <div class="spinner"></div>
+                    <span>Procesando pago seguro...</span>
+                </div>
+                } @else {
+                <button class="btn-procesar"
+                    [disabled]="!facturaSeleccionada || !metodoPagoSeleccionado || !planPagoSeleccionado"
+                    (click)="procesarPago()">
+                    <i class="fas fa-lock"></i>
+                    Procesar Pago Seguro - S/ {{ calcularTotalConInteres().toFixed(2) }}
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Vista de Historial -->
+    @if (vistaActiva === 'historial') {
+    <div class="vista-historial">
+        <h2>📜 Historial de Pagos</h2>
+
+        <div class="historial-lista">
+            @for (factura of facturas; track factura.id) {
+            @if (factura.estado === 'pagado') {
+            <div class="pago-historial">
+                <div class="pago-info">
+                    <div class="pago-header">
+                        <h4>{{ factura.numeroFactura }}</h4>
+                        <span class="fecha-pago">{{ factura.fechaPago | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <p class="concepto">{{ factura.concepto }}</p>
+                    <div class="pago-detalles">
+                        <span class="metodo">{{ factura.metodoPago }}</span>
+                        <span class="transaccion">{{ factura.numeroTransaccion }}</span>
+                    </div>
+                </div>
+                <div class="pago-monto">
+                    <span class="monto">S/ {{ factura.total.toFixed(2) }}</span>
+                    <span class="estado-pago">✅ Pagado</span>
+                </div>
+            </div>
+            }
+            }
+        </div>
+    </div>
+    }
+</div>

@@ -7,21 +7,11 @@ import { BlogComponent } from './features/public/pages/blog/blog.component';
 import { ContactoComponent } from './features/public/pages/contacto/contacto.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegistroComponent } from './features/auth/registro/registro.component';
-import { CarritoComponent } from './features/public/pages/carrito/carrito.component';
 import { CheckoutComponent } from './features/private/checkout/checkout.component';
-import { ServicioFormularioComponent } from './shared/components/servicio-formulario/servicio-formulario.component';
+import { ServicioFormularioComponent } from './features/public/components/servicio-formulario/servicio-formulario.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { PacienteComponent } from './features/private/dashboard/paciente/paciente.component';
-import { MisCitasComponent } from './features/private/dashboard/paciente/mis-citas/mis-citas.component';
-import { MiPerfilComponent } from './features/private/dashboard/paciente/mi-perfil/mi-perfil.component';
-import { HistorialMedicoComponent } from './features/private/dashboard/paciente/historial-medico/historial-medico.component';
-import { PagosComponent } from './features/private/dashboard/paciente/pagos/pagos.component';
 import { DoctorComponent } from './features/private/dashboard/doctor/doctor.component';
-import { PerfilComponent } from './features/private/dashboard/doctor/perfil/perfil.component';
-import { ResumenComponent } from './features/private/dashboard/doctor/resumen/resumen.component';
-import { ReportePersonalComponent } from './features/private/dashboard/doctor/reporte-personal/reporte-personal.component';
-import { HorariosComponent } from './features/private/dashboard/doctor/horarios/horarios.component';
-import { PacientesComponent } from './features/private/dashboard/doctor/pacientes/pacientes.component';
 import { AdminComponent } from './features/private/dashboard/admin/admin.component';
 // import { ServiciosComponent } from './features/public/pages/servicios/servicios.component';
 
@@ -36,8 +26,10 @@ export const routes: Routes = [
     { path: 'contacto', component: ContactoComponent },
     { path: 'login', component: LoginComponent },
     { path: 'registro', component: RegistroComponent },
-    { path: 'carrito', component: CarritoComponent },
     { path: 'checkout', component: CheckoutComponent },
+    {
+        path: 'recuperar', loadComponent: () => import('./features/auth/recuperar/recuperar.component').then(m => m.RecuperarComponent)
+    },
     // { path: 'servicios', component: ServiciosComponent },
     { path: 'servicio-formulario', component: ServicioFormularioComponent, canActivate: [AuthGuard] },
 
@@ -46,11 +38,12 @@ export const routes: Routes = [
         component: PacienteComponent,
         canActivate: [AuthGuard],
         children: [
-            { path: '', redirectTo: 'miperfil', pathMatch: 'full' },
-            { path: 'mi-perfil', component: MiPerfilComponent },
-            { path: 'mis-citas', component: MisCitasComponent },
-            { path: 'pagos', component: PagosComponent },
-            { path: 'historial-medico', component: HistorialMedicoComponent },
+            { path: '', redirectTo: 'mi-resumen', pathMatch: 'full' },
+            { path: 'mi-resumen', loadComponent: () => import('./features/private/dashboard/paciente/mi-resumen/mi-resumen.component').then(m => m.MiResumenComponent) },
+            { path: 'mi-perfil', loadComponent: () => import('./features/private/dashboard/paciente/mi-perfil/mi-perfil.component').then(m => m.MiPerfilComponent) },
+            { path: 'mis-citas', loadComponent: () => import('./features/private/dashboard/paciente/mis-citas/mis-citas.component').then(m => m.MisCitasComponent) },
+            { path: 'pagos', loadComponent: () => import('./features/private/dashboard/paciente/pagos/pagos.component').then(m => m.PagosComponent) },
+            { path: 'historial-medico', loadComponent: () => import('./features/private/dashboard/paciente/historial-medico/historial-medico.component').then(m => m.HistorialMedicoComponent) },
         ]
     },
     {
@@ -59,12 +52,12 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         children: [
             { path: '', redirectTo: 'resumen', pathMatch: 'full' },
-            { path: 'resumen', component: ResumenComponent },
-            { path: 'perfil', component: PerfilComponent },
-            { path: 'citas', component: MisCitasComponent },
-            { path: 'reporte-personal', component: ReportePersonalComponent },
-            { path: 'horarios', component: HorariosComponent },
-            { path: 'pacientes', component: PacientesComponent },
+            { path: 'resumen', loadComponent: () => import('./features/private/dashboard/doctor/resumen/resumen.component').then(m => m.ResumenComponent) },
+            { path: 'mi-perfil', loadComponent: () => import('./features/private/dashboard/doctor/perfil/perfil.component').then(m => m.PerfilComponent) },
+            { path: 'citas', loadComponent: () => import('./features/private/dashboard/doctor/citas/citas.component').then(m => m.CitasComponent) },
+            { path: 'reporte-personal', loadComponent: () => import('./features/private/dashboard/doctor/reporte-personal/reporte-personal.component').then(m => m.ReportePersonalComponent) },
+            { path: 'horarios', loadComponent: () => import('./features/private/dashboard/doctor/horarios/horarios.component').then(m => m.HorariosComponent) },
+            { path: 'pacientes', loadComponent: () => import('./features/private/dashboard/doctor/pacientes/pacientes.component').then(m => m.PacientesComponent) },
         ]
     },
     {
@@ -80,5 +73,8 @@ export const routes: Routes = [
             { path: 'gestion-usuarios', loadComponent: () => import('./features/private/dashboard/admin/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent) },
             { path: 'reportes', loadComponent: () => import('./features/private/dashboard/admin/reportes/reportes.component').then(m => m.ReportesComponent) },
         ]
+    },
+    {
+        path: 'configuracion', loadComponent: () => import('./core/config/configuration/configuration.component').then(m => m.ConfigurationComponent)
     }
 ];

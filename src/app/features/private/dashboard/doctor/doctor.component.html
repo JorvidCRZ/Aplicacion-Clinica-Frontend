@@ -1,1 +1,10 @@
-<p>doctor.component works!</p>
+<div class="dashboard-container">
+    <app-sidebar 
+        [menuItems]="sidebarItems" 
+        [title]="'Navegación ' + (currentUser?.rol | titlecase)"
+        [currentUser]="currentUser">
+    </app-sidebar>
+    <div class="content-area">
+        <router-outlet></router-outlet>
+    </div>
+</div>

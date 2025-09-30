@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service';
+
 
 @Component({
   selector: 'app-citas',
@@ -13,7 +15,27 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 export class CitasComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
+  // Estado del modal de reserva
+  mostrarModal = false;
+  citaParaReservar: any = null;
+  horarioParaReservar: string = '';
+
+  // Datos del formulario de cita
+  datosCita = {
+    motivo: '',
+    tipoConsulta: 'consulta-general',
+    observaciones: ''
+  };
+
   ngOnInit(): void {
+    // Inicializar arrays del buscador
+    this.resultadosBuscadorDoctor = [];
+    this.resultadosBuscadorEspecialidad = [];
+
     this.route.paramMap.subscribe(params => {
       const idEspecialidad = params.get('idEspecialidad');
       if (idEspecialidad) {
@@ -75,31 +97,73 @@ export class CitasComponent implements OnInit {
     { doctor: 'Dra. Mónica Fuentes', especialidad: 'Psiquiatría', paciente: 'Santiago León', disponibilidad: ['9:00 AM', '11:00 AM', '3:00 PM'] },
     { doctor: 'Dr. Alberto Castillo', especialidad: 'Psiquiatría', paciente: 'Isabel Moreno', disponibilidad: ['10:30 AM', '1:30 PM'] },
     { doctor: 'Dra. Claudia Rivas', especialidad: 'Psiquiatría', paciente: 'Fernando Salinas', disponibilidad: ['8:15 AM', '2:45 PM'] },
-    { doctor: 'Dr. Gustavo Ponce', especialidad: 'Psiquiatría', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] }
+    { doctor: 'Dr. Gustavo Ponce', especialidad: 'Psiquiatría', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] },
+    // 🧠 Neurología
+    { doctor: 'Dr. Enrique Palacios', especialidad: 'Neurología', paciente: 'Patricia Gómez', disponibilidad: ['9:00 AM', '1:00 PM'] },
+
+    // 🔬 Endocrinología
+    { doctor: 'Dra. Mirtha Valdez', especialidad: 'Endocrinología', paciente: 'Roberto Lozano', disponibilidad: ['10:30 AM', '3:45 PM'] },
+
+    // 💪 Reumatología
+    { doctor: 'Dr. Francisco Rojas', especialidad: 'Reumatología', paciente: 'Cecilia Vargas', disponibilidad: ['8:15 AM', '12:30 PM'] },
+
+    // 💧 Urología
+    { doctor: 'Dra. Elena Bustamante', especialidad: 'Urología', paciente: 'Oscar Medina', disponibilidad: ['11:00 AM', '4:00 PM'] }
+
   ];
-
-  constructor(private route: ActivatedRoute) { }
-
 
   selectedEspecialidad: string | null = null;
   busqueda: any[] = [];
 
-  terminoDoctor: string = '';
-  terminoEspecialidad: string = '';
+  // Variables para el buscador
+  resultadosBuscadorDoctor: any[] = [];
+  resultadosBuscadorEspecialidad: any[] = [];
+
+  // Estados individuales para cada card
+  cardStates: { [doctorName: string]: { diaSeleccionado: string, horarioSeleccionado: string } } = {};
+
+  // Horarios por día para cada doctor
+  horariosPorDia: { [key: string]: string[] } = {
+    'jueves': ['10:20', '10:40', '11:00', '11:20', '11:40', '12:00'],
+    'viernes': ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'],
+    'sabado': ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'],
+    'lunes': ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'],
+    'martes': ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00']
+  };
+
+  // Información de los días disponibles
+  diasDisponibles = [
+    { codigo: 'jueves', nombre: 'Jue', fecha: '04 Sep' },
+    { codigo: 'viernes', nombre: 'Vie', fecha: '05 Sep' },
+    { codigo: 'sabado', nombre: 'Sáb', fecha: '06 Sep' },
+    { codigo: 'lunes', nombre: 'Lun', fecha: '08 Sep' },
+    { codigo: 'martes', nombre: 'Mar', fecha: '09 Sep' }
+  ];
+
+  // Métodos para manejar los resultados del buscador
+  onBuscarDoctor(resultados: any[]) {
+    this.resultadosBuscadorDoctor = resultados;
+  }
+
+  onBuscarEspecialidad(resultados: any[]) {
+    this.resultadosBuscadorEspecialidad = resultados;
+  }
 
   get citasFiltradas() {
     let data = [...this.citas];
 
-    // 🔍 Filtrar por nombre de doctor
-    if (this.terminoDoctor) {
-      const term = this.terminoDoctor.toLowerCase();
-      data = data.filter(c => c.doctor.toLowerCase().includes(term));
+    // Aplicar filtro de buscador de doctor si hay resultados específicos
+    if (this.resultadosBuscadorDoctor.length > 0 && this.resultadosBuscadorDoctor.length < this.citas.length) {
+      data = data.filter(cita =>
+        this.resultadosBuscadorDoctor.some(resultado => resultado.doctor === cita.doctor)
+      );
     }
 
-    // 🏥 Filtrar por especialidad buscada
-    if (this.terminoEspecialidad) {
-      const termEsp = this.terminoEspecialidad.toLowerCase();
-      data = data.filter(c => c.especialidad.toLowerCase().includes(termEsp));
+    // Aplicar filtro de buscador de especialidad si hay resultados específicos
+    if (this.resultadosBuscadorEspecialidad.length > 0 && this.resultadosBuscadorEspecialidad.length < this.citas.length) {
+      data = data.filter(cita =>
+        this.resultadosBuscadorEspecialidad.some(resultado => resultado.especialidad === cita.especialidad)
+      );
     }
 
     // 📌 Filtrar si viene por URL (ej: /citas/cardiologia)
@@ -114,6 +178,38 @@ export class CitasComponent implements OnInit {
     this.selectedEspecialidad = especialidad;
   }
 
+  // Métodos para manejar estados individuales de cada card
+  getCardState(doctorName: string) {
+    if (!this.cardStates[doctorName]) {
+      this.cardStates[doctorName] = {
+        diaSeleccionado: 'jueves',
+        horarioSeleccionado: ''
+      };
+    }
+    return this.cardStates[doctorName];
+  }
+
+  seleccionarDiaCard(doctorName: string, dia: string) {
+    const state = this.getCardState(doctorName);
+    state.diaSeleccionado = dia;
+    state.horarioSeleccionado = ''; // Limpiar horario al cambiar día
+  }
+
+  seleccionarHorarioCard(doctorName: string, horario: string) {
+    const state = this.getCardState(doctorName);
+    state.horarioSeleccionado = horario;
+  }
+
+  getHorariosDelDia(doctorName: string): string[] {
+    const state = this.getCardState(doctorName);
+    return this.horariosPorDia[state.diaSeleccionado] || [];
+  }
+
+  getDiaActual(doctorName: string) {
+    const state = this.getCardState(doctorName);
+    return this.diasDisponibles.find(d => d.codigo === state.diaSeleccionado);
+  }
+
   onBuscarResultados(resultados: any[]) {
     this.busqueda = resultados.map(r => ({
       ...r,
@@ -124,6 +220,122 @@ export class CitasComponent implements OnInit {
   }
 
   seleccionarHorario(cita: any, horario: string) {
-    alert(`Seleccionaste a ${cita.doctor} en ${horario}`);
+    const mensaje = `¿Deseas reservar una cita con ${cita.doctor} el ${horario}?`;
+
+    if (confirm(mensaje)) {
+      // Aquí podrías verificar si está logueado para proceder con la reserva
+      alert(`✅ Cita reservada con ${cita.doctor} a las ${horario}. Te contactaremos pronto para confirmar.`);
+    }
   }
+
+  reservarCita(cita: any) {
+    const state = this.getCardState(cita.doctor);
+    if (!state.horarioSeleccionado) {
+      alert('Por favor selecciona un horario primero');
+      return;
+    }
+
+    // Guardar datos para el modal
+    this.citaParaReservar = cita;
+    this.horarioParaReservar = state.horarioSeleccionado;
+    this.mostrarModal = true;
+  }
+
+  // Verificar si está logueado y proceder
+  verificarYContinuar() {
+    const usuario = this.authService.currentUser;
+
+    if (usuario) {
+      // Usuario logueado - continuar con el proceso
+      this.procesarReservaCita();
+    } else {
+      // No logueado - mostrar opciones de autenticación
+      this.mostrarOpcionesAuth();
+    }
+  }
+
+  mostrarOpcionesAuth() {
+    const mensaje = '¿Ya tienes una cuenta?\n\n' +
+      '✅ SÍ - Inicia sesión\n' +
+      '❌ NO - Regístrate primero';
+
+    if (confirm(mensaje)) {
+      // Ir a login
+      this.router.navigate(['/login'], {
+        queryParams: {
+          returnUrl: '/citas',
+          reserva: 'pendiente',
+          doctor: this.citaParaReservar.doctor,
+          horario: this.horarioParaReservar
+        }
+      });
+    } else {
+      // Ir a registro
+      this.router.navigate(['/registro'], {
+        queryParams: {
+          returnUrl: '/citas',
+          reserva: 'pendiente',
+          doctor: this.citaParaReservar.doctor,
+          horario: this.horarioParaReservar
+        }
+      });
+    }
+  }
+
+  procesarReservaCita() {
+    if (!this.datosCita.motivo.trim()) {
+      alert('Por favor indica el motivo de la consulta');
+      return;
+    }
+
+    // Redirección directa al checkout si los datos son válidos
+    const usuario = this.authService.currentUser;
+    console.log('Usuario:', usuario);
+    console.log('Cita:', this.citaParaReservar);
+    if (usuario?.rol === 'paciente' && this.citaParaReservar) {
+      this.router.navigate(['/checkout'], {
+        queryParams: {
+          doctor: this.citaParaReservar.doctor,
+          especialidad: this.citaParaReservar.especialidad,
+          fecha: new Date().toISOString().split('T')[0],
+          hora: this.horarioParaReservar
+        }
+      });
+    }
+    this.cerrarModal();
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.citaParaReservar = null;
+    this.horarioParaReservar = '';
+    this.datosCita = {
+      motivo: '',
+      tipoConsulta: 'consulta-general',
+      observaciones: ''
+    };
+  }
+
+  irALogin() {
+    this.router.navigate(['/login'], {
+      queryParams: {
+        returnUrl: '/citas',
+        reserva: 'pendiente'
+      }
+    });
+  }
+
+  irARegistro() {
+    this.router.navigate(['/registro'], {
+      queryParams: {
+        returnUrl: '/citas',
+        reserva: 'pendiente'
+      }
+    });
+  }
+
+  get estaLogueado(): boolean {
+    return !!this.authService.currentUser;
+  }
+
 }

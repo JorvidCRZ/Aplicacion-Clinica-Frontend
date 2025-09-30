@@ -63,8 +63,9 @@
             </mat-error>
             }
 
-            <!-- Links -->
             <div class="mt-4 text-center">
+                <h1 class="h5 mb-3 text-muted">¿Necesitas ayuda?</h1>
+                <a [routerLink]="['/recuperar']" class="link-registro" style="font-weight: 900; color: var(--negro) !important;"> Recuperar Contraseña </a>
                 <a [routerLink]="['/recuperar']" class="link-recuperar d-block mb-2">¿Olvidaste tu contraseña?</a>
                 <span class="texto-registro">¿No tienes cuenta?</span>
                 <a [routerLink]="['/registro']" class="link-registro" style="font-weight: 900; color: var(--negro) !important;"> Regístrate </a>

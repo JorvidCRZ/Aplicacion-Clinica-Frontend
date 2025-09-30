@@ -41,12 +41,8 @@ import { TipoDocumentoService } from '../../../core/services/tipoDocumento.servi
   styleUrls: ['./registro.component.css']
 })
 export class RegistroComponent implements OnInit {
-
-  // Paso 1: datos básicos
   datosForm: any;
-  // Paso 2: datos personales
   personalesForm: any;
-  // Paso 3: credenciales
   credencialesForm: any;
   mostrarPassword: boolean = false;
   mostrarConfirmarPassword: boolean = false;
@@ -54,24 +50,17 @@ export class RegistroComponent implements OnInit {
   startDate = new Date(this.today.getFullYear() - 25, 0, 1);
   minDate = new Date(this.today.getFullYear() - 120, 0, 1);
   maxDate = this.today;
-  // 🔥 DATOS DE UBIGEO
+
   departamentos: Departamento[] = [];
   provincias: Provincia[] = [];
   distritos: Distrito[] = [];
-
-  // 🔥 TIPOS DE DOCUMENTO
   tiposDocumento: TipoDocumento[] = TipoDocumentoService.getTodosLosTipos();
-
-  // 🔥 MENSAJE DE ÉXITO
   mostrarMensajeExito: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private ubigeoService: UbigeoService // 🔥 INYECTAR EL SERVICIO HTTP
-  ) {
-    // Los formularios se inicializarán en ngOnInit
-  }
+    private ubigeoService: UbigeoService) { }
 
   verContrasena() {
     this.mostrarPassword = !this.mostrarPassword;
@@ -95,12 +84,10 @@ export class RegistroComponent implements OnInit {
       const nuevoPaciente: Paciente = {
         id: Date.now(),
 
-        // 🔥 DATOS BÁSICOS
         tipoDocumento: this.datosForm.value.tipoDocumento!,
         numeroDocumento: this.datosForm.value.dni!,
         fechaNacimiento: this.datosForm.value.fechaNacimiento!,
 
-        // 🔥 DATOS PERSONALES
         nombre: this.personalesForm.value.nombre!,
         apellidoPaterno: this.personalesForm.value.apellidoPaterno!,
         apellidoMaterno: this.personalesForm.value.apellidoMaterno!,
@@ -111,7 +98,6 @@ export class RegistroComponent implements OnInit {
         distrito: this.personalesForm.value.distrito!,
         domicilio: this.personalesForm.value.domicilio!,
 
-        // 🔥 CREDENCIALES
         telefono: this.credencialesForm.value.celular!,
         email: this.credencialesForm.value.correo!,
         password: this.credencialesForm.value.password!,
@@ -122,10 +108,8 @@ export class RegistroComponent implements OnInit {
       usuarios.push(nuevoPaciente);
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
 
-      // 🎉 Mostrar mensaje de éxito
       this.mostrarMensajeExito = true;
 
-      // Redirigir al login después de 3 segundos
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 3000);
@@ -138,17 +122,15 @@ export class RegistroComponent implements OnInit {
     return pass === confirm ? null : { notSame: true };
   }
 
-  // 🔥 MÉTODOS DE UBIGEO
   ngOnInit() {
-    // Inicializar formularios
+
     this.initializeForms();
-    // Cargar datos de ubigeo
     this.cargarDepartamentos();
 
 
     this.datosForm.get('tipoDocumento')?.valueChanges.subscribe((tipoCodigo: string) => {
       const numeroCtrl = this.datosForm.get('dni');
-      numeroCtrl?.clearValidators(); // Limpiar validaciones anteriores
+      numeroCtrl?.clearValidators(); 
 
       const tipoDocumento = TipoDocumentoService.getTipoDocumento(tipoCodigo);
 
@@ -161,10 +143,9 @@ export class RegistroComponent implements OnInit {
         ]);
       }
 
-      numeroCtrl?.updateValueAndValidity(); // Aplicar nueva validación
+      numeroCtrl?.updateValueAndValidity();
     });
 
-    // Cargar datos de ubigeo
     this.cargarDepartamentos();
   }
 
@@ -219,8 +200,6 @@ export class RegistroComponent implements OnInit {
     const codigoDepartamento = event.value;
     this.provincias = [];
     this.distritos = [];
-
-    // Reset de provincia y distrito
     this.personalesForm.patchValue({
       provincia: '',
       distrito: ''
@@ -241,8 +220,6 @@ export class RegistroComponent implements OnInit {
   onProvinciaChange(event: any) {
     const codigoProvincia = event.value;
     this.distritos = [];
-
-    // Reset de distrito
     this.personalesForm.patchValue({
       distrito: ''
     });
@@ -259,7 +236,6 @@ export class RegistroComponent implements OnInit {
     }
   }
 
-  // 🔥 MÉTODOS AUXILIARES PARA TIPOS DE DOCUMENTO
   getPlaceholderDocumento(): string {
     const tipoCodigo = this.datosForm?.get('tipoDocumento')?.value;
     const tipoDocumento = TipoDocumentoService.getTipoDocumento(tipoCodigo);
@@ -272,7 +248,6 @@ export class RegistroComponent implements OnInit {
     return tipoDocumento?.nombre || 'Número de documento';
   }
 
-  // 🔥 MÉTODO UNIFICADO PARA MENSAJES DE ERROR
   getMensajeError(): string {
     const tipoCodigo = this.datosForm?.get('tipoDocumento')?.value;
     return TipoDocumentoService.getMensajeError(tipoCodigo);

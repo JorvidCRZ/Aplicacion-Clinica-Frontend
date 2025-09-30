@@ -1,0 +1,46 @@
+<nav class="sidebar">
+    @if (currentUser) {
+    <div class="user-profile">
+        <div class="user-avatar">
+            <i [class]="getUserIcon()"></i>
+        </div>
+        <div class="user-info">
+            <h6 class="user-name">{{ currentUser?.nombre }}</h6>
+            <small class="user-email">{{ currentUser?.email }}</small>
+        </div>
+    </div>
+    }
+
+    <div class="sidebar-title">
+        <i class="fas fa-tachometer-alt"></i>
+        {{ title }}
+    </div>
+
+    <ul class="menu-items">
+        @for (item of menuItems; track item.route) {
+        <li class="menu-item">
+            <a [routerLink]="item.route" routerLinkActive="active">
+                <i [class]="item.icon"></i>
+                {{ item.label }}
+            </a>
+        </li>
+        }
+    </ul>
+
+    <div class="sidebar-footer">
+        <ul>
+            <li class="menu-item">
+                <a [routerLink]="['/configuracion']" routerLinkActive="active">
+                    <i class="fas fa-user-cog"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="menu-item">
+                <a (click)="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

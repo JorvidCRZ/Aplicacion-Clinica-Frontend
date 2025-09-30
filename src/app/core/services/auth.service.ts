@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../models/users/usuario';
+import { Doctor } from '../models/users/doctor';
+import { Admin } from '../models/users/admin';
+import { Paciente } from '../models/users/paciente';
 
 export type AuthState = {
   isLoggedIn: boolean;
-  user: Usuario | null;
+  user: Usuario | Doctor | Admin | Paciente | null;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -45,12 +48,13 @@ export class AuthService {
 
   // 🔹 Persiste estado en localStorage y BehaviorSubject
   private persistState(state: AuthState): void {
-    localStorage.setItem(this.KEY_AUTH, JSON.stringify(state));
+    const serialized = JSON.stringify(state);
+    localStorage.setItem(this.KEY_AUTH, serialized);
     this.authStateSubject.next(state);
   }
 
   // 🔹 Login con un usuario
-  login(user: Usuario): void {
+  login(user: Usuario | Doctor | Admin | Paciente): void {
     this.persistState({ isLoggedIn: true, user });
   }
 
@@ -66,8 +70,9 @@ export class AuthService {
   }
 
   // 🔹 Devuelve el usuario actual
-  get currentUser(): Usuario | null {
-    return this.authStateSubject.value.user;
+  get currentUser(): Usuario | Doctor | Admin | Paciente | null {
+    const user = this.authStateSubject.value.user;
+    return user;
   }
 
   // 🔹 Comprueba si está logueado
@@ -76,8 +81,8 @@ export class AuthService {
   }
 
   // 🔹 Actualiza parcialmente los datos del usuario
-  updateUser(data: Partial<Usuario>): void {
-    const user = { ...this.currentUser, ...data } as Usuario;
+  updateUser(data: Partial<Usuario | Doctor | Admin | Paciente>): void {
+    const user = { ...this.currentUser, ...data } as Usuario | Doctor | Admin | Paciente;
     this.persistState({ isLoggedIn: true, user });
   }
 

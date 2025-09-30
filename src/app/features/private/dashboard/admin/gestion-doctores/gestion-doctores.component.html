@@ -1,1 +1,28 @@
-<p>doctores.component works!</p>
+<!-- 👨‍⚕️ GESTIÓN DE DOCTORES -->
+<div class="page-container">
+  <!-- 📋 HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Doctores</h2>
+      <p>Administra la información de todos los doctores</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarDoctor()">
+        <i class="fas fa-plus"></i>
+        Agregar Doctor
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 DATA TABLE -->
+  <app-data-table
+    [data]="doctores"
+    [columns]="columns"
+    [actions]="actions"
+    [searchable]="true"
+    [loading]="isLoading"
+    emptyMessage="No hay doctores registrados"
+    (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+</div>

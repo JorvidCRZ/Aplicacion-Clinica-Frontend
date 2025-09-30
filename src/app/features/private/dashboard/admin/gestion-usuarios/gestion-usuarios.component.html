@@ -1,1 +1,28 @@
-<p>usuarios.component works!</p>
+<!-- 👥 GESTIÓN DE USUARIOS -->
+<div class="page-container">
+  <!-- 📋 HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Usuarios</h2>
+      <p>Administra todos los usuarios del sistema</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarUsuario()">
+        <i class="fas fa-plus"></i>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 DATA TABLE -->
+  <app-data-table
+    [data]="usuarios"
+    [columns]="columns"
+    [actions]="actions"
+    [searchable]="true"
+    [loading]="isLoading"
+    emptyMessage="No hay usuarios registrados"
+    (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+</div>

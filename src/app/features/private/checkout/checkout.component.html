@@ -1,107 +1,284 @@
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-7">
-            <!-- Paso 1: Información de Envío -->
-            <div class="card rounded-3 shadow-sm mb-4 p-4">
-                <h4 class="fw-bold mb-4">1. Información de Envío</h4>
-                <form [formGroup]="checkoutForm" (ngSubmit)="confirmarPago()">
-                    <!-- ... campos del formulario ... -->
+<div class="checkout-container my-5">
+  <div class="checkout-header">
+    <button class="btn-volver" (click)="volver()">
+      <i class="fas fa-arrow-left"></i>
+      Volver
+    </button>
+    <h1>Confirmar Cita Médica</h1>
+  </div>
 
-                    <!-- Paso 2: Método de Pago -->
-                    <div class="card rounded-3 shadow-sm mb-4 p-4">
-                        <h4 class="fw-bold mb-4">2. Método de Pago</h4>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="card h-100 p-3 shadow-sm rounded-3 border-primary"
-                                    [class.bg-light]="checkoutForm.get('metodoPago')?.value === 'Tarjeta'">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="tarjeta" value="Tarjeta"
-                                            formControlName="metodoPago">
-                                        <label class="form-check-label fw-semibold" for="tarjeta">Tarjeta de
-                                            crédito/débito</label>
-                                    </div>
-                                    @if (mostrarTarjeta) {
-                                    <div class="mt-3">
-                                        <input type="text" id="numeroTarjeta" class="form-control mb-2"
-                                            formControlName="numeroTarjeta" maxlength="16"
-                                            placeholder="Número de tarjeta">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <input type="text" id="fechaVencimiento" class="form-control mb-2"
-                                                    formControlName="fechaVencimiento" maxlength="5"
-                                                    placeholder="MM/AA">
-                                            </div>
-                                            <div class="col-6">
-                                                <input type="text" id="cvv" class="form-control mb-2"
-                                                    formControlName="cvv" maxlength="3" placeholder="CVV">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    }
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="card h-100 p-3 shadow-sm rounded-3 border-success"
-                                    [class.bg-light]="checkoutForm.get('metodoPago')?.value === 'YAPE'">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" id="yape" value="YAPE"
-                                            formControlName="metodoPago">
-                                        <label class="form-check-label fw-semibold" for="yape">Yape</label>
-                                    </div>
-                                    @if (mostrarYape) {
-                                    <div class="mt-3">
-                                        <input type="text" id="numeroYape" class="form-control mb-2"
-                                            formControlName="numeroYape" maxlength="9" placeholder="Número de Yape">
-                                    </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3">Confirmar Pedido</button>
-                </form>
-
-                <!-- Estado del pago -->
-                @if (pagoExitoso === true) {
-                <div class="alert alert-success mt-3" role="alert">
-                    Pago realizado correctamente
-                </div>
-                }
-                @else if (pagoExitoso === false) {
-                <div class="alert alert-danger mt-3" role="alert">
-                    Datos incompletos o incorrectos
-                </div>
-                }
+  @if (pagoExitoso === null && !procesandoPago) {
+    <div class="checkout-content">
+      <!-- Información de la cita -->
+      @if (citaSeleccionada) {
+        <div class="seccion-cita">
+          <h2>
+            <i class="fas fa-calendar-alt"></i>
+            Detalles de la Cita
+          </h2>
+          
+          <div class="cita-detalle">
+            <div class="doctor-info">
+              <h3>{{ citaSeleccionada.doctor }}</h3>
+              <p class="especialidad">{{ citaSeleccionada.especialidad }}</p>
+              <p class="descripcion">{{ citaSeleccionada.descripcion }}</p>
             </div>
+            
+            <div class="cita-datos">
+              <div class="dato">
+                <i class="fas fa-calendar"></i>
+                <span>{{ citaSeleccionada.fecha | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="dato">
+                <i class="fas fa-clock"></i>
+                <span>{{ citaSeleccionada.hora }}</span>
+              </div>
+              <div class="dato">
+                <i class="fas fa-hourglass-half"></i>
+                <span>{{ citaSeleccionada.duracion }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Formulario de datos del paciente -->
+      <div class="seccion-formulario">
+        <h2>
+          <i class="fas fa-user"></i>
+          Datos del Paciente
+        </h2>
+
+        <form [formGroup]="checkoutForm" class="checkout-form">
+          <div class="form-group">
+            <label for="nombre">Nombre Completo</label>
+            <input 
+              type="text" 
+              id="nombre" 
+              formControlName="nombre"
+              placeholder="Ingresa tu nombre completo">
+            @if (checkoutForm.get('nombre')?.invalid && checkoutForm.get('nombre')?.touched) {
+              <div class="error-message">El nombre es requerido</div>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Correo Electrónico</label>
+              <input 
+                type="email" 
+                id="email" 
+                formControlName="email"
+                placeholder="correo@ejemplo.com">
+              @if (checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched) {
+                <div class="error-message">Ingresa un correo válido</div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input 
+                type="tel" 
+                id="telefono" 
+                formControlName="telefono"
+                placeholder="987654321">
+              @if (checkoutForm.get('telefono')?.invalid && checkoutForm.get('telefono')?.touched) {
+                <div class="error-message">Teléfono debe tener 9 dígitos</div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="observaciones">Observaciones (Opcional)</label>
+            <textarea 
+              id="observaciones" 
+              formControlName="observaciones"
+              placeholder="Notas adicionales para el médico"
+              rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <!-- Métodos de pago -->
+      <div class="seccion-pago">
+        <h2>
+          <i class="fas fa-credit-card"></i>
+          Método de Pago
+        </h2>
+
+        <div class="metodos-pago">
+          @for (metodo of metodosPago; track metodo.id) {
+            @if (metodo.disponible) {
+              <div 
+                class="metodo-pago"
+                [class.seleccionado]="metodoPagoSeleccionado?.id === metodo.id"
+                (click)="seleccionarMetodoPago(metodo)">
+                <div class="metodo-icono">
+                  <i [class]="metodo.icono"></i>
+                </div>
+                <div class="metodo-info">
+                  <span class="metodo-nombre">{{ metodo.nombre }}</span>
+                  @if (metodo.comision > 0) {
+                    <span class="metodo-comision">+ {{ (metodo.comision * 100) | number:'1.1-1' }}% comisión</span>
+                  } @else {
+                    <span class="metodo-gratis">Sin comisión</span>
+                  }
+                </div>
+              </div>
+            }
+          }
         </div>
 
-        <!-- Resumen del Pedido -->
-        @if (pagoExitoso !== true) {
-        <div class="col-md-5">
-            <div class="card rounded-3 shadow-sm p-4 sticky-top" style="top: 2rem;">
-                <h4 class="fw-bold mb-4">Resumen del Pedido</h4>
-
-                @if (carrito.length > 0) {
-                @for (item of carrito; track item.nombre) {
-                <div class="mb-2 d-flex justify-content-between">
-                    <span class="fw-semibold">{{ item.nombre }} <span class="text-muted">x{{ item.cantidad
-                            }}</span></span>
-                    <span>S/ {{ (item.precio * item.cantidad) | number:'1.2-2' }}</span>
-                </div>
-                }
-                <hr>
-                <div class="mb-2 d-flex justify-content-between">
-                    <span class="fw-bold">Total</span>
-                    <span class="fw-bold">S/ {{ total | number:'1.2-2' }}</span>
-                </div>
-                }
-                @else {
-                <div class="text-center text-muted">No hay productos en el carrito.</div>
-                }
+        <!-- Campos específicos del método de pago -->
+        @if (mostrarCamposTarjeta) {
+          <div class="campos-pago">
+            <h3>Datos de la Tarjeta</h3>
+            
+            <div class="form-group">
+              <label for="numeroTarjeta">Número de Tarjeta</label>
+              <input 
+                type="text" 
+                id="numeroTarjeta" 
+                formControlName="numeroTarjeta"
+                placeholder="1234 5678 9012 3456"
+                maxlength="16">
+              @if (checkoutForm.get('numeroTarjeta')?.invalid && checkoutForm.get('numeroTarjeta')?.touched) {
+                <div class="error-message">Número de tarjeta inválido</div>
+              }
             </div>
-        </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fechaVencimiento">Fecha de Vencimiento</label>
+                <input 
+                  type="text" 
+                  id="fechaVencimiento" 
+                  formControlName="fechaVencimiento"
+                  placeholder="MM/AA"
+                  maxlength="5">
+                @if (checkoutForm.get('fechaVencimiento')?.invalid && checkoutForm.get('fechaVencimiento')?.touched) {
+                  <div class="error-message">Formato: MM/AA</div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input 
+                  type="text" 
+                  id="cvv" 
+                  formControlName="cvv"
+                  placeholder="123"
+                  maxlength="3">
+                @if (checkoutForm.get('cvv')?.invalid && checkoutForm.get('cvv')?.touched) {
+                  <div class="error-message">CVV inválido</div>
+                }
+              </div>
+            </div>
+          </div>
         }
+
+        @if (mostrarCamposYape) {
+          <div class="campos-pago">
+            <h3>Número de {{ metodoPagoSeleccionado?.nombre }}</h3>
+            
+            <div class="form-group">
+              <label for="numeroYape">Número de teléfono</label>
+              <input 
+                type="tel" 
+                id="numeroYape" 
+                formControlName="numeroYape"
+                placeholder="987654321">
+              @if (checkoutForm.get('numeroYape')?.invalid && checkoutForm.get('numeroYape')?.touched) {
+                <div class="error-message">Número de teléfono inválido</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Resumen de pago -->
+      @if (citaSeleccionada && metodoPagoSeleccionado) {
+        <div class="seccion-resumen">
+          <h2>
+            <i class="fas fa-file-invoice-dollar"></i>
+            Resumen de Pago
+          </h2>
+
+          <div class="resumen-detalle">
+            <div class="item-resumen">
+              <span>Consulta {{ citaSeleccionada.especialidad }}</span>
+              <span>S/ {{ citaSeleccionada.precio | number:'1.2-2' }}</span>
+            </div>
+            
+            @if (calcularComision() > 0) {
+              <div class="item-resumen comision">
+                <span>Comisión {{ metodoPagoSeleccionado.nombre }}</span>
+                <span>S/ {{ calcularComision() | number:'1.2-2' }}</span>
+              </div>
+            }
+            
+            <hr>
+            
+            <div class="item-resumen total">
+              <span><strong>Total a Pagar</strong></span>
+              <span><strong>S/ {{ calcularTotal() | number:'1.2-2' }}</strong></span>
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            class="btn-confirmar"
+            [disabled]="checkoutForm.invalid || !metodoPagoSeleccionado"
+            (click)="confirmarPago()">
+            <i class="fas fa-check-circle"></i>
+            Confirmar Pago
+          </button>
+        </div>
+      }
     </div>
+  }
+
+  <!-- Estado de procesamiento -->
+  @if (procesandoPago) {
+    <div class="mensaje-estado procesando">
+      <div class="spinner"></div>
+      <h2>Procesando Pago</h2>
+      <p>Por favor espera mientras procesamos tu pago...</p>
+    </div>
+  }
+
+  <!-- Resultado del pago -->
+  @if (pagoExitoso === true) {
+    <div class="mensaje-estado exito">
+      <div class="icono-exito">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h2>¡Pago Exitoso!</h2>
+      <p>Tu cita médica ha sido confirmada y pagada correctamente.</p>
+      @if (citaSeleccionada) {
+        <div class="cita-confirmada">
+          <h3>Detalles de tu cita:</h3>
+          <p><strong>Doctor:</strong> {{ citaSeleccionada.doctor }}</p>
+          <p><strong>Especialidad:</strong> {{ citaSeleccionada.especialidad }}</p>
+          <p><strong>Fecha:</strong> {{ citaSeleccionada.fecha | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Hora:</strong> {{ citaSeleccionada.hora }}</p>
+        </div>
+      }
+      <p class="redireccion">Serás redirigido al dashboard en unos segundos...</p>
+    </div>
+  }
+
+  @if (pagoExitoso === false) {
+    <div class="mensaje-estado error">
+      <div class="icono-error">
+        <i class="fas fa-times-circle"></i>
+      </div>
+      <h2>Error en el Pago</h2>
+      <p>Hubo un problema al procesar tu pago. Por favor, verifica tus datos e inténtalo nuevamente.</p>
+      <button class="btn-reintentar" (click)="pagoExitoso = null">
+        <i class="fas fa-redo"></i>
+        Intentar de Nuevo
+      </button>
+    </div>
+  }
 </div>

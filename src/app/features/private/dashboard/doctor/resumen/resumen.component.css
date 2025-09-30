@@ -1,0 +1,641 @@
+/* 🏥 DASHBOARD DOCTOR - ESTILOS PROFESIONALES */
+
+.dashboard-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* 🎯 Header con saludo */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    color: var(--blanco);
+    box-shadow: 0 8px 32px rgba(26, 78, 141, 0.3);
+}
+
+.saludo-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.fecha-actual {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.especialidad-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+}
+
+/* 📅 Próxima cita */
+.proxima-cita-card {
+    background: var(--blanco);
+    color: var(--azul);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 280px;
+}
+
+.proxima-cita-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.hora-paciente {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+.hora {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul);
+}
+
+.paciente {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.tipo-consulta {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.btn-iniciar-cita {
+    background: linear-gradient(135deg, var(--verde) 0%, #4CAF50 100%);
+    color: var(--blanco);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-iniciar-cita:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* 📊 Estadísticas grid */
+.estadisticas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--blanco);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card.hoy {
+    border-left-color: var(--azul);
+}
+
+.stat-card.pacientes {
+    border-left-color: var(--verde);
+}
+
+.stat-card.tiempo {
+    border-left-color: #fd7e14;
+}
+
+.stat-card.eficiencia {
+    border-left-color: #6f42c1;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--blanco);
+}
+
+.stat-card.hoy .stat-icon {
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+}
+
+.stat-card.pacientes .stat-icon {
+    background: linear-gradient(135deg, var(--verde) 0%, #4CAF50 100%);
+}
+
+.stat-card.tiempo .stat-icon {
+    background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);
+}
+
+.stat-card.eficiencia .stat-icon {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a2c8a 100%);
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.numero {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--azul);
+    line-height: 1;
+}
+
+.label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #495057;
+    margin-top: 0.25rem;
+}
+
+.sublabel {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+/* 📋 Contenido principal */
+.contenido-principal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.columna-izquierda,
+.columna-derecha {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* 🃏 Secciones */
+.seccion-card {
+    background: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.seccion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.seccion-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--azul);
+}
+
+.btn-ver-todas {
+    background: none;
+    border: none;
+    color: var(--azul);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+
+.btn-ver-todas:hover {
+    background: rgba(26, 78, 141, 0.1);
+    transform: translateX(2px);
+}
+
+/* 📅 Citas del día */
+.citas-lista {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.cita-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.cita-item:hover {
+    background: #f8f9fa;
+    border-color: var(--azul);
+}
+
+.cita-item.estado-siguiente {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%);
+    border-color: var(--verde);
+}
+
+.cita-hora {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.cita-hora .hora {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--azul);
+}
+
+.duracion {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.cita-info {
+    flex: 1;
+}
+
+.paciente-nombre {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.consulta-tipo {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.badge.completada {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--verde);
+}
+
+.badge.siguiente {
+    background: rgba(255, 193, 7, 0.1);
+    color: #f57c00;
+}
+
+.badge.programada {
+    background: rgba(26, 78, 141, 0.1);
+    color: var(--azul);
+}
+
+/* 👥 Pacientes recientes */
+.pacientes-lista {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.paciente-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.paciente-item:hover {
+    background: #f8f9fa;
+    border-color: var(--azul);
+}
+
+.paciente-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blanco);
+    font-size: 1.2rem;
+}
+
+.paciente-info {
+    flex: 1;
+}
+
+.paciente-nombre {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.paciente-diagnostico {
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.paciente-fecha {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.estado-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.estado-badge.estado-critico {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.estado-badge.estado-seguimiento {
+    background: rgba(255, 193, 7, 0.1);
+    color: #f57c00;
+}
+
+.estado-badge.estado-control {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--verde);
+}
+
+.estado-badge.estado-nuevo {
+    background: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+}
+
+/* 📈 Métricas de rendimiento */
+.metricas-grid {
+    padding: 1.5rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.metrica-item {
+    text-align: center;
+}
+
+.metrica-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul);
+    margin-bottom: 0.5rem;
+}
+
+.metrica-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+}
+
+.metrica-barra {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.barra-progreso {
+    height: 100%;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    border-radius: 4px;
+    transition: width 0.8s ease;
+}
+
+/* 📄 Actividades recientes */
+.actividades-lista {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.actividad-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.actividad-item:hover {
+    background: #f8f9fa;
+    border-color: var(--azul);
+}
+
+.actividad-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blanco);
+    font-size: 1rem;
+}
+
+.actividad-icon.tipo-cita {
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+}
+
+.actividad-icon.tipo-diagnostico {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.actividad-icon.tipo-tratamiento {
+    background: linear-gradient(135deg, var(--verde) 0%, #4CAF50 100%);
+}
+
+.actividad-icon.tipo-nota {
+    background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);
+}
+
+.actividad-info {
+    flex: 1;
+}
+
+.actividad-descripcion {
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.actividad-paciente {
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.actividad-tiempo {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* 🚀 Acciones rápidas */
+.acciones-rapidas {
+    background: var(--blanco);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.acciones-rapidas h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--azul);
+}
+
+.acciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.accion-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border: 2px solid #e9ecef;
+    background: var(--blanco);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #495057;
+}
+
+.accion-btn:hover {
+    border-color: var(--azul);
+    background: rgba(26, 78, 141, 0.05);
+    transform: translateY(-2px);
+    color: var(--azul);
+}
+
+.accion-btn i {
+    font-size: 1.5rem;
+    color: var(--azul);
+}
+
+.accion-btn span {
+    font-weight: 600;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1200px) {
+    .contenido-principal {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .proxima-cita-card {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .estadisticas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .acciones-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cita-item,
+    .paciente-item,
+    .actividad-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .cita-hora,
+    .paciente-avatar {
+        align-self: center;
+    }
+}

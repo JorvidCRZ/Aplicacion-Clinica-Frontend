@@ -31,17 +31,30 @@ export class BuscadorComponent {
 
     const textoNormalizado = this.normalize(this.texto);
 
-    this.sugerencias = this.data.filter(item => {
+    // Filtrar los elementos que coinciden
+    const elementosFiltrados = this.data.filter(item => {
       const valor = this.key ? item[this.key] : item;
-      return this.normalize(valor).includes(textoNormalizado);
+      return this.normalize(String(valor)).includes(textoNormalizado);
     });
 
-    this.resultado.emit(this.sugerencias);
+    // Generar sugerencias como strings únicos
+    this.sugerencias = [...new Set(elementosFiltrados.map(item => {
+      return this.key ? item[this.key] : item;
+    }))].slice(0, 5); // Limitar a 5 sugerencias
+
+    this.resultado.emit(elementosFiltrados);
   }
 
-  seleccionar(opcion: any) {
-    this.texto = this.key ? opcion[this.key] : opcion;
-    this.resultado.emit([opcion]);
+  seleccionar(valorSeleccionado: string) {
+    this.texto = valorSeleccionado;
+    
+    // Encontrar todos los elementos que coinciden con el valor seleccionado
+    const elementosCoincidentes = this.data.filter(item => {
+      const valor = this.key ? item[this.key] : item;
+      return String(valor).toLowerCase() === valorSeleccionado.toLowerCase();
+    });
+    
+    this.resultado.emit(elementosCoincidentes);
     this.sugerencias = [];
   }
 

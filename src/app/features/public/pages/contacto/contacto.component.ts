@@ -22,11 +22,13 @@ type ContactoForm = {
 export class ContactoComponent {
 
   readonly tiposConsulta = [
-    'Agendar cita',
-    'Consulta sobre adopción',
-    'Emergencia',
-    'Consulta sobre productos',
-    'Información sobre servicios',
+    'Agendar cita médica',
+    'Consulta médica general',
+    'Urgencia/Emergencia',
+    'Información sobre especialidades',
+    'Consulta sobre tratamientos',
+    'Resultados médicos',
+    'Seguro médico y pagos',
     'Otro'
   ] as const;
 

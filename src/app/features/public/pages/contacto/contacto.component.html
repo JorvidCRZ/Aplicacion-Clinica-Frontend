@@ -6,21 +6,22 @@
                 <!-- 🔹 Encabezado fuera del form -->
                 <div class="text-center mb-4">
                     <h2 class="fw-bold" style="color: var(--azul-oscuro);">Contáctanos</h2>
-                    <p class="text-muted mb-0">¿Tienes dudas o sugerencias? ¡Escríbenos!</p>
+                    <p class="text-muted mb-0">¿Necesitas atención médica o tienes consultas? ¡Estamos aquí para ayudarte!</p>
                 </div>
                 <div class="card p-3 shadow-sm">
                     <div class="d-flex align-items-center gap-2 mb-3 contact-heading">
-                        <!-- Icono mensaje -->
+                        <!-- Icono médico -->
                         <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
-                            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"
                                 stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M12 5L8 21l4-7 4 7-4-16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
 
                         <!-- Bloque de texto -->
                         <div>
-                            <h5 class="mb-0 fw-bold" style="color: var(--azul-oscuro);">Envíanos un mensaje</h5>
+                            <h5 class="mb-0 fw-bold" style="color: var(--azul-oscuro);">Envíanos tu consulta médica</h5>
                             <small class="d-block contact-subtitle">
-                                Completa el formulario y te responderemos lo antes posible
+                                Completa el formulario y nuestro equipo médico te responderá a la brevedad
                             </small>
                         </div>
                     </div>
@@ -70,7 +71,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Asunto</label>
                             <input class="form-control" formControlName="asunto"
-                                placeholder="¿En qué podemos ayudarte?">
+                                placeholder="Ej: Consulta sobre cardiología, cita urgente, etc.">
                             <div class="invalid-feedback d-block" *ngIf="asunto.touched && asunto.invalid">
                                 El asunto es obligatorio (mínimo 3 caracteres).
                             </div>
@@ -80,7 +81,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Mensaje</label>
                             <textarea rows="4" class="form-control" formControlName="mensaje"
-                                placeholder="Describe tu consulta con el mayor detalle posible..."></textarea>
+                                placeholder="Describe tu consulta médica, síntomas, o cualquier información relevante que nos ayude a brindarte la mejor atención..."></textarea>
                             <div class="invalid-feedback d-block" *ngIf="mensaje.touched && mensaje.invalid">
                                 El mensaje es obligatorio (10–1000 caracteres).
                             </div>
@@ -88,18 +89,18 @@
 
                         <!-- Acciones -->
                         <div class="text-center">
-                            <button type="submit" class="btn btn-lg btn-warning w-100">
-                                <i class="bi bi-calendar-check"></i>
-                                {{ sending ? 'Enviando…' : 'Enviar mensaje' }}
+                            <button type="submit" class="btn btn-lg w-100" style="background: var(--verde); color: var(--blanco); border: none;">
+                                <i class="bi bi-hospital"></i>
+                                {{ sending ? 'Enviando consulta…' : 'Enviar consulta médica' }}
                             </button>
                         </div>
 
                         <!-- Estados -->
                         <div class="alert alert-success mt-3" *ngIf="sentOk === true">
-                            ¡Gracias! Tu mensaje fue enviado correctamente.
+                            ✅ ¡Gracias! Tu consulta médica fue enviada correctamente. Nuestro equipo se pondrá en contacto contigo pronto.
                         </div>
                         <div class="alert alert-danger mt-3" *ngIf="sentOk === false">
-                            Ocurrió un error. Inténtalo nuevamente.
+                            ❌ Ocurrió un error al enviar tu consulta. Por favor, inténtalo nuevamente o llama a nuestro número de emergencia.
                         </div>
                     </form>
                 </div>

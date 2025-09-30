@@ -1,1 +1,28 @@
-<p>pacientes.component works!</p>
+<!-- 👥 GESTIÓN DE PACIENTES -->
+<div class="page-container">
+  <!-- 📋 HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Pacientes</h2>
+      <p>Administra la información de todos los pacientes</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarPaciente()">
+        <i class="fas fa-plus"></i>
+        Agregar Paciente
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 DATA TABLE -->
+  <app-data-table
+    [data]="pacientes"
+    [columns]="columns"
+    [actions]="actions"
+    [searchable]="true"
+    [loading]="isLoading"
+    emptyMessage="No hay pacientes registrados"
+    (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+</div>

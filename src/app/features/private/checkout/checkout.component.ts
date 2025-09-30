@@ -1,92 +1,258 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CarritoService, ProductoCarrito } from '../../../core/services/carrito.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService, AuthState } from '../../../core/services/auth.service';
+import { Paciente } from '../../../core/models/users/paciente';
+
+interface CitaMedica {
+  id: string;
+  doctor: string;
+  especialidad: string;
+  fecha: string;
+  hora: string;
+  precio: number;
+  descripcion: string;
+  duracion: string;
+}
+
+interface MetodoPago {
+  id: string;
+  nombre: string;
+  icono: string;
+  comision: number;
+  disponible: boolean;
+}
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './checkout.component.html',
-  styleUrl: './checkout.component.css'
+  styleUrls: ['./checkout.component.css']
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit, OnDestroy {
   checkoutForm: FormGroup;
   pagoExitoso: boolean | null = null;
-  mostrarTarjeta: boolean = false;
-  mostrarYape: boolean = true;
-  carrito: ProductoCarrito[] = [];
+  procesandoPago: boolean = false;
+  
+  // Datos de la cita
+  citaSeleccionada: CitaMedica | null = null;
+  usuarioActual: Paciente | null = null;
+  authSubscription: Subscription | null = null;
+  
+  // Métodos de pago
+  metodosPago: MetodoPago[] = [
+    {
+      id: 'tarjeta',
+      nombre: 'Tarjeta de Crédito/Débito',
+      icono: 'fas fa-credit-card',
+      comision: 0.035,
+      disponible: true
+    },
+    {
+      id: 'yape',
+      nombre: 'Yape',
+      icono: 'fas fa-mobile-alt',
+      comision: 0,
+      disponible: true
+    },
+    {
+      id: 'plin',
+      nombre: 'Plin',
+      icono: 'fas fa-wallet',
+      comision: 0,
+      disponible: true
+    },
+    {
+      id: 'transferencia',
+      nombre: 'Transferencia Bancaria',
+      icono: 'fas fa-university',
+      comision: 0,
+      disponible: true
+    }
+  ];
+  
+  metodoPagoSeleccionado: MetodoPago | null = null;
 
-  constructor(private fb: FormBuilder, private carritoService: CarritoService) {
-    const usuarioActivoStr = localStorage.getItem('usuarioActivo');
-    const usuarioActivo = usuarioActivoStr ? JSON.parse(usuarioActivoStr) : null;
-
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.checkoutForm = this.fb.group({
-      nombre: [usuarioActivo?.nombre || '', Validators.required],
-      email: [usuarioActivo?.email || '', [Validators.required, Validators.email]],
-      telefono: [usuarioActivo?.telefono || '', [Validators.required, Validators.pattern(/^9\d{8}$/)]],
-      direccion: ['', Validators.required],
-      metodoPago: ['YAPE', Validators.required],
-      numeroYape: ['', [Validators.required, Validators.pattern(/^9\d{8}$/)]],
-      numeroTarjeta: ['', [Validators.required, Validators.pattern(/^\d{16}$/)]],
-      fechaVencimiento: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/(\d{2})$/)]],
-      cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]]
-    });
-
-    this.toggleMetodoPago();
-    this.carrito = this.carritoService.getCarrito();
-  }
-
-  get total(): number {
-    return this.carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
-  }
-
-  toggleMetodoPago() {
-    this.checkoutForm.get('metodoPago')?.valueChanges.subscribe(value => {
-      this.mostrarTarjeta = value === 'Tarjeta';
-      this.mostrarYape = value === 'YAPE';
-      if (!this.mostrarTarjeta) {
-        this.checkoutForm.get('numeroTarjeta')?.reset();
-        this.checkoutForm.get('cvv')?.reset();
-        this.checkoutForm.get('fechaVencimiento')?.reset();
-      }
-      if (!this.mostrarYape) {
-        this.checkoutForm.get('numeroYape')?.reset();
-      }
+      // Datos del paciente
+      nombre: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.required, Validators.pattern(/^9\d{8}$/)]],
+      
+      // Datos de pago para tarjeta
+      numeroTarjeta: [''],
+      fechaVencimiento: [''],
+      cvv: [''],
+      
+      // Datos de pago para Yape/Plin
+      numeroYape: [''],
+      
+      // Notas adicionales
+      observaciones: ['']
     });
   }
 
-  confirmarPago() {
-    if (this.checkoutForm.get('metodoPago')?.value === 'YAPE') {
-      if (
-        this.checkoutForm.get('nombre')?.invalid ||
-        this.checkoutForm.get('email')?.invalid ||
-        this.checkoutForm.get('direccion')?.invalid ||
-        this.checkoutForm.get('numeroYape')?.invalid
-      ) {
-        this.pagoExitoso = false;
-        return;
+  ngOnInit(): void {
+    // Obtener datos del usuario actual
+    this.authSubscription = this.authService.authState$.subscribe((authState: AuthState) => {
+      if (authState.user && authState.user.rol === 'paciente') {
+        this.usuarioActual = authState.user as Paciente;
+        this.cargarDatosUsuario();
       }
-    } else if (this.checkoutForm.get('metodoPago')?.value === 'Tarjeta') {
-      if (
-        this.checkoutForm.get('nombre')?.invalid ||
-        this.checkoutForm.get('email')?.invalid ||
-        this.checkoutForm.get('direccion')?.invalid ||
-        this.checkoutForm.get('numeroTarjeta')?.invalid ||
-        this.checkoutForm.get('fechaVencimiento')?.invalid ||
-        this.checkoutForm.get('cvv')?.invalid
-      ) {
-        this.pagoExitoso = false;
-        return;
+    });
+
+    // Obtener datos de la cita desde los parámetros de la URL o localStorage
+    this.cargarDatosCita();
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+  }
+
+  private cargarDatosUsuario(): void {
+    if (this.usuarioActual) {
+      this.checkoutForm.patchValue({
+        nombre: `${this.usuarioActual.nombre} ${this.usuarioActual.apellidoPaterno || ''} ${this.usuarioActual.apellidoMaterno || ''}`.trim(),
+        email: this.usuarioActual.email,
+        telefono: this.usuarioActual.telefono
+      });
+    }
+  }
+
+  private cargarDatosCita(): void {
+    // Intentar obtener datos de la cita desde query params o localStorage
+    this.route.queryParams.subscribe(params => {
+      if (params['doctor'] && params['especialidad']) {
+        this.citaSeleccionada = {
+          id: 'CITA-' + Date.now(),
+          doctor: params['doctor'],
+          especialidad: params['especialidad'],
+          fecha: params['fecha'] || new Date().toISOString().split('T')[0],
+          hora: params['hora'] || '10:00',
+          precio: this.obtenerPrecioPorEspecialidad(params['especialidad']),
+          descripcion: `Consulta de ${params['especialidad']} con ${params['doctor']}`,
+          duracion: '30 minutos'
+        };
+      } else {
+        // Si no hay parámetros, crear una cita de ejemplo
+        this.citaSeleccionada = {
+          id: 'CITA-' + Date.now(),
+          doctor: 'Dr. Juan Pérez',
+          especialidad: 'Medicina General',
+          fecha: new Date().toISOString().split('T')[0],
+          hora: '10:00',
+          precio: 80.00,
+          descripcion: 'Consulta médica general',
+          duracion: '30 minutos'
+        };
       }
-    } else {
+    });
+  }
+
+  private obtenerPrecioPorEspecialidad(especialidad: string): number {
+    const precios = {
+      'Cardiología': 150.00,
+      'Dermatología': 120.00,
+      'Pediatría': 100.00,
+      'Ginecología': 130.00,
+      'Medicina General': 80.00,
+      'Traumatología': 140.00,
+      'Psicología': 110.00,
+      'Odontología': 90.00,
+      'Anestesiología': 160.00
+    };
+    return precios[especialidad as keyof typeof precios] || 80.00;
+  }
+
+  seleccionarMetodoPago(metodo: MetodoPago): void {
+    this.metodoPagoSeleccionado = metodo;
+    this.actualizarValidadores();
+  }
+
+  private actualizarValidadores(): void {
+    // Limpiar validadores previos
+    this.checkoutForm.get('numeroTarjeta')?.clearValidators();
+    this.checkoutForm.get('fechaVencimiento')?.clearValidators();
+    this.checkoutForm.get('cvv')?.clearValidators();
+    this.checkoutForm.get('numeroYape')?.clearValidators();
+
+    if (this.metodoPagoSeleccionado?.id === 'tarjeta') {
+      this.checkoutForm.get('numeroTarjeta')?.setValidators([Validators.required, Validators.pattern(/^\d{16}$/)]);
+      this.checkoutForm.get('fechaVencimiento')?.setValidators([Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/(\d{2})$/)]);
+      this.checkoutForm.get('cvv')?.setValidators([Validators.required, Validators.pattern(/^\d{3}$/)]);
+    } else if (this.metodoPagoSeleccionado?.id === 'yape' || this.metodoPagoSeleccionado?.id === 'plin') {
+      this.checkoutForm.get('numeroYape')?.setValidators([Validators.required, Validators.pattern(/^9\d{8}$/)]);
+    }
+
+    // Actualizar validadores
+    this.checkoutForm.get('numeroTarjeta')?.updateValueAndValidity();
+    this.checkoutForm.get('fechaVencimiento')?.updateValueAndValidity();
+    this.checkoutForm.get('cvv')?.updateValueAndValidity();
+    this.checkoutForm.get('numeroYape')?.updateValueAndValidity();
+  }
+
+  calcularTotal(): number {
+    if (!this.citaSeleccionada || !this.metodoPagoSeleccionado) return 0;
+    
+    const precio = this.citaSeleccionada.precio;
+    const comision = precio * this.metodoPagoSeleccionado.comision;
+    return precio + comision;
+  }
+
+  calcularComision(): number {
+    if (!this.citaSeleccionada || !this.metodoPagoSeleccionado) return 0;
+    
+    return this.citaSeleccionada.precio * this.metodoPagoSeleccionado.comision;
+  }
+
+  confirmarPago(): void {
+    if (!this.citaSeleccionada || !this.metodoPagoSeleccionado) {
       this.pagoExitoso = false;
       return;
     }
-    this.pagoExitoso = true;
-    // Vacía el carrito y actualiza el resumen
-    this.carritoService.vaciarCarrito();
-    this.carrito = [];
+
+    if (this.checkoutForm.invalid) {
+      this.pagoExitoso = false;
+      return;
+    }
+
+    this.procesandoPago = true;
+
+    // Simular procesamiento de pago
+    setTimeout(() => {
+      // Aquí iría la lógica real de procesamiento de pago
+      
+      this.pagoExitoso = true;
+      this.procesandoPago = false;
+
+      // Redirigir al dashboard después de 3 segundos
+      setTimeout(() => {
+        this.router.navigate(['/paciente/mis-citas']);
+      }, 3000);
+    }, 2500);
+  }
+
+  volver(): void {
+    this.router.navigate(['/citas']);
+  }
+
+  get mostrarCamposTarjeta(): boolean {
+    return this.metodoPagoSeleccionado?.id === 'tarjeta';
+  }
+
+  get mostrarCamposYape(): boolean {
+    return this.metodoPagoSeleccionado?.id === 'yape' || this.metodoPagoSeleccionado?.id === 'plin';
   }
 }

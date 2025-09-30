@@ -1,1 +1,28 @@
-<p>citas.component works!</p>
+<!-- 📅 GESTIÓN DE CITAS -->
+<div class="page-container">
+  <!-- 📋 HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Citas</h2>
+      <p>Administra todas las citas médicas</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarCita()">
+        <i class="fas fa-plus"></i>
+        Nueva Cita
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 DATA TABLE -->
+  <app-data-table
+    [data]="citas"
+    [columns]="columns"
+    [actions]="actions"
+    [searchable]="true"
+    [loading]="isLoading"
+    emptyMessage="No hay citas registradas"
+    (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+</div>

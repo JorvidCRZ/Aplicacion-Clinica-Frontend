@@ -1,1 +1,95 @@
-<p>panel.component works!</p>
+<!-- 📊 PANEL DE CONTROL - DASHBOARD PRINCIPAL -->
+<div class="dashboard-container">
+  <!-- 📋 HEADER -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Panel de Control</h1>
+      <p>Resumen general de la clínica</p>
+    </div>
+    <div class="header-date">
+      <i class="fas fa-calendar"></i>
+      Hoy
+    </div>
+  </div>
+
+  <!-- 📊 ESTADÍSTICAS PRINCIPALES -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let stat of estadisticas">
+      <div class="stat-icon" [style.background-color]="stat.color">
+        <i class="fas" [class]="stat.icono"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ stat.valor }}</div>
+        <div class="stat-label">{{ stat.titulo }}</div>
+        <div class="stat-change" *ngIf="stat.cambio" [class]="'change-' + stat.tendencia">
+          <i class="fas" [class]="stat.tendencia === 'up' ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ stat.cambio }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📈 GRÁFICOS Y TABLAS -->
+  <div class="charts-grid">
+    <!-- 📊 GRÁFICO DE CITAS POR ESTADO -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Estado de Citas</h3>
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div class="chart-content">
+        <div class="chart-stats">
+          <div class="chart-item">
+            <div class="chart-color confirmada"></div>
+            <span>Confirmadas: {{ citasPorEstado.confirmadas }}</span>
+            <div class="chart-percentage">{{ calcularPorcentaje(citasPorEstado.confirmadas, totalCitas) }}%</div>
+          </div>
+          <div class="chart-item">
+            <div class="chart-color pendiente"></div>
+            <span>Pendientes: {{ citasPorEstado.pendientes }}</span>
+            <div class="chart-percentage">{{ calcularPorcentaje(citasPorEstado.pendientes, totalCitas) }}%</div>
+          </div>
+          <div class="chart-item">
+            <div class="chart-color completada"></div>
+            <span>Completadas: {{ citasPorEstado.completadas }}</span>
+            <div class="chart-percentage">{{ calcularPorcentaje(citasPorEstado.completadas, totalCitas) }}%</div>
+          </div>
+          <div class="chart-item">
+            <div class="chart-color cancelada"></div>
+            <span>Canceladas: {{ citasPorEstado.canceladas }}</span>
+            <div class="chart-percentage">{{ calcularPorcentaje(citasPorEstado.canceladas, totalCitas) }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📅 CITAS DE HOY -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3>Citas de Hoy</h3>
+        <i class="fas fa-calendar-day"></i>
+      </div>
+      <div class="chart-content">
+        <div class="citas-list" *ngIf="citasHoy.length > 0; else noCitas">
+          <div class="cita-item" *ngFor="let cita of citasHoy">
+            <div class="cita-time">{{ cita.hora }}</div>
+            <div class="cita-info">
+              <div class="cita-paciente">{{ cita.paciente }}</div>
+              <div class="cita-doctor">{{ cita.doctor }}</div>
+            </div>
+            <div class="cita-estado" [class]="getEstadoClass(cita.estado)">
+              {{ cita.estado }}
+            </div>
+          </div>
+        </div>
+        <ng-template #noCitas>
+          <div class="no-citas">
+            <i class="fas fa-calendar-times"></i>
+            <p>No hay citas programadas para hoy</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+</div>

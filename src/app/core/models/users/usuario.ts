@@ -13,6 +13,7 @@ export interface Usuario {
   apellidoMaterno?: string;
   fechaNacimiento?: Date;
   genero?: 'masculino' | 'femenino' | 'otro';
+  especialidad?: string;
   pais?: string;
   departamento?: string;
   provincia?: string;

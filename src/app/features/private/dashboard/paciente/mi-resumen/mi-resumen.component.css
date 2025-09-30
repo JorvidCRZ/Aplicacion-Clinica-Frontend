@@ -1,0 +1,231 @@
+/* Resumen simple del paciente */
+.resumen-paciente {
+  padding: 1.5rem;
+  background: var(--gris-claro);
+  min-height: 100vh;
+}
+
+/* Header */
+.header-resumen {
+  background: var(--azul);
+  color: var(--blanco);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.header-resumen h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+}
+
+.header-resumen p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* Tarjetas */
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.tarjeta {
+  background: var(--blanco);
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.tarjeta:hover {
+  transform: translateY(-5px);
+}
+
+.tarjeta .icono {
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blanco);
+}
+
+.tarjeta.cita .icono { background: var(--azul); }
+.tarjeta.historial .icono { background: var(--verde); }
+.tarjeta.pagos .icono { background: var(--amarillo); }
+.tarjeta.perfil .icono { background: var(--plomo); }
+
+.tarjeta .contenido {
+  flex: 1;
+}
+
+.tarjeta h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--azul-oscuro);
+  font-size: 1.1rem;
+}
+
+.tarjeta .fecha {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--azul);
+  margin: 0;
+}
+
+.tarjeta .doctor,
+.tarjeta .especialidad {
+  margin: 0.2rem 0;
+  color: var(--negro);
+  font-size: 0.9rem;
+}
+
+.tarjeta .numero {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--verde);
+  margin: 0;
+}
+
+.tarjeta .etiqueta {
+  color: var(--plomo);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.tarjeta .monto {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--rojo);
+  margin: 0;
+}
+
+.tarjeta .estado {
+  color: var(--rojo);
+  font-weight: bold;
+  margin: 0.3rem 0;
+}
+
+.tarjeta .estado.pagado {
+  color: var(--verde);
+}
+
+.sin-datos {
+  color: var(--plomo);
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+/* Botones */
+.btn-agendar,
+.btn-ver,
+.btn-pagar,
+.btn-editar {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-agendar { background: var(--verde); color: var(--blanco); }
+.btn-ver { background: var(--azul); color: var(--blanco); }
+.btn-pagar { background: var(--amarillo); color: var(--negro); }
+.btn-editar { background: var(--plomo); color: var(--blanco); }
+
+.btn-agendar:hover { background: var(--verde-oscuro); }
+.btn-ver:hover { background: var(--azul-oscuro); }
+.btn-pagar:hover { background: var(--amarillo-oscuro); }
+.btn-editar:hover { background: var(--negro); }
+
+/* Acciones rápidas */
+.acciones-rapidas {
+  background: var(--blanco);
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.acciones-rapidas h2 {
+  margin: 0 0 1rem 0;
+  color: var(--azul-oscuro);
+  font-size: 1.3rem;
+}
+
+.botones-rapidos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.accion-btn {
+  background: var(--azul);
+  color: var(--blanco);
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.accion-btn:hover {
+  background: var(--azul-oscuro);
+  transform: translateY(-3px);
+}
+
+.accion-btn i {
+  font-size: 1.5rem;
+}
+
+.accion-btn span {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .resumen-paciente {
+    padding: 1rem;
+  }
+  
+  .header-resumen {
+    padding: 1.5rem;
+  }
+  
+  .header-resumen h1 {
+    font-size: 1.5rem;
+  }
+  
+  .tarjetas-resumen {
+    grid-template-columns: 1fr;
+  }
+  
+  .botones-rapidos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .botones-rapidos {
+    grid-template-columns: 1fr;
+  }
+  
+  .tarjeta {
+    flex-direction: column;
+    text-align: center;
+  }
+}

@@ -19,6 +19,7 @@ export class EspecialidadesComponent implements OnInit {
   ngOnInit(): void {
     // Aquí simulas el consumo de tu API con un array de prueba
     this.especialidades = [
+      { id: 0, nombre: 'Medicina General', descripcion: 'Atención primaria y preventiva para todas las edades.' },
       { id: 1, nombre: 'Cardiología', descripcion: 'Cuidado del corazón y sistema circulatorio.' },
       { id: 2, nombre: 'Dermatología', descripcion: 'Tratamiento de la piel, cabello y uñas.' },
       { id: 3, nombre: 'Pediatría', descripcion: 'Atención médica para niños y adolescentes.' },

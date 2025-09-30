@@ -10,55 +10,209 @@
     <div class="row mb-4 ">
         <!-- Buscador por Doctor -->
         <div class="col-12 col-md-6 mb-2">
-            <app-buscador placeholder="Buscar por doctor..." [data]="citas" key="doctor" (resultado)="citas = $event">
+            <app-buscador placeholder="Buscar por doctor..." [data]="citas" key="doctor" (resultado)="onBuscarDoctor($event)">
             </app-buscador>
         </div>
 
         <!-- Buscador por Especialidad -->
         <div class="col-12 col-md-6 mb-2">
             <app-buscador placeholder="Buscar por especialidad..." [data]="citas" key="especialidad"
-                (resultado)="citas = $event">
+                (resultado)="onBuscarEspecialidad($event)">
             </app-buscador>
         </div>
     </div>
 
 
     <!-- Cards de doctores -->
-   <div class="row">
-    @for (cita of citasFiltradas; track cita.doctor) {
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="card shadow doctor-card h-100 border-0">
-                <div class="card-body d-flex flex-column text-center">
-                    <div class="mb-3">
-                        <img 
-                            src="https://vivamas.aviva.pe/professionals/default.png" 
-                            style="width:10vw;" 
-                            alt="Doctor" 
-                            class="rounded-circle border shadow-sm">
-                    </div>
+    <div class="row">
+        @for (cita of citasFiltradas; track cita.doctor) {
+        <div class="col-12 mb-4">
+            <div class="doctor-card-clean">
 
-                    <h5 class="card-title text-primary fw-bold">{{ cita.doctor }}</h5>
-                    <p class="card-subtitle mb-2 text-muted">{{ cita.especialidad }}</p>
+                <!-- Header con especialidad -->
+                <div class="especialidad-header-clean">
+                    {{ cita.especialidad.toUpperCase() }}
+                </div>
 
-                    <div class="mt-auto">
-                        <h6 class="text-secondary">Disponibilidad:</h6>
-                        <div class="d-flex flex-wrap justify-content-center gap-2 mt-2">
-                            @for (horario of cita.disponibilidad; track horario) {
-                                <button 
-                                    class="btn btn-outline-primary btn-sm px-3 py-1 rounded-pill"
-                                    (click)="seleccionarHorario(cita, horario)">
-                                    {{ horario }}
-                                </button>
-                            }
+                <!-- Contenido principal -->
+                <div class="card-content-clean">
+
+                    <!-- Lado izquierdo: Doctor info -->
+                    <div class="doctor-side">
+                        <div class="doctor-avatar-clean">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+
+                        <div class="doctor-info-clean">
+                            <h3 class="doctor-name-clean">{{ cita.doctor }}</h3>
+                            <div class="doctor-meta">
+                                <span class="cmp-clean">CMP: {{ 30000 + (cita.doctor.length * 1234) }}</span>
+                                <a href="#" class="ver-perfil-clean">Ver perfil →</a>
+                            </div>
+                            <div class="consulta-badge-clean">
+                                <i class="fas fa-building"></i>
+                                <span>Presencial</span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Lado derecho: Disponibilidad -->
+                    <div class="disponibilidad-side">
+
+                        <!-- Selector de días -->
+                        <div class="dias-clean">
+                            @for (dia of diasDisponibles; track dia.codigo) {
+                            <button class="dia-btn-clean" 
+                                [class.active]="getCardState(cita.doctor).diaSeleccionado === dia.codigo"
+                                (click)="seleccionarDiaCard(cita.doctor, dia.codigo)">
+                                <div class="dia-info">
+                                    <span class="dia-nombre-clean">{{ dia.nombre }}</span>
+                                    <span class="dia-fecha-clean">{{ dia.fecha }}</span>
+                                </div>
+                            </button>
+                            }
+                        </div>
+
+                        <!-- Grid de horarios -->
+                        <div class="horarios-clean">
+                            @for (horario of getHorariosDelDia(cita.doctor); track horario) {
+                            <button class="horario-btn-clean" 
+                                [class.selected]="getCardState(cita.doctor).horarioSeleccionado === horario"
+                                (click)="seleccionarHorarioCard(cita.doctor, horario)">
+                                {{ horario }}
+                            </button>
+                            }
+
+                            @if (getHorariosDelDia(cita.doctor).length === 0) {
+                            <div class="no-horarios-clean">
+                                <p>No hay horarios disponibles</p>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Botón de reserva -->
+                        <button class="btn-reservar-clean" (click)="reservarCita(cita)"
+                            [disabled]="!getCardState(cita.doctor).horarioSeleccionado">
+                            @if (getCardState(cita.doctor).horarioSeleccionado) {
+                            <i class="fas fa-calendar-check"></i>
+                            Reservar {{ getDiaActual(cita.doctor)?.nombre }} {{ getCardState(cita.doctor).horarioSeleccionado }}
+                            } @else {
+                            <i class="fas fa-calendar-plus"></i>
+                            Selecciona día y horario
+                            }
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div class="card-footer bg-light text-center">
-                    <button class="btn btn-success btn-sm w-100">Reservar Cita</button>
-                </div>
             </div>
         </div>
+        }
+    </div>
+
+    <!-- 🔔 MODAL DE RESERVA DE CITA -->
+    @if (mostrarModal) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <!-- Header del Modal -->
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-plus"></i> Reservar Cita</h3>
+                <button class="btn-close" (click)="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Información de la cita seleccionada -->
+            <div class="cita-seleccionada">
+                <div class="doctor-info-modal">
+                    <img src="https://vivamas.aviva.pe/professionals/default.png" alt="Doctor"
+                        class="doctor-avatar-modal">
+                    <div class="doctor-datos-modal">
+                        <h4>{{ citaParaReservar?.doctor }}</h4>
+                        <p class="especialidad-modal">{{ citaParaReservar?.especialidad }}</p>
+                        <p class="horario-modal">
+                            <i class="fas fa-clock"></i>
+                            {{ horarioParaReservar }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verificación de autenticación -->
+            @if (!estaLogueado) {
+            <div class="auth-required">
+                <div class="auth-message">
+                    <i class="fas fa-user-shield"></i>
+                    <h4>¡Necesitas una cuenta para continuar!</h4>
+                    <p>Para reservar tu cita necesitas estar registrado en nuestro sistema</p>
+                </div>
+
+                <div class="auth-options">
+                    <div class="auth-option">
+                        <h5>¿Ya tienes cuenta?</h5>
+                        <button class="btn btn-primary" (click)="irALogin()">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Iniciar Sesión
+                        </button>
+                    </div>
+
+                    <div class="auth-divider">
+                        <span>O</span>
+                    </div>
+
+                    <div class="auth-option">
+                        <h5>¿Primera vez aquí?</h5>
+                        <button class="btn btn-success" (click)="irARegistro()">
+                            <i class="fas fa-user-plus"></i>
+                            Registrarse
+                        </button>
+                    </div>
+                </div>
+            </div>
+            } @else {
+            <!-- Formulario de datos de la cita -->
+            <div class="formulario-cita">
+                <h4><i class="fas fa-clipboard-list"></i> Datos de la Cita</h4>
+
+                <div class="campo-formulario">
+                    <label for="motivo">Motivo de la consulta *</label>
+                    <textarea id="motivo" [(ngModel)]="datosCita.motivo" class="form-control" rows="3"
+                        placeholder="Describe brevemente el motivo de tu consulta..." required>
+                        </textarea>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="tipoConsulta">Tipo de consulta</label>
+                    <select id="tipoConsulta" [(ngModel)]="datosCita.tipoConsulta" class="form-select">
+                        <option value="consulta-general">Consulta General</option>
+                        <option value="consulta-especializada">Consulta Especializada</option>
+                        <option value="control-rutinario">Control Rutinario</option>
+                        <option value="emergencia">Emergencia</option>
+                    </select>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="observaciones">Observaciones adicionales</label>
+                    <textarea id="observaciones" [(ngModel)]="datosCita.observaciones" class="form-control" rows="2"
+                        placeholder="Información adicional (opcional)...">
+                        </textarea>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="modal-actions">
+                <button class="btn btn-secondary" (click)="cerrarModal()">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button class="btn btn-primary" (click)="procesarReservaCita()" [disabled]="!datosCita.motivo.trim()">
+                    <i class="fas fa-check"></i>
+                    Confirmar Reserva
+                </button>
+            </div>
+            }
+        </div>
+    </div>
     }
-</div>
 </div>

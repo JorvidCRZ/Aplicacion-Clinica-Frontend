@@ -1,0 +1,60 @@
+<div class="configuracion-container">
+    <div class="header">
+        <h2>⚙️ Configuración</h2>
+        <p>Seguridad y notificaciones</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab" [class.activo]="seccionActiva === 'seguridad'" (click)="cambiarSeccion('seguridad')">
+            🔐 Seguridad
+        </button>
+        <button class="tab" [class.activo]="seccionActiva === 'notificaciones'"
+            (click)="cambiarSeccion('notificaciones')">
+            📧 Notificaciones
+        </button>
+    </div>
+
+    <div *ngIf="seccionActiva === 'seguridad'" class="seccion">
+        <h3>🔐 Seguridad</h3>
+
+        <div class="item">
+            <div class="info">
+                <h4>Cambiar Contraseña</h4>
+                <p>Actualiza tu contraseña</p>
+            </div>
+            <button class="btn" (click)="cambiarContrasena()">🔑 Cambiar</button>
+        </div>
+
+        <div class="item">
+            <div class="info">
+                <h4>Autenticación de Dos Factores</h4>
+                <p>Seguridad adicional</p>
+            </div>
+            <button class="btn" (click)="configurarAutenticacion()">🔒 Activar</button>
+        </div>
+
+        <div class="item">
+            <div class="info">
+                <h4>Historial de Sesiones</h4>
+                <p>Ver inicios de sesión</p>
+            </div>
+            <button class="btn" (click)="verHistorialSesiones()">📋 Ver</button>
+        </div>
+    </div>
+
+    <div *ngIf="seccionActiva === 'notificaciones'" class="seccion">
+        <h3>📧 Notificaciones por Email</h3>
+
+        <div class="item">
+            <div class="info">
+                <h4>Recibir notificaciones por email</h4>
+                <p>Citas, resultados y recordatorios</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" [(ngModel)]="notificacionEmail">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+</div>
+

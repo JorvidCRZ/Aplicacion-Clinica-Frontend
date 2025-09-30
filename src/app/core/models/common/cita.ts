@@ -1,16 +1,48 @@
+// Interfaz para formularios de citas simples
 export interface Cita {
   nombreCompleto: string;
   telefono: string;
   email: string;
-  
-  nombreMascota: string;
-  especie: string;
-  raza: string;
-  edad: string;
-  
-  servicioRequerido: string;
+  cedula: string;
+  fechaNacimiento: string;
+  genero: string;
+  direccion: string;
+  especialidadRequerida: string;
+  motivoConsulta: string;
   fechaPreferida: string;
   horaPreferida: string;
   notasAdicionales: string;
 }
- 
+
+export interface CitaCompleta {
+  id: number;
+  pacienteNombre: string;
+  doctorNombre: string;
+  especialidad: string;
+  fecha: string;
+  hora: string;
+  estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+
+  // Datos del paciente
+  pacienteEmail: string;
+  pacienteTelefono: string;
+  pacienteEdad?: number;
+
+  // Detalles de la cita médica
+  tipoConsulta: string;
+  motivoConsulta: string;
+  sintomas?: string;
+  notasAdicionales?: string;
+
+  // Metadatos
+  fechaCreacion: string;
+  fechaModificacion?: string;
+  duracionEstimada?: number; // en minutos
+}
+
+export interface EstadoCita {
+  id: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
+  label: string;
+  color: string;
+  icon: string;
+}

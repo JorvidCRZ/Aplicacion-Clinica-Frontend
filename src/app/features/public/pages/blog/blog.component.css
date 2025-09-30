@@ -1,144 +1,192 @@
-.titulo {
-    text-align: center;
+.contenedor-blog{
+    background-color: var(--gris);
+    border-radius: 20px;
 }
 
-.blog {
-    display: flex;
-    padding: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.noticia {
-    max-width: 450px;
-    margin: 40px 15px;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 2px 2px 10px var(--negro);
-    background: var(--blanco);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.noticia h2,
-.noticia h3,
-.blog h2 {
-    font-size: 20px;
-    color: var(--azul-oscuro);
-    text-align: center;
-}
-
-.noticia img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-}
-
-.noticia p {
-    font-size: 17px;
-}
-
-.noticia .principal {
-    font-size: 20px;
-}
-
-.noticia p,
-.recomendaciones li p {
-    line-height: 1.6;
-    text-align: center;
-    color: var(--negro);
+.blog-container {
+    min-height: 100vh;
+    color: var(--blanco);
     font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
 }
 
-.noticia a {
-    padding: 10px;
-    display: block;
-    color: white;
-    margin-top: 10px;
-    font-weight: bold;
-    border-radius: 5px;
+/* Header principal */
+.blog-header {
     text-align: center;
-    text-decoration: none;
-    background-color: var(--azul);
+    padding: 2rem 1rem;
 }
 
-.noticia a:hover {
-    background-color: var(--azul-oscuro);
+.main-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--azul-oscuro);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.lista-salud,
-.recomendaciones {
-    padding-left: 20px;
-    list-style-type: disc;
+/* Contenido principal */
+.blog-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.lista-salud li,
-.recomendaciones li {
-    padding: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 5px;
-    background: var(--gris);
+/* Secciones del blog */
+.blog-section {
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--blanco);
+    margin-bottom: 1.5rem;
+    text-align: left;
+    border-bottom: 2px solid var(--verde);
+    padding-bottom: 0.5rem;
+}
+
+.subsection-title {
+    font-size: 1.3rem;
+    color: var(--verde);
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+/* Layout de contenido */
+.section-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.two-column {
+    flex-direction: row;
+}
+
+.text-content {
+    flex: 2;
+}
+
+.image-placeholder {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Texto e introducción */
+.intro-text, 
+.section-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--blanco);
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.future-text {
+    background: rgba(76, 175, 80, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
     border-left: 4px solid var(--verde);
-    transition: background-color 0.3s ease;
+    margin-top: 1rem;
 }
 
-.lista-salud li:hover,
-.recomendaciones li:hover {
-    background-color: var(--celeste);
+/* Listas de consejos y recomendaciones */
+.health-tips,
+.recommendations,
+.medical-advances {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
 }
 
-@media (max-width: 1441px) {
-    .blog {
-        width: 100%;
-        padding: 0;
+.health-tips li,
+.recommendations li,
+.medical-advances li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    border-left: 4px solid var(--verde);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.health-tips li strong,
+.recommendations li strong,
+.medical-advances li strong {
+    color: var(--verde);
+}
+
+/* Subtítulos con iconos */
+h4 {
+    color: var(--verde);
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.8rem 0;
+    font-weight: 600;
+}
+
+/* Imágenes del blog */
+.blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
     }
-
-    .noticia {
+    
+    .section-content,
+    .two-column {
+        flex-direction: column;
+    }
+    
+    .image-placeholder {
+        min-width: auto;
+        margin-top: 1rem;
+    }
+    
+    .blog-content {
         padding: 1rem;
-        width: 350px;
     }
-
-    .noticia p,
-    .recomendaciones li p {
-        line-height: 1;
-        margin: 0;
+    
+    .blog-section {
+        padding: 1.5rem;
     }
-}
-
-@media (max-width: 1025px) {
-
-    .noticia p,
-    .recomendaciones li p {
-        font-size: 15px;
-    }
-
-    .noticia .principal {
-        font-size: 15px;
-        margin-bottom: 1rem;
+    
+    .section-title {
+        font-size: 1.5rem;
     }
 }
 
-@media (max-width: 769px) {
-    .noticia {
-        margin: 1rem 0.5rem;
-        width: 90%;
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 1.4rem;
     }
-
-    .lista-salud li,
-    .recomendaciones li {
-        margin: 1rem 0;
-        padding: 1.5rem 0;
+    
+    .blog-header {
+        padding: 1rem;
     }
-}
-
-@media (max-width: 426px) {
-
-    .lista-salud,
-    .recomendaciones {
-        width: 100%;
-        padding: 0;
-        list-style-type: none;
+    
+    .health-tips li,
+    .recommendations li,
+    .medical-advances li {
+        font-size: 0.9rem;
+        padding: 0.6rem;
     }
 }
