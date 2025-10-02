@@ -34,6 +34,34 @@ interface MetodoPago {
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
+  irAMisCitas() {
+    this.router.navigate(['/paciente/mis-citas']);
+  }
+  // ...existing code...
+
+  // UX: limpiar teléfono y formatear fecha de vencimiento
+  onTelefonoInput(event: any) {
+    let value = event.target.value.replace(/\s+/g, '');
+    value = value.replace(/^\+?51/, '');
+    if (value.length > 9) value = value.slice(0, 9);
+    this.checkoutForm.get('telefono')?.setValue(value, { emitEvent: false });
+  }
+
+  onNumeroYapeInput(event: any) {
+    let value = event.target.value.replace(/\s+/g, '');
+    value = value.replace(/^\+?51/, '');
+    if (value.length > 9) value = value.slice(0, 9);
+    this.checkoutForm.get('numeroYape')?.setValue(value, { emitEvent: false });
+  }
+
+  onFechaVencimientoInput(event: any) {
+    let value = event.target.value.replace(/[^\d]/g, '');
+    if (value.length > 2) {
+      value = value.slice(0,2) + '/' + value.slice(2,4);
+    }
+    if (value.length > 5) value = value.slice(0,5);
+    this.checkoutForm.get('fechaVencimiento')?.setValue(value, { emitEvent: false });
+  }
   checkoutForm: FormGroup;
   pagoExitoso: boolean | null = null;
   procesandoPago: boolean = false;
@@ -56,20 +84,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       id: 'yape',
       nombre: 'Yape',
       icono: 'fas fa-mobile-alt',
-      comision: 0,
-      disponible: true
-    },
-    {
-      id: 'plin',
-      nombre: 'Plin',
-      icono: 'fas fa-wallet',
-      comision: 0,
-      disponible: true
-    },
-    {
-      id: 'transferencia',
-      nombre: 'Transferencia Bancaria',
-      icono: 'fas fa-university',
       comision: 0,
       disponible: true
     }
@@ -123,10 +137,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   private cargarDatosUsuario(): void {
     if (this.usuarioActual) {
+      // Limpiar el teléfono por defecto
+      let telefono = this.usuarioActual.telefono || '';
+      telefono = telefono.replace(/\s+/g, '');
+      telefono = telefono.replace(/^\+?51/, '');
+      if (telefono.length > 9) telefono = telefono.slice(0, 9);
       this.checkoutForm.patchValue({
         nombre: `${this.usuarioActual.nombre} ${this.usuarioActual.apellidoPaterno || ''} ${this.usuarioActual.apellidoMaterno || ''}`.trim(),
         email: this.usuarioActual.email,
-        telefono: this.usuarioActual.telefono
+        telefono: telefono
       });
     }
   }
@@ -222,26 +241,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.pagoExitoso = false;
       return;
     }
-
     if (this.checkoutForm.invalid) {
       this.pagoExitoso = false;
       return;
     }
-
     this.procesandoPago = true;
-
     // Simular procesamiento de pago
     setTimeout(() => {
-      // Aquí iría la lógica real de procesamiento de pago
-      
       this.pagoExitoso = true;
       this.procesandoPago = false;
-
-      // Redirigir al dashboard después de 3 segundos
-      setTimeout(() => {
-        this.router.navigate(['/paciente/mis-citas']);
-      }, 3000);
-    }, 2500);
+      // Ya no redirige automáticamente, el usuario decide con el botón
+    }, 2000);
   }
 
   volver(): void {
@@ -253,6 +263,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   get mostrarCamposYape(): boolean {
-    return this.metodoPagoSeleccionado?.id === 'yape' || this.metodoPagoSeleccionado?.id === 'plin';
+    return this.metodoPagoSeleccionado?.id === 'yape';
   }
 }

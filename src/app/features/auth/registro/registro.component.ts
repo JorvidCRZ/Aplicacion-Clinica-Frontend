@@ -7,6 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Usuario } from '../../../core/models/users/usuario';
 import { Paciente } from '../../../core/models/users/paciente';
+import { Doctor } from '../../../core/models/users/doctor';
+import { Admin } from '../../../core/models/users/admin';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatOption } from '@angular/material/autocomplete';
@@ -83,11 +85,9 @@ export class RegistroComponent implements OnInit {
     if (this.datosForm.valid && this.personalesForm.valid && this.credencialesForm.valid) {
       const nuevoPaciente: Paciente = {
         id: Date.now(),
-
         tipoDocumento: this.datosForm.value.tipoDocumento!,
         numeroDocumento: this.datosForm.value.dni!,
         fechaNacimiento: this.datosForm.value.fechaNacimiento!,
-
         nombre: this.personalesForm.value.nombre!,
         apellidoPaterno: this.personalesForm.value.apellidoPaterno!,
         apellidoMaterno: this.personalesForm.value.apellidoMaterno!,
@@ -97,14 +97,15 @@ export class RegistroComponent implements OnInit {
         provincia: this.personalesForm.value.provincia!,
         distrito: this.personalesForm.value.distrito!,
         domicilio: this.personalesForm.value.domicilio!,
-
         telefono: this.credencialesForm.value.celular!,
         email: this.credencialesForm.value.correo!,
         password: this.credencialesForm.value.password!,
-        rol: 'paciente'
+        rol: 'paciente',
+        // Puedes agregar aquí más campos de Paciente si lo deseas
       };
 
-      let usuarios: Usuario[] = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      // Guardar como array de (Usuario | Paciente | Doctor | Admin)[]
+      let usuarios: (Usuario | Paciente | Doctor | Admin)[] = JSON.parse(localStorage.getItem('usuarios') || '[]');
       usuarios.push(nuevoPaciente);
       localStorage.setItem('usuarios', JSON.stringify(usuarios));
 

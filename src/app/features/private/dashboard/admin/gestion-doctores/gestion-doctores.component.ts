@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Doctor } from '../../../../../core/models/users/doctor';
 import { Usuario } from '../../../../../core/models/users/usuario';
+import { DoctorService } from '../../../../../core/services/doctor.service';
 
 @Component({
   selector: 'app-gestion-doctores',
@@ -15,16 +16,22 @@ import { Usuario } from '../../../../../core/models/users/usuario';
 export class GestionDoctoresComponent implements OnInit {
   doctores: Doctor[] = [];
   isLoading = false;
+  mostrarModalVer = false;
+  doctorActual: Doctor | null = null;
+  modoEdicion = false;
+  doctorService = new DoctorService();
 
   // 📋 Configuración de columnas para la tabla
   columns: TableColumn[] = [
-    { key: 'id', label: 'ID', sortable: true },
-    { key: 'nombre', label: 'Nombre Completo', sortable: true },
-    { key: 'email', label: 'Email', sortable: true },
-    { key: 'especialidad', label: 'Especialidad', sortable: true },
-    { key: 'nroColegiado', label: 'Nro. Colegiado', sortable: true },
-    { key: 'telefono', label: 'Teléfono', sortable: false },
-    { key: 'horario', label: 'Horario', sortable: false }
+  { key: 'id', label: 'ID', sortable: true },
+  { key: 'nombre', label: 'Nombre', sortable: true },
+  { key: 'apellidoPaterno', label: 'Apellido Paterno', sortable: true },
+  { key: 'apellidoMaterno', label: 'Apellido Materno', sortable: true },
+  { key: 'email', label: 'Email', sortable: true },
+  { key: 'especialidad', label: 'Especialidad', sortable: true },
+  { key: 'nroColegiado', label: 'Nro. Colegiado', sortable: true },
+  { key: 'telefono', label: 'Teléfono', sortable: false },
+  { key: 'horario', label: 'Horario', sortable: false }
   ];
 
   // 🎯 Configuración de acciones para cada fila
@@ -32,21 +39,37 @@ export class GestionDoctoresComponent implements OnInit {
     {
       action: 'view',
       label: 'Ver',
-      icon: 'fa-eye',
+      icon: 'fa fa-eye',
       class: 'btn-view'
     },
     {
       action: 'edit',
       label: 'Editar',
-      icon: 'fa-edit',
+      icon: 'fa fa-edit',
       class: 'btn-edit'
     },
     {
       action: 'delete',
       label: 'Eliminar',
-      icon: 'fa-trash',
+      icon: 'fa fa-trash',
       class: 'btn-delete'
     }
+  ];
+
+  especialidades = [
+    { id: 0, nombre: 'Medicina General', descripcion: 'Atención primaria y preventiva para todas las edades.' },
+    { id: 1, nombre: 'Cardiología', descripcion: 'Cuidado del corazón y sistema circulatorio.' },
+    { id: 2, nombre: 'Dermatología', descripcion: 'Tratamiento de la piel, cabello y uñas.' },
+    { id: 3, nombre: 'Pediatría', descripcion: 'Atención médica para niños y adolescentes.' },
+    { id: 4, nombre: 'Ginecología', descripcion: 'Salud reproductiva y sistema femenino.' },
+    { id: 5, nombre: 'Traumatología', descripcion: 'Lesiones óseas, musculares y articulares.' },
+    { id: 6, nombre: 'Oftalmología', descripcion: 'Diagnóstico y tratamiento de problemas oculares.' },
+    { id: 7, nombre: 'Odontología', descripcion: 'Salud dental y cuidado bucal.' },
+    { id: 8, nombre: 'Neurología', descripcion: 'Sistema nervioso y trastornos neurológicos.' },
+    { id: 9, nombre: 'Endocrinología', descripcion: 'Glándulas y hormonas en el cuerpo.' },
+    { id: 10, nombre: 'Reumatología', descripcion: 'Enfermedades de articulaciones y tejidos blandos.' },
+    { id: 11, nombre: 'Psiquiatría', descripcion: 'Salud mental y emocional.' },
+    { id: 12, nombre: 'Urología', descripcion: 'Sistema urinario y aparato reproductor masculino.' }
   ];
 
   ngOnInit(): void {
@@ -79,7 +102,9 @@ export class GestionDoctoresComponent implements OnInit {
     const doctoresEjemplo: Doctor[] = [
       {
         id: nextId,
-        nombre: 'Dr. Luján Carrión',
+        nombre: 'Luján',
+        apellidoPaterno: 'Carrión',
+        apellidoMaterno: 'García',
         email: 'doctor@gmail.com',
         telefono: '999999999',
         password: 'doctor123',
@@ -92,7 +117,9 @@ export class GestionDoctoresComponent implements OnInit {
       },
       {
         id: nextId + 1,
-        nombre: 'Dra. María González',
+        nombre: 'María',
+        apellidoPaterno: 'González',
+        apellidoMaterno: 'Ramos',
         email: 'maria.gonzalez@clinica.com',
         telefono: '987654321',
         password: 'maria123',
@@ -105,7 +132,9 @@ export class GestionDoctoresComponent implements OnInit {
       },
       {
         id: nextId + 2,
-        nombre: 'Dr. Carlos Mendoza',
+        nombre: 'Carlos',
+        apellidoPaterno: 'Mendoza',
+        apellidoMaterno: 'López',
         email: 'carlos.mendoza@clinica.com',
         telefono: '956789123',
         password: 'carlos123',
@@ -131,9 +160,50 @@ export class GestionDoctoresComponent implements OnInit {
 
   // ➕ Agregar nuevo doctor
   agregarDoctor(): void {
-    console.log('🆕 Agregar nuevo doctor');
-    // TODO: Implementar modal o navegación a formulario
-    alert('Función de agregar doctor próximamente disponible');
+    this.modoEdicion = false;
+    this.doctorActual = {
+      id: 0,
+      nombre: '',
+      apellidoPaterno: '',
+      apellidoMaterno: '',
+      email: '',
+      telefono: '',
+      password: '',
+      rol: 'doctor',
+      tipoDocumento: '',
+      numeroDocumento: '',
+      especialidad: '',
+      nroColegiado: '',
+      horario: ''
+    };
+  }
+
+  editarDoctor(doctor: Doctor): void {
+    this.modoEdicion = true;
+    this.doctorActual = { ...doctor };
+  }
+
+  guardarDoctor(): void {
+    if (!this.doctorActual) return;
+    if (this.modoEdicion) {
+      this.doctorService.update(this.doctorActual);
+    } else {
+      this.doctorService.add(this.doctorActual);
+    }
+    this.doctorActual = null;
+    this.modoEdicion = false;
+    this.cargarDoctores();
+  }
+
+  verDoctor(doctor: Doctor): void {
+    this.doctorActual = { ...doctor };
+    this.mostrarModalVer = true;
+  }
+
+  cancelarFormulario(): void {
+    this.mostrarModalVer = false;
+    this.doctorActual = null;
+    this.modoEdicion = false;
   }
 
   // 🎯 Manejar acciones de la tabla
@@ -155,31 +225,13 @@ export class GestionDoctoresComponent implements OnInit {
     }
   }
 
-  // 👁️ Ver detalles del doctor
-  private verDoctor(doctor: Doctor): void {
-    console.log('👁️ Ver doctor:', doctor);
-    alert(`Doctor: ${doctor.nombre}\nEspecialidad: ${doctor.especialidad}\nColegiado: ${doctor.nroColegiado}`);
-  }
-
-  // ✏️ Editar doctor
-  private editarDoctor(doctor: Doctor): void {
-    console.log('✏️ Editar doctor:', doctor);
-    // TODO: Implementar modal o navegación a formulario de edición
-    alert('Función de editar doctor próximamente disponible');
-  }
-
   // 🗑️ Eliminar doctor
   private eliminarDoctor(doctor: Doctor): void {
     const confirmacion = confirm(`¿Estás seguro de eliminar al doctor ${doctor.nombre}?`);
     
     if (confirmacion) {
-      const usuarios = this.obtenerUsuarios();
-      const usuariosActualizados = usuarios.filter(u => u.id !== doctor.id);
-      
-      localStorage.setItem('usuarios', JSON.stringify(usuariosActualizados));
+      this.doctorService.delete(doctor.id);
       this.cargarDoctores();
-      
-      console.log('🗑️ Doctor eliminado:', doctor.nombre);
     }
   }
 

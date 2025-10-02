@@ -222,6 +222,23 @@ body {
 .action-btn.btn-danger {
   background-color: #e53e3e;
 }
+/* 🎯 Custom action colors for usuarios table */
+.action-btn.btn-view {
+  background-color: var(--azul-claro);
+  color: #fff;
+}
+.action-btn.btn-edit {
+  background-color: var(--verde);
+  color: #fff;
+}
+.action-btn.btn-delete {
+  background-color: var(--rojo);
+  color: #fff;
+}
+.action-btn.btn-warning {
+  background-color: var(--amarillo);
+  color: #fff;
+}
 
 /* 📭 EMPTY STATE */
 .empty-container {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Usuario } from '../../../../../core/models/users/usuario';
 import { Paciente } from '../../../../../core/models/users/paciente';
+import { PacienteService } from '../../../../../core/services/paciente.service';
 
 @Component({
   selector: 'app-gestion-pacientes',
@@ -15,6 +16,10 @@ import { Paciente } from '../../../../../core/models/users/paciente';
 export class GestionPacientesComponent implements OnInit {
   pacientes: Paciente[] = [];
   isLoading = false;
+  mostrarModalVer = false;
+  pacienteActual: Paciente | null = null;
+  modoEdicion = false;
+  pacienteService = new PacienteService();
 
   // 📋 Configuración de columnas para mostrar pacientes reales
   columns: TableColumn[] = [
@@ -45,8 +50,7 @@ export class GestionPacientesComponent implements OnInit {
     
     // Simular delay de carga
     setTimeout(() => {
-      const usuarios = this.obtenerUsuarios();
-      this.pacientes = usuarios.filter(u => u.rol === 'paciente') as Paciente[];
+      this.pacientes = this.pacienteService.getAll();
       
       // Si no hay pacientes, agregar algunos de ejemplo
       if (this.pacientes.length === 0) {
@@ -154,15 +158,31 @@ export class GestionPacientesComponent implements OnInit {
 
   // ➕ Agregar nuevo paciente
   agregarPaciente(): void {
-    console.log('➕ Agregar nuevo paciente');
-    // TODO: Implementar modal o navegación a formulario
-    alert('Función de agregar paciente próximamente disponible');
+    this.modoEdicion = false;
+    this.pacienteActual = {
+      id: 0,
+      nombre: '',
+      email: '',
+      telefono: '',
+      password: '',
+      rol: 'paciente',
+      tipoDocumento: '',
+      numeroDocumento: '',
+      apellidoPaterno: '',
+      apellidoMaterno: '',
+      fechaNacimiento: new Date(),
+      genero: 'otro',
+      pais: '',
+      departamento: '',
+      provincia: '',
+      distrito: '',
+      domicilio: ''
+    };
   }
 
   // 🎯 Manejar acciones de tabla
   onTableAction(event: {action: string, item: any}): void {
     const paciente = event.item as Paciente;
-    
     switch(event.action) {
       case 'view':
         this.verPaciente(paciente);
@@ -186,24 +206,27 @@ export class GestionPacientesComponent implements OnInit {
 
   // 👁️ Ver paciente
   private verPaciente(paciente: Paciente): void {
-    console.log('👁️ Ver paciente:', paciente);
-    const detalles = `
-Paciente: ${paciente.nombre}
-Email: ${paciente.email}
-Teléfono: ${paciente.telefono}
-Documento: ${paciente.tipoDocumento} - ${paciente.numeroDocumento}
-Género: ${paciente.genero}
-Fecha Nacimiento: ${paciente.fechaNacimiento?.toLocaleDateString() || 'No especificada'}
-Dirección: ${paciente.domicilio || 'No especificada'}
-    `;
-    alert(detalles);
+    this.pacienteActual = { ...paciente };
+    this.mostrarModalVer = true;
   }
 
   // ✏️ Editar paciente
   private editarPaciente(paciente: Paciente): void {
-    console.log('✏️ Editar paciente:', paciente);
-    // TODO: Implementar modal de edición
-    alert('Función de editar paciente próximamente disponible');
+    this.modoEdicion = true;
+    this.pacienteActual = { ...paciente };
+  }
+
+  // 💾 Guardar paciente (nuevo o editado)
+  guardarPaciente(): void {
+    if (!this.pacienteActual) return;
+    if (this.modoEdicion) {
+      this.pacienteService.update(this.pacienteActual);
+    } else {
+      this.pacienteService.add(this.pacienteActual);
+    }
+    this.pacienteActual = null;
+    this.modoEdicion = false;
+    this.cargarPacientes();
   }
 
   // 🗑️ Eliminar paciente
@@ -211,13 +234,15 @@ Dirección: ${paciente.domicilio || 'No especificada'}
     const confirmacion = confirm(`¿Estás seguro de eliminar al paciente ${paciente.nombre}?`);
     
     if (confirmacion) {
-      const usuarios = this.obtenerUsuarios();
-      const usuariosActualizados = usuarios.filter(u => u.id !== paciente.id);
-      
-      localStorage.setItem('usuarios', JSON.stringify(usuariosActualizados));
+      this.pacienteService.delete(paciente.id);
       this.cargarPacientes();
       
       console.log('🗑️ Paciente eliminado:', paciente.nombre);
     }
+  }
+
+  cancelarFormulario(): void {
+    this.mostrarModalVer = false;
+    this.pacienteActual = null;
   }
 }

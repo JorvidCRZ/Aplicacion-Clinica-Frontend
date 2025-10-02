@@ -5,4 +5,6 @@ export interface Doctor extends Usuario {
     nroColegiado: string;
     horario?: string;
     rol: 'doctor';
+    apellidoPaterno: string;
+    apellidoMaterno: string;
 }

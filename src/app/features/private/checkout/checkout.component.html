@@ -81,7 +81,8 @@
                 type="tel" 
                 id="telefono" 
                 formControlName="telefono"
-                placeholder="987654321">
+                placeholder="987654321"
+                (input)="onTelefonoInput($event)">
               @if (checkoutForm.get('telefono')?.invalid && checkoutForm.get('telefono')?.touched) {
                 <div class="error-message">Teléfono debe tener 9 dígitos</div>
               }
@@ -131,9 +132,8 @@
 
         <!-- Campos específicos del método de pago -->
         @if (mostrarCamposTarjeta) {
-          <div class="campos-pago">
+          <form [formGroup]="checkoutForm" class="campos-pago" style="margin-bottom:0;">
             <h3>Datos de la Tarjeta</h3>
-            
             <div class="form-group">
               <label for="numeroTarjeta">Número de Tarjeta</label>
               <input 
@@ -146,7 +146,6 @@
                 <div class="error-message">Número de tarjeta inválido</div>
               }
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label for="fechaVencimiento">Fecha de Vencimiento</label>
@@ -155,12 +154,12 @@
                   id="fechaVencimiento" 
                   formControlName="fechaVencimiento"
                   placeholder="MM/AA"
-                  maxlength="5">
+                  maxlength="5"
+                  (input)="onFechaVencimientoInput($event)">
                 @if (checkoutForm.get('fechaVencimiento')?.invalid && checkoutForm.get('fechaVencimiento')?.touched) {
                   <div class="error-message">Formato: MM/AA</div>
                 }
               </div>
-
               <div class="form-group">
                 <label for="cvv">CVV</label>
                 <input 
@@ -174,25 +173,25 @@
                 }
               </div>
             </div>
-          </div>
+          </form>
         }
 
         @if (mostrarCamposYape) {
-          <div class="campos-pago">
+          <form [formGroup]="checkoutForm" class="campos-pago" style="margin-bottom:0;">
             <h3>Número de {{ metodoPagoSeleccionado?.nombre }}</h3>
-            
             <div class="form-group">
               <label for="numeroYape">Número de teléfono</label>
               <input 
                 type="tel" 
                 id="numeroYape" 
                 formControlName="numeroYape"
-                placeholder="987654321">
+                placeholder="987654321"
+                (input)="onNumeroYapeInput($event)">
               @if (checkoutForm.get('numeroYape')?.invalid && checkoutForm.get('numeroYape')?.touched) {
                 <div class="error-message">Número de teléfono inválido</div>
               }
             </div>
-          </div>
+          </form>
         }
       </div>
 
@@ -264,7 +263,10 @@
           <p><strong>Hora:</strong> {{ citaSeleccionada.hora }}</p>
         </div>
       }
-      <p class="redireccion">Serás redirigido al dashboard en unos segundos...</p>
+      <button class="btn-confirmar" (click)="irAMisCitas()">
+        <i class="fas fa-calendar-check"></i>
+        Ir a Mis Citas
+      </button>
     </div>
   }
 

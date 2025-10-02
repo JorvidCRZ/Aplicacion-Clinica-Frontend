@@ -121,54 +121,54 @@ export class LoginComponent {
     // 🤒 Crear pacientes de ejemplo
     const paciente1: Paciente = {
       id: 3,
-      nombre: 'Jorge David',
-      apellidoPaterno: 'Cruz',
-      apellidoMaterno: 'Peña',
-      email: 'jdcruzp11@gmail.com',
-      telefono: '+51 987 123 456',
-      password: 'Jorvix123*',
+      nombre: 'Carlos Alberto',
+      apellidoPaterno: 'Ramirez',
+      apellidoMaterno: 'Gomez',
+      email: 'paciente1@gmail.com',
+      telefono: '+51 999 888 777',
+      password: 'paciente123*',
       rol: 'paciente',
       tipoDocumento: 'DNI',
-      numeroDocumento: '12345678',
-      fechaNacimiento: new Date('1990-03-15'),
+      numeroDocumento: '11223344',
+      fechaNacimiento: new Date('1988-05-10'),
       genero: 'masculino',
       pais: 'Peru',
-      departamento: 'Lima',
-      provincia: 'Lima',
-      distrito: 'SJL',
-      domicilio: 'Av. Pardo 456, SJL, Lima, Perú',
-      historialMedico: 'Sin antecedentes relevantes',
+      departamento: 'Arequipa',
+      provincia: 'Arequipa',
+      distrito: 'Cercado',
+      domicilio: 'Calle Real 123, Cercado, Arequipa, Perú',
+      historialMedico: 'Diabetes tipo 2',
       contactoEmergencia: {
-        nombre: 'Olinda Huaripata',
-        telefono: '+51 987 789 012',
-        relacion: 'esposa'
+        nombre: 'María Gomez',
+        telefono: '+51 999 111 222',
+        relacion: 'madre'
       }
     };
 
     const paciente2: Paciente = {
       id: 4,
-      nombre: 'Olinda Milagros',
-      apellidoPaterno: 'Huaripata',
-      apellidoMaterno: 'Navarro',
-      email: 'Olih@gmail.com',
-      telefono: '+51 987 789 012',
-      password: 'Linda123*',
+      nombre: 'Lucía Fernanda',
+      apellidoPaterno: 'Vargas',
+      apellidoMaterno: 'Salas',
+      email: 'paciente2@gmail.com',
+      telefono: '+51 988 777 666',
+      password: 'paciente123*',
       rol: 'paciente',
       tipoDocumento: 'DNI',
-      numeroDocumento: '87654321',
-      fechaNacimiento: new Date('1985-07-22'),
+      numeroDocumento: '55667788',
+      fechaNacimiento: new Date('1992-11-25'),
       genero: 'femenino',
       pais: 'Peru',
-      departamento: 'Lima',
-      provincia: 'Lima',
-      distrito: 'San Isidro',
-      domicilio: 'Av. República 789, San Isidro, Lima, Perú',
-      historialMedico: 'Hipertensión controlada',
-      alergias: ['Penicilina'],
+      departamento: 'Cusco',
+      provincia: 'Cusco',
+      distrito: 'Wanchaq',
+      domicilio: 'Av. Cultura 456, Wanchaq, Cusco, Perú',
+      historialMedico: 'Asma leve',
+      alergias: ['Aspirina'],
       contactoEmergencia: {
-        nombre: 'Jorge  Cruz',
-        telefono: '+51 987 123 456',
-        relacion: 'esposo'  
+        nombre: 'Pedro Vargas',
+        telefono: '+51 988 333 444',
+        relacion: 'padre'  
       }
     };
 
@@ -229,7 +229,7 @@ export class LoginComponent {
             this.router.navigate(['/doctor/resumen']);
             break;
           case 'paciente':
-            this.router.navigate(['/paciente/resumen']);
+            this.router.navigate(['/paciente/mi-resumen']);
             break;
         }
       }

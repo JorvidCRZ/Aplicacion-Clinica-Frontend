@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Usuario } from '../../../../../core/models/users/usuario';
+import { UsuarioService } from '../../../../../core/services/usuario.service';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -14,6 +15,11 @@ import { Usuario } from '../../../../../core/models/users/usuario';
 export class GestionUsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   isLoading = false;
+  usuarioService = new UsuarioService();
+  mostrarFormulario = false;
+  modoEdicion = false;
+  usuarioActual: Usuario | null = null;
+  mostrarModalVer = false;
 
   // 📋 Configuración de columnas para la tabla
   columns: TableColumn[] = [
@@ -31,25 +37,25 @@ export class GestionUsuariosComponent implements OnInit {
     {
       action: 'view',
       label: 'Ver',
-      icon: 'fa-eye',
+      icon: 'fa fa-eye',
       class: 'btn-view'
     },
     {
       action: 'edit',
       label: 'Editar',
-      icon: 'fa-edit',
+      icon: 'fa fa-edit',
       class: 'btn-edit'
     },
     {
       action: 'delete',
       label: 'Eliminar',
-      icon: 'fa-trash',
+      icon: 'fa fa-trash',
       class: 'btn-delete'
     },
     {
       action: 'resetPassword',
       label: 'Reset Pass',
-      icon: 'fa-key',
+      icon: 'fa fa-key',
       class: 'btn-warning'
     }
   ];
@@ -61,16 +67,16 @@ export class GestionUsuariosComponent implements OnInit {
   // 👥 Cargar datos de usuarios desde localStorage
   cargarUsuarios(): void {
     this.isLoading = true;
-    
+
     // Simular delay de carga
     setTimeout(() => {
       this.usuarios = this.obtenerUsuarios();
-      
+
       // Agregar usuarios de ejemplo si no existen
       if (this.usuarios.length === 0) {
         this.agregarUsuariosEjemplo();
       }
-      
+
       this.isLoading = false;
     }, 500);
   }
@@ -155,7 +161,7 @@ export class GestionUsuariosComponent implements OnInit {
         genero: 'masculino'
       }
     ];
-    
+
     localStorage.setItem('usuarios', JSON.stringify(usuariosEjemplo));
     this.usuarios = usuariosEjemplo;
   }
@@ -168,15 +174,50 @@ export class GestionUsuariosComponent implements OnInit {
 
   // ➕ Agregar nuevo usuario
   agregarUsuario(): void {
-    console.log('➕ Agregar nuevo usuario');
-    // TODO: Implementar modal o navegación a formulario
-    alert('Función de agregar usuario próximamente disponible');
+    this.modoEdicion = false;
+    this.usuarioActual = {
+      id: 0,
+      nombre: '',
+      email: '',
+      telefono: '',
+      password: '',
+      rol: 'paciente',
+      tipoDocumento: 'DNI',
+      numeroDocumento: ''
+    };
+    this.mostrarFormulario = true;
+  }
+
+  // ✏️ Editar usuario
+  editarUsuario(usuario: Usuario): void {
+    this.modoEdicion = true;
+    this.usuarioActual = { ...usuario };
+    this.mostrarFormulario = true;
+  }
+
+  // 💾 Guardar usuario
+  guardarUsuario(): void {
+    if (!this.usuarioActual) return;
+    if (this.modoEdicion) {
+      this.usuarioService.update(this.usuarioActual);
+    } else {
+      this.usuarioService.add(this.usuarioActual);
+    }
+    this.mostrarFormulario = false;
+    this.cargarUsuarios();
+  }
+
+  // ❌ Cancelar formulario
+  cancelarFormulario(): void {
+    this.mostrarFormulario = false;
+    this.usuarioActual = null;
+    this.mostrarModalVer = false;
   }
 
   // 🎯 Manejar acciones de la tabla
   onTableAction(event: { action: string, item: any }): void {
     const usuario = event.item as Usuario;
-    
+
     switch (event.action) {
       case 'view':
         this.verUsuario(usuario);
@@ -197,22 +238,8 @@ export class GestionUsuariosComponent implements OnInit {
 
   // 👁️ Ver detalles del usuario
   private verUsuario(usuario: Usuario): void {
-    console.log('👁️ Ver usuario:', usuario);
-    const detalles = `
-Usuario: ${usuario.nombre}
-Email: ${usuario.email}
-Rol: ${usuario.rol}
-Teléfono: ${usuario.telefono}
-Documento: ${usuario.tipoDocumento} - ${usuario.numeroDocumento}
-    `;
-    alert(detalles);
-  }
-
-  // ✏️ Editar usuario
-  private editarUsuario(usuario: Usuario): void {
-    console.log('✏️ Editar usuario:', usuario);
-    // TODO: Implementar modal o navegación a formulario de edición
-    alert('Función de editar usuario próximamente disponible');
+    this.usuarioActual = { ...usuario };
+    this.mostrarModalVer = true;
   }
 
   // 🗑️ Eliminar usuario
@@ -222,16 +249,16 @@ Documento: ${usuario.tipoDocumento} - ${usuario.numeroDocumento}
       alert('No se puede eliminar el usuario administrador principal');
       return;
     }
-    
+
     const confirmacion = confirm(`¿Estás seguro de eliminar al usuario ${usuario.nombre}?`);
-    
+
     if (confirmacion) {
       const usuarios = this.obtenerUsuarios();
       const usuariosActualizados = usuarios.filter(u => u.id !== usuario.id);
-      
+
       localStorage.setItem('usuarios', JSON.stringify(usuariosActualizados));
       this.cargarUsuarios();
-      
+
       console.log('🗑️ Usuario eliminado:', usuario.nombre);
     }
   }
@@ -239,19 +266,19 @@ Documento: ${usuario.tipoDocumento} - ${usuario.numeroDocumento}
   // 🔐 Resetear password del usuario
   private resetearPassword(usuario: Usuario): void {
     const confirmacion = confirm(`¿Resetear la contraseña de ${usuario.nombre}?`);
-    
+
     if (confirmacion) {
       const usuarios = this.obtenerUsuarios();
       const usuarioIndex = usuarios.findIndex(u => u.id === usuario.id);
-      
+
       if (usuarioIndex !== -1) {
         // Generar nueva contraseña temporal
         const nuevaPassword = 'temp123';
         usuarios[usuarioIndex].password = nuevaPassword;
-        
+
         localStorage.setItem('usuarios', JSON.stringify(usuarios));
         this.cargarUsuarios();
-        
+
         alert(`Contraseña reseteada para ${usuario.nombre}\\nNueva contraseña temporal: ${nuevaPassword}`);
         console.log('🔐 Password reseteado para:', usuario.nombre);
       }
