@@ -70,10 +70,11 @@
         <i class="fas fa-calendar-day"></i>
       </div>
       <div class="chart-content">
-        <div class="citas-list" *ngIf="citasHoy.length > 0; else noCitas">
-          <div class="cita-item" *ngFor="let cita of citasHoy">
-            <div class="cita-time">{{ cita.hora }}</div>
-            <div class="cita-info">
+        @if (citasHoy.length > 0) {
+          <div class="citas-list">
+            <div class="cita-item" *ngFor="let cita of citasHoy">
+              <div class="cita-time">{{ cita.hora }}</div>
+              <div class="cita-info">
               <div class="cita-paciente">{{ cita.paciente }}</div>
               <div class="cita-doctor">{{ cita.doctor }}</div>
             </div>
@@ -82,12 +83,14 @@
             </div>
           </div>
         </div>
+      } @else {
         <ng-template #noCitas>
           <div class="no-citas">
             <i class="fas fa-calendar-times"></i>
             <p>No hay citas programadas para hoy</p>
           </div>
         </ng-template>
+      }
       </div>
     </div>
   </div>
