@@ -21,6 +21,7 @@ export const routes: Routes = [
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
     { path: 'inicio', component: InicioComponent },
     { path: 'especialidades', component: EspecialidadesComponent },
+    { path: 'especialidadportada/:idEspecialidad', loadComponent: () => import('./features/public/pages/especialidadportada/especialidadportada').then(m => m.Especialidadportada) },
     { path: 'nosotros', component: NosotrosComponent },
     { path: 'citas', component: CitasComponent },
     { path: 'citas/:idEspecialidad', component: CitasComponent },
