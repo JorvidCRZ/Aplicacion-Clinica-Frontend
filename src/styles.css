@@ -4,6 +4,7 @@
 @import url('style/scroll.css');
 @import url('style/variables.css');
 @import url('style/registro-material.css');
+@import url('style/responsive.css');
 html {
     scroll-behavior: smooth;
     font-size: 16px;
