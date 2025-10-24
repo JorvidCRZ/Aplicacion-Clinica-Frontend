@@ -25,11 +25,6 @@ export class Especialidadportada implements OnInit {
     if (id) {
       this.especialidadService.getEspecialidad(id).subscribe((esp) => {
         this.especialidad = esp;
-        console.log('Especialidad cargada:', esp);
-        if (esp) {
-          console.log('urlImgPort:', esp.urlImgPort);
-          console.log('urlImgIcono:', esp.urlImgIcono);
-        }
       });
       this.subespecialidadService.getSubespecialidadesPorEspecialidad(id).subscribe((subs) => {
         this.subespecialidades = subs;
