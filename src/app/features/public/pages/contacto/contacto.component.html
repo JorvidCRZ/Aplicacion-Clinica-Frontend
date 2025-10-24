@@ -89,9 +89,14 @@
 
                         <!-- Acciones -->
                         <div class="text-center">
-                            <button type="submit" class="btn btn-lg w-100" style="background: var(--verde); color: var(--blanco); border: none;">
+                            <button type="submit" class="btn btn-lg w-100" style="background: var(--verde); color: var(--blanco); border: none;"
+                                [disabled]="sending || form.invalid" aria-busy="{{sending}}">
                                 <i class="bi bi-hospital"></i>
-                                {{ sending ? 'Enviando consulta…' : 'Enviar consulta médica' }}
+                                <span *ngIf="sending" class="align-middle">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Enviando consulta…
+                                </span>
+                                <span *ngIf="!sending">Enviar consulta médica</span>
                             </button>
                         </div>
 

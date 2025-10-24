@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {ReactiveFormsModule, FormControl, FormGroup, Validators, NonNullableFormBuilder} from '@angular/forms';
 import { Contacto } from '../../../../core/models/common/contacto';
+import { firstValueFrom } from 'rxjs';
+import { ContactoService } from '../../../../servicesApi/contacto.service';
 
 type ContactoForm = {
   nombre: FormControl<string>;
@@ -57,20 +59,29 @@ export class ContactoComponent {
   get tipoConsulta() { return this.form.controls.tipoConsulta; }
   get mensaje() { return this.form.controls.mensaje; }
 
+  // inyectar servicio
+  private contactoService = inject(ContactoService);
+
   async onSubmit(): Promise<void> {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     this.sending = true; this.sentOk = null;
     try {
-      const payload: Contacto = {
-        ...this.form.getRawValue(),
-        telefono: this.telefono.value?.trim() || undefined
+      const raw = this.form.getRawValue();
+      const payload: any = {
+        nombre: (raw.nombre || '').trim(),
+        correo: (raw.correo || '').trim(),
+        telefono: raw.telefono?.trim() || undefined,
+        asunto: raw.asunto || undefined,
+        tipoConsulta: raw.tipoConsulta || undefined,
+        mensaje: raw.mensaje || undefined
       };
-      console.log('Contacto enviado:', payload);
-      await new Promise(r => setTimeout(r, 700));
+
+      await firstValueFrom(this.contactoService.crear(payload));
       this.sentOk = true;
       this.form.reset();
-    } catch {
+    } catch (e) {
+      console.error('Error enviando contacto', e);
       this.sentOk = false;
     } finally {
       this.sending = false;
