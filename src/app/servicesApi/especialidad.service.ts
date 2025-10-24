@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Especialidad {
     idEspecialidad: number;
@@ -15,7 +16,7 @@ export interface Especialidad {
     providedIn: 'root'
 })
 export class EspecialidadService {
-    private URL = 'http://localhost:8080/api/especialidades';
+    private URL = `${environment.apiBaseUrl}/especialidades`;
     private http = inject(HttpClient);
 
     getEspecialidades(): Observable<Especialidad[]> {
