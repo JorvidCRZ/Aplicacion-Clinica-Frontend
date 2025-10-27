@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/rol/auth.service';
 import { Usuario } from '../../../core/models/users/usuario';
 import { Doctor } from '../../../core/models/users/doctor';
 import { Admin } from '../../../core/models/users/admin';

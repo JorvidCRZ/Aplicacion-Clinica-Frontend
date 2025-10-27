@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { CitaCompleta, EstadoCita } from '../../../../../core/models/common/cita';
-import { CitaService } from '../../../../../core/services/cita.service';
+import { CitaService } from '../../../../../core/services/logic/cita.service';
 
 @Component({
   selector: 'app-gestion-citas',

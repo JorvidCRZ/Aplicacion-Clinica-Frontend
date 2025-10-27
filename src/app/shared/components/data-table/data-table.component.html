@@ -93,7 +93,7 @@
                 <label for="pageSize">Mostrar:</label>
                 <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
                     @for (size of pageSizeOptions; track size) {
-                        <option [value]="size">{{ size }}</option>
+                    <option [value]="size">{{ size }}</option>
                     }
                 </select>
                 <span>por página</span>
@@ -106,11 +106,9 @@
                 </button>
 
                 @for (page of pageNumbers; track page) {
-                    <button class="page-btn" 
-                            [class.active]="page === currentPage" 
-                            (click)="goToPage(page)">
-                        {{ page }}
-                    </button>
+                <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
+                    {{ page }}
+                </button>
                 }
 
                 <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">

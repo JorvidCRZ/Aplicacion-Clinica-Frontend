@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Usuario } from '../../../../../core/models/users/usuario';
-import { UsuarioService } from '../../../../../core/services/usuario.service';
+import { UsuarioService } from '../../../../../core/services/rol/usuario.service';
 
 @Component({
   selector: 'app-gestion-usuarios',

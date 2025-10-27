@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EspecialidadService, Especialidad } from '../../../../servicesApi/especialidad.service';
-import { SubespecialidadService, Subespecialidad } from '../../../../servicesApi/subespecialidad.service';
+import { EspecialidadService, Especialidad } from '../../../../core/services/pages/especialidad.service';
+import { SubespecialidadService, Subespecialidad } from '../../../../core/services/pages/subespecialidad.service';
 
 @Component({
   selector: 'app-especialidadportada',

@@ -13,6 +13,10 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
+.buscador {
+    text-align: -webkit-center;
+}
+
 /* Header con especialidad */
 .especialidad-header-clean {
     background: linear-gradient(135deg, var(--azul) 0%, var(--azul-medio) 100%);

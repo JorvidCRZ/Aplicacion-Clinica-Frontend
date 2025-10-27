@@ -9,13 +9,13 @@
 
     <div class="row mb-4 ">
         <!-- Buscador por Doctor -->
-        <div class="col-12 col-md-6 mb-2">
+        <div class="col-12 col-md-6 mb-2 buscador">
             <app-buscador placeholder="Buscar por doctor..." [data]="citas" key="doctor" (resultado)="onBuscarDoctor($event)">
             </app-buscador>
         </div>
 
         <!-- Buscador por Especialidad -->
-        <div class="col-12 col-md-6 mb-2">
+        <div class="col-12 col-md-6 mb-2 buscador">
             <app-buscador placeholder="Buscar por especialidad..." [data]="citas" key="especialidad"
                 (resultado)="onBuscarEspecialidad($event)">
             </app-buscador>

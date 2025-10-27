@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../../../core/services/auth.service';
+import { AuthService } from '../../../../../core/services/rol/auth.service';
 import { Doctor } from '../../../../../core/models/users/doctor';
 
 interface HorarioBloque {

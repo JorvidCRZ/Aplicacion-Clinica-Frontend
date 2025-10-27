@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { AuthService, AuthState } from '../../../../../core/services/auth.service';
+import { AuthService, AuthState } from '../../../../../core/services/rol/auth.service';
 import { Paciente } from '../../../../../core/models/users/paciente';
 
 interface Factura {
@@ -59,7 +59,9 @@ export class PagosComponent implements OnInit, OnDestroy {
   // Filtros y estado
   filtroEstado: string = 'todos';
   filtroFecha: string = '';
-  vistaActiva: 'facturas' | 'pagar' | 'historial' = 'facturas';
+  // Nota: este componente mostrará únicamente pagos realizados (historial).
+  // Se mantienen otras propiedades por compatibilidad, pero la UI sólo usará los getters abajo.
+  vistaActiva: 'facturas' | 'pagar' | 'historial' = 'historial';
   
   // Pago
   facturaSeleccionada: Factura | null = null;
@@ -267,6 +269,22 @@ export class PagosComponent implements OnInit, OnDestroy {
     this.totalVencido = this.facturas
       .filter(f => f.estado === 'vencido')
       .reduce((sum, f) => sum + f.total, 0);
+  }
+
+  /**
+   * Devuelve las facturas cuyo estado sea 'pagado', ordenadas por fecha de pago descendente.
+   */
+  get facturasPagadas(): Factura[] {
+    return this.facturas
+      .filter(f => f.estado === 'pagado')
+      .sort((a, b) => (b.fechaPago ? b.fechaPago.getTime() : b.fecha.getTime()) - (a.fechaPago ? a.fechaPago.getTime() : a.fecha.getTime()));
+  }
+
+  /**
+   * Facturas recientes: las 3 últimas facturas pagadas (puedes ajustar el número aquí).
+   */
+  get facturasRecientes(): Factura[] {
+    return this.facturasPagadas.slice(0, 3);
   }
   
   get facturasFiltradas(): Factura[] {

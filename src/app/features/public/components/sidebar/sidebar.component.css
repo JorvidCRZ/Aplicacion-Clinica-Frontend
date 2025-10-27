@@ -123,20 +123,20 @@
     
     &:hover {
       background: rgba(255, 255, 255, 0.1);
-      color: white;
+      color: var(--blanco);
       transform: translateX(5px);
       
       i {
-        color: white;
+        color: var(--blanco);
       }
     }
     
     &.active {
       background: rgba(255, 255, 255, 0.2);
-      color: white;
+      color: var(--blanco);
       
       i {
-        color: white;
+        color: var(--blanco);
       }
     }
   }

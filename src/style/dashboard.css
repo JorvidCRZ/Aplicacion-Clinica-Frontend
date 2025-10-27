@@ -1,4 +1,4 @@
-/* 🎨 DASHBOARD SHARED STYLES - Para Admin, Doctor y Paciente */
+/*  DASHBOARD SHARED STYLES - Para Admin, Doctor y Paciente */
 
 :host {
     display: block;
@@ -6,14 +6,14 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* 📊 DASHBOARD CONTAINER - Sidebar + Contenido */
+/*  DASHBOARD CONTAINER - Sidebar + Contenido */
 .dashboard-container {
     display: grid;
     grid-template-columns: 280px 1fr;
     min-height: 100vh;
 }
 
-/* 📈 CONTENT AREA */
+/*  CONTENT AREA */
 .content-area {
     background: var(--gris-claro);
     min-height: 100vh;
@@ -41,7 +41,7 @@
     font-size: 1.1rem;
 }
 
-/* 🎯 CARDS DE ESTADÍSTICAS */
+/*  CARDS DE ESTADÍSTICAS */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -104,7 +104,6 @@
     font-weight: 500;
 }
 
-/* 📱 RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     .dashboard-container {
         grid-template-columns: 1fr;
@@ -121,6 +120,10 @@
 
     .content-header h2 {
         font-size: 1.5rem;
+    }
+
+    app-sidebar{
+        display: none;
     }
 }
 

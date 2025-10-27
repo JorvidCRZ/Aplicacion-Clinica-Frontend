@@ -55,7 +55,7 @@ p.descripcion {
 
     &:hover {
         cursor: pointer;
-        filter: drop-shadow(20px 20px 4px rgba(0, 0, 0, 0.5)) brightness(0.8);
+        filter: drop-shadow(20px 20px 4px var(--negro-sombra)) brightness(0.8);
     }
 }
 
@@ -75,6 +75,4 @@ p.descripcion {
     h1.titulo {
         font-size: 3rem;
     }
-
-
 }

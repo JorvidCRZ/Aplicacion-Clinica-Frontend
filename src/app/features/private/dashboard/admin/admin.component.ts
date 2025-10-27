@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services/rol/auth.service';
 import { MENU_DASHBOARD } from '../../../../core/config/menu-dasboard.config';
 import { MenuItem } from '../../../../core/models/common/menu-items';
 import { CommonModule } from '@angular/common';

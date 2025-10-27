@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
-import { Usuario } from '../models/users/usuario';
-import { Doctor } from '../models/users/doctor';
-import { Admin } from '../models/users/admin';
-import { Paciente } from '../models/users/paciente';
+import { Usuario } from '../../models/users/usuario';
+import { Doctor } from '../../models/users/doctor';
+import { Admin } from '../../models/users/admin';
+import { Paciente } from '../../models/users/paciente';
 
 export type AuthState = {
   isLoggedIn: boolean;

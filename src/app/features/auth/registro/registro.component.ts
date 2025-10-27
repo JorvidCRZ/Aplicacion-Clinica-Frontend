@@ -15,11 +15,11 @@ import { MatOption } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { UbigeoService, Departamento, Provincia, Distrito } from '../../../core/services/ubigeo.service';
+import { UbigeoService, Departamento, Provincia, Distrito } from '../../../core/services/forms/ubigeo.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TipoDocumento, } from '../../../core/models/common/tipo-documento';
-import { TipoDocumentoService } from '../../../core/services/tipoDocumento.service';
+import { TipoDocumentoService } from '../../../core/services/forms/tipoDocumento.service';
 
 @Component({
   selector: 'app-registro',

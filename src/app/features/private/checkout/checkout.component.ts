@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AuthService, AuthState } from '../../../core/services/auth.service';
+import { AuthService, AuthState } from '../../../core/services/rol/auth.service';
 import { Paciente } from '../../../core/models/users/paciente';
 
 interface CitaMedica {

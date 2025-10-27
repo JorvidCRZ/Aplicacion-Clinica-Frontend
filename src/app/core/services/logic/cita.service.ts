@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CitaCompleta } from '../models/common/cita';
+import { CitaCompleta } from '../../models/common/cita';
 
 @Injectable({
     providedIn: 'root'

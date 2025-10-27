@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services/rol/auth.service';
 
 
 @Component({

@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
-import { EspecialidadService, Especialidad } from '../../../../servicesApi/especialidad.service';
+import { EspecialidadService, Especialidad } from '../../../../core/services/pages/especialidad.service';
 
 @Component({
   selector: 'app-especialidades',

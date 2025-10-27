@@ -13,7 +13,6 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { PacienteComponent } from './features/private/dashboard/paciente/paciente.component';
 import { DoctorComponent } from './features/private/dashboard/doctor/doctor.component';
 import { AdminComponent } from './features/private/dashboard/admin/admin.component';
-import { E } from '@angular/cdk/keycodes';
 import { ErrorComponent } from './shared/components/error/error.component';
 // import { ServiciosComponent } from './features/public/pages/servicios/servicios.component';
 

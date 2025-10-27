@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import {ReactiveFormsModule, FormControl, FormGroup, Validators, NonNullableFormBuilder} from '@angular/forms';
 import { Contacto } from '../../../../core/models/common/contacto';
 import { firstValueFrom } from 'rxjs';
-import { ContactoService } from '../../../../servicesApi/contacto.service';
+import { ContactoService } from '../../../../core/services/forms/contacto.service';
 
 type ContactoForm = {
   nombre: FormControl<string>;

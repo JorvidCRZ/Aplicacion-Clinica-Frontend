@@ -5,7 +5,7 @@ span,p{
 
 .login-container{
     justify-content: center;
-    background: white;
+    background: var(--blanco);
     min-height: 90vh;
     max-width: 1200px;
     margin: 2rem auto;

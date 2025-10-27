@@ -45,7 +45,7 @@
                 <i class="fas fa-credit-card"></i>
             </div>
             <div class="contenido">
-                <h3>Estado de Cuenta</h3>
+                <h3>Pagos Realizados</h3>
                 <p class="monto">S/ {{ saldoPendiente }}</p>
                 <p class="estado" [class.pagado]="saldoPendiente === 0">
                     {{ saldoPendiente === 0 ? 'Al día' : 'Pendiente' }}

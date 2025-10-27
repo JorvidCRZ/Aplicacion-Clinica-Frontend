@@ -4,12 +4,12 @@
 	--bg: var(--gris-claro);
 
 	.mdc-text-field--outlined {
-		outline: white !important;
+		outline: var(--blanco) !important;
 	}
 
 	/* Opcional: también cuando está en focus */
 	.mdc-text-field--outlined.mdc-text-field--focused {
-		border-color: white !important;
+		border-color: var(--blanco) !important;
 	}
 }
 
@@ -175,7 +175,7 @@ button[mat-button] {
 }
 
 .mensaje-flotante {
-	background: linear-gradient(145deg, #ffffff 0%, #f8fafe 100%);
+	background: linear-gradient(145deg, var(--blanco) 0%, #f8fafe 100%);
 	border: 1px solid rgba(13, 71, 161, 0.1);
 	border-radius: 12px;
 	padding: 2.5rem;

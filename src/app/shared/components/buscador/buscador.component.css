@@ -43,28 +43,27 @@ ul.list-group {
     cursor: pointer;
 }
 
-/* Mejorar el estilo de las sugerencias */
 .sugerencias-list {
     top: 100%;
     left: 0;
     right: 0;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--gris);
     border-radius: 8px;
-    background: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: var(--blanco);
+    box-shadow: 0 4px 12px var(--negro-sombra);
     margin-top: 4px;
 }
 
 .sugerencia-item {
     padding: 10px 15px;
     border: none;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--gris-claro);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .sugerencia-item:hover {
-    background-color: #f8fafc;
+    background-color: var(--gris);
     color: var(--azul);
 }
 

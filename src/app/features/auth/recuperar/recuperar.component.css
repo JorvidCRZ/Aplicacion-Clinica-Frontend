@@ -1,26 +1,20 @@
-/* Fondo simple */
+
 .container {
     height: 100vh;
-    background: #f5f7fa;
-    /* gris/blanco suave */
+    background: var(--gris-claro);
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: 'Roboto', sans-serif;
 }
 
-/* Panel principal dividido */
 .panel-recuperacion {
     display: flex;
     width: 1100px;
-    /* Más ancho */
     max-width: 95%;
-    /* Para pantallas pequeñas */
     min-height: 600px;
-    /* Más alto */
-    background: #fff;
+    background: var(--blanco);
     border-radius: 25px;
-    /* Bordes más suaves */
     overflow: hidden;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.8s ease-in-out;
@@ -38,7 +32,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: #fff;
+    color: var(--blanco);
     padding: 2rem;
     position: relative;
 }
@@ -55,23 +49,21 @@
     font-size: 1.8rem;
     margin-bottom: 0.7rem;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    color: #fff;
+    color: var(--blanco);
 }
 
 .panel-left p {
     font-size: 1rem;
     opacity: 0.95;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    color: #fff;
+    color: var(--blanco);
 }
 
-/* Lado derecho (formulario) */
 .panel-right {
     flex: 1;
     background: #1976d2;
-    /* azul más claro */
     padding: 3rem 2.5rem;
-    color: #fff;
+    color: var(--blanco);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -89,7 +81,6 @@
     margin-bottom: 2rem;
 }
 
-/* Campos */
 mat-form-field {
     margin-bottom: 1.5rem;
     width: 100%;
@@ -100,7 +91,7 @@ mat-label {
 }
 
 input {
-    color: #fff !important;
+    color: var(--blanco) !important;
 }
 
 .mat-form-field-outline {
@@ -114,7 +105,7 @@ input {
 /* Botón validar */
 .btn-validar {
     background-color: #0d47a1 !important;
-    color: #fff !important;
+    color: var(--blanco) !important;
     font-weight: 600;
     border-radius: 30px;
     padding: 0.9rem;

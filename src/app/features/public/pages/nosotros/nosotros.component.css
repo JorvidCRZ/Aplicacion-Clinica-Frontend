@@ -64,7 +64,7 @@ ul {
 }
 
 @media screen and (width < 500px) {
-    .contendor-nosotros {
+    .contenedor-nosotros {
         padding: 1rem 0 !important;
     }
 }

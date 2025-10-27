@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuItem } from '../../../../core/models/common/menu-items';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services/rol/auth.service';
 
 @Component({
   selector: 'app-sidebar',

@@ -1,4 +1,4 @@
-.contenedor-blog{
+.contenedor-blog {
     background-color: var(--gris);
     border-radius: 20px;
 }
@@ -24,7 +24,7 @@
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Contenido principal */
@@ -82,7 +82,7 @@
 }
 
 /* Texto e introducción */
-.intro-text, 
+.intro-text,
 .section-content p {
     font-size: 1rem;
     line-height: 1.6;
@@ -141,7 +141,7 @@ h4 {
     object-fit: cover;
     border-radius: 10px;
     border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive Design */
@@ -150,25 +150,25 @@ h4 {
         font-size: 1.8rem;
         letter-spacing: 1px;
     }
-    
+
     .section-content,
     .two-column {
         flex-direction: column;
     }
-    
+
     .image-placeholder {
         min-width: auto;
         margin-top: 1rem;
     }
-    
+
     .blog-content {
         padding: 1rem;
     }
-    
+
     .blog-section {
         padding: 1.5rem;
     }
-    
+
     .section-title {
         font-size: 1.5rem;
     }
@@ -178,11 +178,11 @@ h4 {
     .main-title {
         font-size: 1.4rem;
     }
-    
+
     .blog-header {
         padding: 1rem;
     }
-    
+
     .health-tips li,
     .recommendations li,
     .medical-advances li {

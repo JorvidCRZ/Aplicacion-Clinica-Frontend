@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Usuario } from '../../../../../core/models/users/usuario';
 import { Paciente } from '../../../../../core/models/users/paciente';
-import { PacienteService } from '../../../../../core/services/paciente.service';
+import { PacienteService } from '../../../../../core/services/rol/paciente.service';
 
 @Component({
   selector: 'app-gestion-pacientes',

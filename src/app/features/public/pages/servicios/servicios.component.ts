@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Card } from '../../../../core/models/utils/card';
 import { CardGalleryComponent } from '../../../../shared/components/card-gallery/card-gallery.component';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services/rol/auth.service';
 import { Router } from '@angular/router';
 
 @Component({

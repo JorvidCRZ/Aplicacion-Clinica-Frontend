@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../core/services/rol/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({

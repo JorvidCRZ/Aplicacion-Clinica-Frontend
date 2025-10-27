@@ -24,7 +24,7 @@
     margin: 1rem 0;
   }
 }
-/* Encabezado */
+
 .checkout-header {
   display: flex;
   align-items: center;
@@ -73,7 +73,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px var(--negro-sombra);
 }
 
 .seccion-cita h2,
@@ -223,7 +223,7 @@ textarea:focus {
   text-align: center;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px var(--negro-sombra);
   background: linear-gradient(135deg, var(--azul-claro) 0%, var(--azul) 100%);
   color: var(--blanco);
 }
