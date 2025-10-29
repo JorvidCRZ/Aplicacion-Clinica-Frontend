@@ -10,5 +10,4 @@ import { RouterModule } from '@angular/router';
   styleUrl: './logo.component.css'
 })
 export class LogoComponent {
-
 }

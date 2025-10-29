@@ -1,5 +1,4 @@
-<div class="reporte-container">
-    <!-- Header del Reporte -->
+<!-- <div class="reporte-container">
     <div class="reporte-header">
         <div class="doctor-info-card">
             <div class="doctor-avatar">
@@ -20,7 +19,6 @@
             </div>
         </div>
 
-        <!-- Controles de Filtro -->
         <div class="filtros-container">
             <div class="filtro-grupo">
                 <label>Período:</label>
@@ -43,7 +41,6 @@
         </div>
     </div>
 
-    <!-- Métricas Principales -->
     <div class="metricas-grid">
         <div *ngFor="let metrica of metricas" class="metrica-card" [style.border-left-color]="metrica.color">
             <div class="metrica-header">
@@ -67,7 +64,6 @@
         </div>
     </div>
 
-    <!-- Navegación de Secciones -->
     <div class="navegacion-tabs">
         <button *ngFor="let tab of tabs" class="tab-button" [class.active]="tabActivo === tab.id"
             (click)="cambiarTab(tab.id)">
@@ -76,14 +72,9 @@
         </button>
     </div>
 
-    <!-- Contenido de las Secciones -->
     <div class="contenido-tabs">
-
-        <!-- Vista: Resumen -->
         <div *ngIf="tabActivo === 'resumen'" class="seccion-contenido">
             <div class="cards-resumen">
-
-                <!-- Citas del Día -->
                 <div class="card-seccion">
                     <div class="card-header">
                         <h3><i class="fas fa-calendar-day"></i> Citas de Hoy</h3>
@@ -105,7 +96,6 @@
                     </div>
                 </div>
 
-                <!-- Actividad Semanal -->
                 <div class="card-seccion">
                     <div class="card-header">
                         <h3><i class="fas fa-chart-bar"></i> Actividad Semanal</h3>
@@ -123,7 +113,6 @@
             </div>
         </div>
 
-        <!-- Vista: Diagnósticos -->
         <div *ngIf="tabActivo === 'diagnosticos'" class="seccion-contenido">
             <div class="card-seccion">
                 <div class="card-header">
@@ -148,7 +137,6 @@
             </div>
         </div>
 
-        <!-- Vista: Productividad -->
         <div *ngIf="tabActivo === 'productividad'" class="seccion-contenido">
             <div class="productividad-stats">
                 <div class="stat-card">
@@ -170,11 +158,10 @@
         </div>
     </div>
 
-    <!-- Loading State -->
     <div *ngIf="cargandoReporte" class="loading-overlay">
         <div class="loading-spinner">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Generando reporte...</p>
         </div>
     </div>
-</div>
+</div> -->

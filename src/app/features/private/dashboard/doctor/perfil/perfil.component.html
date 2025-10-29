@@ -1,5 +1,4 @@
-<div class="perfil-usuario-container">
-
+<!-- <div class="perfil-usuario-container">
     <div class="perfil-header-moderno">
         <div class="usuario-card-principal">
             <div class="usuario-avatar-moderno">
@@ -49,7 +48,6 @@
         </div>
     </div>
 
-    <!-- ⚡ Acciones del perfil -->
     <div class="acciones-modernas">
         @if (!editando) {
         <button (click)="activarEdicion()" class="btn-moderno primary">
@@ -73,7 +71,6 @@
         }
     </div>
 
-    <!-- 📑 Navegación de secciones -->
     <div class="secciones-nav-moderna">
         <div class="nav-tabs-container">
             <button (click)="cambiarSeccion('informacion')" [class.active]="seccionActiva === 'informacion'"
@@ -96,9 +93,7 @@
         </div>
     </div>
 
-    <!-- 📋 Contenido de las secciones -->
     <div class="secciones-contenido-moderno">
-        <!-- 👤 Información Personal -->
         @if (seccionActiva === 'informacion') {
         <div class="seccion-card-moderna">
             <div class="seccion-header-moderna">
@@ -227,7 +222,6 @@
         </div>
         }
 
-        <!-- 🎓 Información Profesional -->
         @if (seccionActiva === 'profesional' && usuarioLogueado?.rol === 'doctor') {
         <div class="seccion-card-moderna">
             <div class="seccion-header-moderna">
@@ -271,7 +265,6 @@
         </div>
         }
 
-        <!-- 🕐 Horarios de Atención -->
         @if (seccionActiva === 'horarios' && usuarioLogueado?.rol === 'doctor') {
         <div class="seccion-card-moderna">
             <div class="seccion-header-moderna">
@@ -321,5 +314,4 @@
         </div>
         }
     </div>
-
-</div>
+</div> -->

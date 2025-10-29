@@ -12,7 +12,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 export class BuscadorComponent {
   @Input() placeholder: string = "Buscar...";
   @Input() data: any[] = [];
-  @Input() key: string = '';   
+  @Input() key: string = '';
   @Output() resultado = new EventEmitter<any[]>();
 
   texto: string = "";
@@ -30,30 +30,27 @@ export class BuscadorComponent {
     }
 
     const textoNormalizado = this.normalize(this.texto);
-
-    // Filtrar los elementos que coinciden
+    
     const elementosFiltrados = this.data.filter(item => {
       const valor = this.key ? item[this.key] : item;
       return this.normalize(String(valor)).includes(textoNormalizado);
     });
 
-    // Generar sugerencias como strings únicos
     this.sugerencias = [...new Set(elementosFiltrados.map(item => {
       return this.key ? item[this.key] : item;
-    }))].slice(0, 5); // Limitar a 5 sugerencias
+    }))].slice(0, 5);
 
     this.resultado.emit(elementosFiltrados);
   }
 
   seleccionar(valorSeleccionado: string) {
     this.texto = valorSeleccionado;
-    
-    // Encontrar todos los elementos que coinciden con el valor seleccionado
+
     const elementosCoincidentes = this.data.filter(item => {
       const valor = this.key ? item[this.key] : item;
       return String(valor).toLowerCase() === valorSeleccionado.toLowerCase();
     });
-    
+
     this.resultado.emit(elementosCoincidentes);
     this.sugerencias = [];
   }

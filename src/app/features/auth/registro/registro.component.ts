@@ -5,10 +5,6 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { Usuario } from '../../../core/models/users/usuario';
-import { Paciente } from '../../../core/models/users/paciente';
-import { Doctor } from '../../../core/models/users/doctor';
-import { Admin } from '../../../core/models/users/admin';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatOption } from '@angular/material/autocomplete';
@@ -20,6 +16,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TipoDocumento, } from '../../../core/models/common/tipo-documento';
 import { TipoDocumentoService } from '../../../core/services/forms/tipoDocumento.service';
+import { UsuarioService } from '../../../core/services/rol/usuario.service';
+import { UsuarioRegistro } from '../../../core/models/users/registro';
 
 @Component({
   selector: 'app-registro',
@@ -62,7 +60,9 @@ export class RegistroComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private ubigeoService: UbigeoService) { }
+    private ubigeoService: UbigeoService,
+    private usuarioService: UsuarioService,
+  ) { }
 
   verContrasena() {
     this.mostrarPassword = !this.mostrarPassword;
@@ -83,37 +83,35 @@ export class RegistroComponent implements OnInit {
 
   registrar() {
     if (this.datosForm.valid && this.personalesForm.valid && this.credencialesForm.valid) {
-      const nuevoPaciente: Paciente = {
-        id: Date.now(),
-        tipoDocumento: this.datosForm.value.tipoDocumento!,
-        numeroDocumento: this.datosForm.value.dni!,
-        fechaNacimiento: this.datosForm.value.fechaNacimiento!,
-        nombre: this.personalesForm.value.nombre!,
-        apellidoPaterno: this.personalesForm.value.apellidoPaterno!,
-        apellidoMaterno: this.personalesForm.value.apellidoMaterno!,
-        genero: this.personalesForm.value.genero!,
-        pais: this.personalesForm.value.pais!,
-        departamento: this.personalesForm.value.departamento!,
-        provincia: this.personalesForm.value.provincia!,
-        distrito: this.personalesForm.value.distrito!,
-        domicilio: this.personalesForm.value.domicilio!,
-        telefono: this.credencialesForm.value.celular!,
-        email: this.credencialesForm.value.correo!,
-        password: this.credencialesForm.value.password!,
-        rol: 'paciente',
-        // Puedes agregar aquí más campos de Paciente si lo deseas
+      const nuevoPaciente: UsuarioRegistro = {
+        correo: this.credencialesForm.value.correo!,
+        contrasena: this.credencialesForm.value.password!,
+        idRol: 3,
+        persona: {
+          tipoDocumento: this.datosForm.value.tipoDocumento!,
+          dni: this.datosForm.value.dni!,
+          nombre1: this.personalesForm.value.nombre1!,
+          nombre2: this.personalesForm.value.nombre2 || '',
+          apellidoPaterno: this.personalesForm.value.apellidoPaterno!,
+          apellidoMaterno: this.personalesForm.value.apellidoMaterno!,
+          fechaNacimiento: this.datosForm.value.fechaNacimiento!,
+          genero: this.personalesForm.value.genero!,
+          pais: this.personalesForm.value.pais!,
+          departamento: this.departamentos.find(d => d.codigo === this.personalesForm.value.departamento)?.nombre || '',
+          provincia: this.provincias.find(p => p.codigo === this.personalesForm.value.provincia)?.nombre || '',
+          distrito: this.distritos.find(d => d.codigo === this.personalesForm.value.distrito)?.nombre || '',
+          direccion: this.personalesForm.value.direccion!,
+          telefono: this.credencialesForm.value.celular!
+        }
       };
-
-      // Guardar como array de (Usuario | Paciente | Doctor | Admin)[]
-      let usuarios: (Usuario | Paciente | Doctor | Admin)[] = JSON.parse(localStorage.getItem('usuarios') || '[]');
-      usuarios.push(nuevoPaciente);
-      localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-      this.mostrarMensajeExito = true;
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 3000);
+      
+      this.usuarioService.add(nuevoPaciente).subscribe({
+        next: () => {
+          this.mostrarMensajeExito = true;
+          setTimeout(() => this.router.navigate(['/login']), 3000);
+        },
+        error: (error) => console.error('Error registrando usuario:', error)
+      });
     }
   }
 
@@ -131,7 +129,7 @@ export class RegistroComponent implements OnInit {
 
     this.datosForm.get('tipoDocumento')?.valueChanges.subscribe((tipoCodigo: string) => {
       const numeroCtrl = this.datosForm.get('dni');
-      numeroCtrl?.clearValidators(); 
+      numeroCtrl?.clearValidators();
 
       const tipoDocumento = TipoDocumentoService.getTipoDocumento(tipoCodigo);
 
@@ -160,19 +158,23 @@ export class RegistroComponent implements OnInit {
     });
 
     this.personalesForm = this.fb.group({
-      nombre: ['', Validators.required],
+      nombre1: ['', Validators.required],
+      nombre2: ['', Validators.required],
       apellidoPaterno: ['', Validators.required],
       apellidoMaterno: ['', Validators.required],
       genero: ['', Validators.required],
       pais: ['', Validators.required],
-      domicilio: ['', Validators.required],
+      direccion: ['', Validators.required],
       departamento: ['', Validators.required],
       provincia: ['', Validators.required],
       distrito: ['', Validators.required]
     });
 
     this.credencialesForm = this.fb.group({
-      celular: ['', Validators.required],
+      celular: ['', [
+        Validators.required,
+        Validators.pattern(/^9\d{8}$/)
+      ]],
       correo: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
@@ -185,10 +187,8 @@ export class RegistroComponent implements OnInit {
   }
 
   cargarDepartamentos() {
-    console.log('🚀 Iniciando carga de departamentos...');
     this.ubigeoService.getDepartamentos().subscribe({
       next: (departamentos: Departamento[]) => {
-        console.log(' Departamentos recibidos en componente:', departamentos);
         this.departamentos = departamentos;
       },
       error: (error: any) => {

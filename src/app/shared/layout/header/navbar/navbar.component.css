@@ -30,7 +30,6 @@
     background-color: var(--azul-claro) !important;
 }
 
-
 @media (max-width: 990px) {
     li a {
         color: var(--blanco);
@@ -53,7 +52,6 @@
         }
     }
 }
-
 
 @media (max-width: 1439px) {
     .nav-item {

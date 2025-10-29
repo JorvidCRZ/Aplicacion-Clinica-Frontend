@@ -292,7 +292,7 @@ export class CitasComponent implements OnInit {
     const usuario = this.authService.currentUser;
     console.log('Usuario:', usuario);
     console.log('Cita:', this.citaParaReservar);
-    if (usuario?.rol === 'paciente' && this.citaParaReservar) {
+    if (usuario?.rol?.nombre === 'Paciente' && this.citaParaReservar) {
       this.router.navigate(['/checkout'], {
         queryParams: {
           doctor: this.citaParaReservar.doctor,

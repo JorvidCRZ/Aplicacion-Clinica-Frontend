@@ -26,7 +26,7 @@ export class RecuperarComponent {
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({
-      gmail: ['', [Validators.required, Validators.email]]  // ✅ ahora solo Gmail
+      gmail: ['', [Validators.required, Validators.email]] 
     });
   }
 

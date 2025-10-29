@@ -1,6 +1,4 @@
-<!-- 👥 GESTIÓN DE USUARIOS -->
-<div class="page-container">
-  <!-- 📋 HEADER -->
+<!-- <div class="page-container">
   <div class="page-header">
     <div class="header-left">
       <h2>Gestión de Usuarios</h2>
@@ -73,7 +71,7 @@
     </form>
   </div>
   }
-  <!-- Modal solo lectura para ver usuario -->
+
   @if (mostrarModalVer && usuarioActual) {
   <div class="usuario-form-modal">
     <form>
@@ -124,11 +122,9 @@
     </form>
   </div>
   }
-  <!-- 📊 DATA TABLE -->
+
   <app-data-table [data]="usuarios" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
     emptyMessage="No hay usuarios registrados" (actionClicked)="onTableAction($event)"
     (sortChanged)="onSortChange($event)">
   </app-data-table>
-
-
-</div>
+</div> -->

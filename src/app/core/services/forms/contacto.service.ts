@@ -19,6 +19,6 @@ export class ContactoService {
       idUsuario: contacto.idUsuario
     };
 
-    return this.http.post<any>(`${environment.apiBaseUrl}/contactos`, dto);
+    return this.http.post<any>(`${environment.apiUrl}/contactos`, dto);
   }
 }

@@ -1,6 +1,4 @@
-<!-- 👨‍⚕️ GESTIÓN DE DOCTORES -->
-<div class="page-container">
-  <!-- 📋 HEADER -->
+<!-- <div class="page-container">
   <div class="page-header">
     <div class="header-left">
       <h2>Gestión de Doctores</h2>
@@ -14,7 +12,6 @@
     </div>
   </div>
 
-  <!-- 📊 DATA TABLE -->
   <app-data-table
     [data]="doctores"
     [columns]="columns"
@@ -26,7 +23,6 @@
     (sortChanged)="onSortChange($event)">
   </app-data-table>
 
-  <!-- Modal solo lectura para ver doctor -->
   @if (mostrarModalVer && doctorActual) {
   <div class="usuario-form-modal">
     <form>
@@ -72,12 +68,10 @@
         <label>Número Documento:</label>
         <input [value]="doctorActual.numeroDocumento" disabled>
       </div>
-      <!-- No mostrar botones de guardar/cancelar en modo ver -->
     </form>
   </div>
   }
 
-  <!-- Modal para agregar/editar doctor -->
   @if (doctorActual && !mostrarModalVer) {
   <div class="usuario-form-modal">
     <form (ngSubmit)="guardarDoctor()" #formDoctor="ngForm">
@@ -132,4 +126,4 @@
     </form>
   </div>
   }
-</div>
+</div> -->

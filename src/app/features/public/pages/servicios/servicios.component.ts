@@ -40,15 +40,9 @@ export class ServiciosComponent {
     private router: Router
   ) { }
 
-  /**
-   * Verifica si el usuario está autenticado antes de agendar cita
-   * Si no está autenticado, lo redirige al login
-   */
   agendarCita(): void {
     if (this.authService.requireAuth('/servicio-formulario')) {
-      // Si está autenticado, navegar al formulario de servicio
       this.router.navigate(['/servicio-formulario']);
     }
-    // Si no está autenticado, requireAuth ya lo redirige al login
   }
 }

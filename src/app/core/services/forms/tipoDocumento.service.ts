@@ -5,7 +5,6 @@ import { TipoDocumento } from '../../models/common/tipo-documento';
     providedIn: 'root'
 })
 
-
 export class TipoDocumentoService {
     static readonly TIPOS_DOCUMENTO: TipoDocumento[] = [
         {
@@ -42,7 +41,6 @@ export class TipoDocumentoService {
         return this.TIPOS_DOCUMENTO;
     }
 
-    // 🔥 MÉTODOS DE VALIDACIÓN
     static validarDocumento(tipoDocumento: string, numeroDocumento: string): boolean {
         const tipo = this.getTipoDocumento(tipoDocumento);
         if (!tipo) return false;
@@ -55,7 +53,6 @@ export class TipoDocumentoService {
 
     static formatearDocumento(tipoDocumento: string, numeroDocumento: string): string {
         if (tipoDocumento === 'DNI' && numeroDocumento.length === 8) {
-            // Formato: 12345678 -> 12,345,678
             return numeroDocumento.replace(/(\d{2})(\d{3})(\d{3})/, '$1,$2,$3');
         }
         return numeroDocumento.toUpperCase();
@@ -68,7 +65,6 @@ export class TipoDocumentoService {
         return `${tipo.codigo}: ${this.formatearDocumento(tipoDocumento, numeroDocumento)}`;
     }
 
-    // 🔥 MÉTODO UNIFICADO PARA MENSAJES DE ERROR
     static getMensajeError(tipoDocumento: string): string {
         const tipo = this.getTipoDocumento(tipoDocumento);
         if (!tipo) return 'Formato de documento incorrecto';

@@ -1,24 +1,11 @@
+import { Persona } from './persona';
+import { Rol } from './rol';
+
 export interface Usuario {
-  id: number;
-  nombre: string;
-  email: string;
-  telefono: string;
-  password: string;
-  rol: 'admin' | 'paciente' | 'doctor';
-  
-  tipoDocumento: string;  
-  numeroDocumento: string;
-  
-  apellidoPaterno?: string;
-  apellidoMaterno?: string;
-  fechaNacimiento?: Date;
-  genero?: 'masculino' | 'femenino' | 'otro';
-  especialidad?: string;
-  pais?: string;
-  departamento?: string;
-  provincia?: string;
-  distrito?: string;
-  domicilio?: string;
+  idUsuario?: number;
+  correo: string;
+  password?: string;
+  rol: Rol;
+  persona: Persona;
+  token?: string;
 }
-
-

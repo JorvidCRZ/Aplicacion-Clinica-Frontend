@@ -1,43 +1,32 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Doctor } from '../../models/users/doctor';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DoctorService {
-  private storageKey = 'usuarios';
+  private apiUrl = `${environment.apiUrl}/doctores`;
 
-  getAll(): Doctor[] {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    const usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    return usuarios.filter((u: any) => u.rol === 'doctor');
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Doctor[]> {
+    return this.http.get<Doctor[]>(this.apiUrl);
   }
 
-  getById(id: number): Doctor | undefined {
-    return this.getAll().find(d => d.id === id);
+  getById(id: number): Observable<Doctor> {
+    return this.http.get<Doctor>(`${this.apiUrl}/${id}`);
   }
 
-  add(doctor: Doctor): void {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    const usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    doctor.id = this.getNextId(usuarios);
-    usuarios.push(doctor);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
+  add(doctor: Doctor): Observable<Doctor> {
+    return this.http.post<Doctor>(this.apiUrl, doctor);
   }
 
-  update(doctor: Doctor): void {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    let usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    usuarios = usuarios.map((u: any) => u.id === doctor.id ? doctor : u);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
+  update(id: number, doctor: Doctor): Observable<Doctor> {
+    return this.http.put<Doctor>(`${this.apiUrl}/${id}`, doctor);
   }
 
-  delete(id: number): void {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    let usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    usuarios = usuarios.filter((u: any) => u.id !== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
-  }
-
-  private getNextId(usuarios: any[]): number {
-    return usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

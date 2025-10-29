@@ -1,4 +1,4 @@
-<div class="checkout-container my-5">
+<!-- <div class="checkout-container my-5">
   <div class="checkout-header">
     <button class="btn-volver" (click)="volver()">
       <i class="fas fa-arrow-left"></i>
@@ -9,7 +9,6 @@
 
   @if (pagoExitoso === null && !procesandoPago) {
     <div class="checkout-content">
-      <!-- Información de la cita -->
       @if (citaSeleccionada) {
         <div class="seccion-cita">
           <h2>
@@ -42,7 +41,6 @@
         </div>
       }
 
-      <!-- Formulario de datos del paciente -->
       <div class="seccion-formulario">
         <h2>
           <i class="fas fa-user"></i>
@@ -100,7 +98,6 @@
         </form>
       </div>
 
-      <!-- Métodos de pago -->
       <div class="seccion-pago">
         <h2>
           <i class="fas fa-credit-card"></i>
@@ -130,7 +127,6 @@
           }
         </div>
 
-        <!-- Campos específicos del método de pago -->
         @if (mostrarCamposTarjeta) {
           <form [formGroup]="checkoutForm" class="campos-pago" style="margin-bottom:0;">
             <h3>Datos de la Tarjeta</h3>
@@ -195,7 +191,6 @@
         }
       </div>
 
-      <!-- Resumen de pago -->
       @if (citaSeleccionada && metodoPagoSeleccionado) {
         <div class="seccion-resumen">
           <h2>
@@ -237,7 +232,6 @@
     </div>
   }
 
-  <!-- Estado de procesamiento -->
   @if (procesandoPago) {
     <div class="mensaje-estado procesando">
       <div class="spinner"></div>
@@ -246,7 +240,6 @@
     </div>
   }
 
-  <!-- Resultado del pago -->
   @if (pagoExitoso === true) {
     <div class="mensaje-estado exito">
       <div class="icono-exito">
@@ -283,4 +276,4 @@
       </button>
     </div>
   }
-</div>
+</div> -->

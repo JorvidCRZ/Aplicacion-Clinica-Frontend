@@ -1,7 +1,4 @@
-<!-- 📅 CITAS DEL DOCTOR -->
-<div class="citas-doctor-container container">
-
-    <!-- 🎯 Header con estadísticas rápidas -->
+<!-- <div class="citas-doctor-container container">
     <div class="citas-header">
         <div class="header-title">
             <h2><i class="fas fa-calendar-check"></i> Citas</h2>
@@ -45,7 +42,6 @@
         </div>
     </div>
 
-    <!-- 🔍 Filtros y búsqueda -->
     <div class="filtros-container">
         <div class="filtros-grupo">
             <div class="filtro-fecha">
@@ -73,7 +69,6 @@
         </button>
     </div>
 
-    <!-- 📋 Lista de citas -->
     <div class="citas-lista">
         <div class="lista-header">
             <h3>Citas {{ obtenerTextoFiltro() }}</h3>
@@ -93,7 +88,6 @@
             <p>No se encontraron citas para los filtros seleccionados</p>
         </div>
         } @else {
-        <!-- 📊 Tabla de citas -->
         <div class="tabla-container">
             <table class="tabla-citas">
                 <thead>
@@ -132,24 +126,18 @@
                 <tbody>
                     @for (cita of citasPaginadas; track cita.id) {
                     <tr class="fila-cita">
-                        <!-- Fecha -->
                         <td>{{ formatearFecha(cita.fecha) }}</td>
 
-                        <!-- Hora -->
                         <td>
                             <span class="hora-badge">{{ cita.hora }}</span>
                         </td>
 
-                        <!-- Paciente -->
                         <td class="paciente-celda">{{ cita.paciente.nombre }}</td>
 
-                        <!-- Documento -->
                         <td>{{ cita.paciente.documento }}</td>
 
-                        <!-- Teléfono -->
                         <td>{{ cita.paciente.telefono }}</td>
 
-                        <!-- Tipo consulta -->
                         <td class="consulta-celda">
                             <div class="consulta-info">
                                 <span class="tipo">{{ cita.tipoConsulta }}</span>
@@ -159,7 +147,6 @@
                             </div>
                         </td>
 
-                        <!-- Estado -->
                         <td>
                             <span class="estado-pill" [class]="'estado-' + cita.estado">
                                 @switch (cita.estado) {
@@ -172,7 +159,6 @@
                             </span>
                         </td>
 
-                        <!-- Acciones -->
                         <td class="acciones-celda">
                             <div class="botones-accion">
                                 @if (cita.estado === 'programada') {
@@ -214,7 +200,6 @@
             </table>
         </div>
 
-        <!-- 🔄 Botón cargar más (por lotes) -->
         @if (hayMasRegistros) {
         <div class="cargar-mas-container">
             <button (click)="cargarMasRegistros()" [disabled]="cargandoMas" class="btn-cargar-mas">
@@ -230,7 +215,6 @@
         </div>
         }
 
-        <!-- 📊 Controles de paginación -->
         @if (totalRegistros > 5) {
         <div class="paginacion-container">
             <div class="paginacion-info">
@@ -265,5 +249,4 @@
         }
         }
     </div>
-
-</div>
+</div> -->

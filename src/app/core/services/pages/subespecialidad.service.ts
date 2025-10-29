@@ -16,7 +16,7 @@ export interface Subespecialidad {
     providedIn: 'root'
 })
 export class SubespecialidadService {
-    private URL = `${environment.apiBaseUrl}/subespecialidades`;
+    private URL = `${environment.apiUrl}/subespecialidades`;
     private http = inject(HttpClient);
 
     getSubespecialidadesPorEspecialidad(idEspecialidad: number): Observable<Subespecialidad[]> {

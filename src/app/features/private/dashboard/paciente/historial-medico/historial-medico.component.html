@@ -1,12 +1,10 @@
-<div class="historial-container">
-  <!-- Header -->
+<!-- <div class="historial-container">
   <div class="historial-header">
     <div class="titulo-seccion">
       <h1 class="titulo">📋 Historial Médico Confidencial</h1>
       <p class="subtitulo">Registro completo de consultas, exámenes y tratamientos médicos</p>
     </div>
 
-    <!-- Aviso de Confidencialidad -->
     <div class="aviso-confidencial">
       <div class="icono-confidencial">
         <i class="fas fa-shield-alt"></i>
@@ -20,7 +18,6 @@
     </div>
   </div>
 
-  <!-- Filtros y Controles -->
   <div class="controles-historial">
     <div class="filtros">
       <div class="filtro-grupo">
@@ -57,7 +54,6 @@
     </div>
   </div>
 
-  <!-- Lista de Registros Médicos -->
   <div class="registros-lista">
     @if (registrosFiltrados.length === 0) {
     <div class="sin-registros">
@@ -112,7 +108,6 @@
     }
   </div>
 
-  <!-- Modal de Detalle -->
   @if (vistaDetallada && registroSeleccionado) {
   <div class="modal-overlay" (click)="cerrarDetalle()">
     <div class="modal-detalle" (click)="$event.stopPropagation()">
@@ -180,4 +175,4 @@
     </div>
   </div>
   }
-</div>
+</div> -->

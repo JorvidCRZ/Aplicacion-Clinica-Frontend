@@ -1,5 +1,4 @@
 <div class="login-container d-flex flex-column flex-md-row py-2 px-0 rounded-4 px-md-3 py-md-5 ">
-    <!-- Imagen - 40% desktop / arriba en móvil -->
     <div class="imagen-section">
         <img src="assets/login/login-fondo.webp" alt="Fondo de Clínica" class="imagen-fondo" />
         <div class="overlay-content">
@@ -9,12 +8,8 @@
         </div>
     </div>
 
-    <!-- Formulario - 60% -->
-    <div class="formulario-section" >
+    <div class="formulario-section">
         <div class="formulario-content px-md-5">
-            <!-- Logo móvil ya no necesario - la imagen está arriba -->
-            
-            <!-- Logo y título -->
             <div class="text-center mb-5">
                 <h2 class="titulo-login">Iniciar Sesión</h2>
                 <p class="subtitulo-login">Ingresa tus credenciales para continuar</p>
@@ -35,7 +30,6 @@
                     }
                 </mat-form-field>
 
-                <!-- Contraseña -->
                 <mat-form-field appearance="outline" class="w-100 mb-3">
                     <mat-label>Contraseña</mat-label>
                     <mat-icon matPrefix>lock</mat-icon>
@@ -50,13 +44,11 @@
                     }
                 </mat-form-field>
 
-                <!-- Botón -->
                 <button mat-flat-button color="boton" class="w-100 mt-3" type="submit">
                     Ingresar
                 </button>
             </form>
 
-            <!-- Error -->
             @if (error) {
             <mat-error class="d-block mt-3 text-center">
                 {{ error }}
@@ -65,10 +57,12 @@
 
             <div class="mt-4 text-center">
                 <h1 class="h5 mb-3 text-muted">¿Necesitas ayuda?</h1>
-                <a [routerLink]="['/recuperar']" class="link-registro" style="font-weight: 900; color: var(--negro) !important;"> Recuperar Contraseña </a>
+                <a [routerLink]="['/recuperar']" class="link-registro"
+                    style="font-weight: 900; color: var(--negro) !important;"> Recuperar Contraseña </a>
                 <a [routerLink]="['/recuperar']" class="link-recuperar d-block mb-2">¿Olvidaste tu contraseña?</a>
                 <span class="texto-registro">¿No tienes cuenta?</span>
-                <a [routerLink]="['/registro']" class="link-registro" style="font-weight: 900; color: var(--negro) !important;"> Regístrate </a>
+                <a [routerLink]="['/registro']" class="link-registro"
+                    style="font-weight: 900; color: var(--negro) !important;"> Regístrate </a>
             </div>
         </div>
     </div>

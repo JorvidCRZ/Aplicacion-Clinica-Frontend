@@ -45,7 +45,7 @@ span,p{
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    color: white;
+    color: var(--blanco);
 }
 
 .logo-overlay {
@@ -69,7 +69,6 @@ span,p{
     line-height: 1.5;
 }
 
-/* 📝 SECCIÓN DEL FORMULARIO - 60% */
 .formulario-section {
     flex: 0 0 55%;
     background: linear-gradient(90deg, var(--azul-medio) 0%, var(--azul-claro) 100%);
@@ -85,7 +84,6 @@ span,p{
     max-width: 450px;
 }
 
-/* 🎯 TÍTULOS */
 .titulo-login {
     color: var(--azul-oscuro);
     font-weight: bold;
@@ -99,8 +97,6 @@ span,p{
     margin-bottom: 0;
 }
 
-
-/* 🔗 ENLACES */
 .link-recuperar {
     color: var(--azul-oscuro);
     text-decoration: none;
@@ -128,13 +124,11 @@ span,p{
     }
 }
 
-/* 📱 LOGO MÓVIL */
 .logo-movil {
     width: 80px;
     height: auto;
 }
 
-/* 📱 RESPONSIVE */
 @media (max-width: 767.98px) {
     .login-container {
         flex-direction: column !important;
@@ -165,7 +159,6 @@ span,p{
         font-size: 1rem !important;
     }
 
-    /* Ajustes para texto del overlay en móvil */
     .overlay-content {
         padding: 1rem !important;
         justify-content: center !important;
@@ -187,9 +180,6 @@ span,p{
     }
 }
 
-
-
-/* 💻 TABLET Y DESKTOP PEQUEÑO */
 @media (min-width: 768px) and (max-width: 991.98px) {
     .imagen-section {
         flex: 0 0 35% !important;
@@ -205,7 +195,6 @@ span,p{
     }
 }
 
-/* 🖥️ DESKTOP GRANDE */
 @media (min-width: 1200px) {
     .formulario-content {
         max-width: 500px;
@@ -216,7 +205,6 @@ span,p{
     }
 }
 
-/* 🎨 FONDO GENERAL PARA HACER VISIBLE EL BORDER RADIUS */
 :host {
     display: block;
     background: var(--gris-claro);
@@ -224,7 +212,6 @@ span,p{
     padding: 1rem;
 }
 
-/* 📱 MÓVIL 375px - Sin padding */
 @media (max-width: 375px) {
     :host {
         padding: 0 !important;

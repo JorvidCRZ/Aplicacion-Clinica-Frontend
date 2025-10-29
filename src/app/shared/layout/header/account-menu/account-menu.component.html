@@ -6,22 +6,19 @@
             <i class="iconos {{ authService.getUserIcon() }}"
                 [style.font-size]="authService.currentUser?.rol ? '1.8rem' : '2rem'"></i>
             <h6 class="fw-semibold mt-1" style="color:var(--blanco);">
-                {{ authService.currentUser?.nombre }}
+                {{ authService.getDisplayName() }}
             </h6>
-            @if(authService.currentUser?.rol) {
+            @if(authService.getRoleDisplayName()) {
             <h6 class="fw-semibold mt-1" style="font-size: 0.75rem; color:var(--blanco);">
-                {{ authService.currentUser?.rol }}
+                {{ authService.getRoleDisplayName() }}
             </h6>
             }
         </button>
 
         <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" style="min-width:220px">
             <li class="px-3 py-2">
-                <div class="fw-bold small mb-1">{{ authService.currentUser?.nombre }}</div>
-                <div class="fw-bold small mb-1">{{ authService.currentUser?.rol }}</div>
-                @if(authService.currentUser?.rol === 'admin') {
-                <div class="badge bg-warning text-dark mt-1">Administrador</div>
-                }
+                <div class="fw-bold small mb-1">{{ authService.getDisplayName() }}</div>
+                <div class="badge bg-warning text-dark fw-bold small mb-1">{{ authService.getRoleDisplayName() }}</div>
             </li>
 
             @for(link of links; track link.route) {

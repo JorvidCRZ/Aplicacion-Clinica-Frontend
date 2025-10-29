@@ -1,39 +1,33 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Usuario } from '../../models/users/usuario';
+import { environment } from '../../../../environments/environment';
+import { UsuarioRegistro } from '../../models/users/registro';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private storageKey = 'usuarios';
+  private apiUrl = `${environment.apiUrl}/usuarios`; 
 
-  getAll(): Usuario[] {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    return usuariosStr ? JSON.parse(usuariosStr) : [];
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(this.apiUrl);
   }
 
-  getById(id: number): Usuario | undefined {
-    return this.getAll().find(u => u.id === id);
+  getById(id: number): Observable<Usuario> {
+    return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
   }
 
-  add(usuario: Usuario): void {
-    const usuarios = this.getAll();
-    usuario.id = this.getNextId(usuarios);
-    usuarios.push(usuario);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
+  add(usuario: Usuario | UsuarioRegistro ): Observable<Usuario> {
+    return this.http.post<Usuario>(this.apiUrl, usuario);
   }
 
-  update(usuario: Usuario): void {
-    let usuarios = this.getAll();
-    usuarios = usuarios.map(u => u.id === usuario.id ? usuario : u);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
+  update(id: number, usuario: Usuario): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, usuario);
   }
 
-  delete(id: number): void {
-    let usuarios = this.getAll();
-    usuarios = usuarios.filter(u => u.id !== id);
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
-  }
-
-  private getNextId(usuarios: Usuario[]): number {
-    return usuarios.length > 0 ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

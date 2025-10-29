@@ -1,6 +1,4 @@
-<!-- 👥 GESTIÓN DE PACIENTES -->
-<div class="page-container">
-  <!-- 📋 HEADER -->
+<!-- <div class="page-container">
   <div class="page-header">
     <div class="header-left">
       <h2>Gestión de Pacientes</h2>
@@ -14,7 +12,6 @@
     </div>
   </div>
 
-  <!-- 📊 DATA TABLE -->
   <app-data-table
     [data]="pacientes"
     [columns]="columns"
@@ -26,7 +23,6 @@
     (sortChanged)="onSortChange($event)">
   </app-data-table>
 
-  <!-- Modal solo lectura para ver paciente -->
   @if (mostrarModalVer && pacienteActual) {
   <div class="usuario-form-modal">
     <form>
@@ -72,12 +68,10 @@
         <label>Dirección:</label>
         <input [value]="pacienteActual.domicilio" disabled>
       </div>
-      <!-- No mostrar botones de guardar/cancelar en modo ver -->
     </form>
   </div>
   }
 
-  <!-- Modal para agregar/editar paciente -->
   @if (pacienteActual && !mostrarModalVer) {
   <div class="usuario-form-modal">
     <form (ngSubmit)="guardarPaciente()" #formPaciente="ngForm">
@@ -134,4 +128,4 @@
     </form>
   </div>
   }
-</div>
+</div> -->

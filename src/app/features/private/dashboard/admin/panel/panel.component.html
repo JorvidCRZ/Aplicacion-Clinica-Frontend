@@ -1,6 +1,5 @@
-<!-- 📊 PANEL DE CONTROL - DASHBOARD PRINCIPAL -->
+<!-- 📊 PANEL DE CONTROL - DASHBOARD PRINCIPAL
 <div class="dashboard-container">
-  <!-- 📋 HEADER -->
   <div class="dashboard-header">
     <div class="header-content">
       <h1>Panel de Control</h1>
@@ -12,26 +11,27 @@
     </div>
   </div>
 
-  <!-- 📊 ESTADÍSTICAS PRINCIPALES -->
   <div class="stats-grid">
-    <div class="stat-card" *ngFor="let stat of estadisticas">
+    @for (stat of estadisticas; track $index) {
+    <div class="stat-card">
       <div class="stat-icon" [style.background-color]="stat.color">
         <i class="fas" [class]="stat.icono"></i>
       </div>
       <div class="stat-content">
         <div class="stat-number">{{ stat.valor }}</div>
         <div class="stat-label">{{ stat.titulo }}</div>
-        <div class="stat-change" *ngIf="stat.cambio" [class]="'change-' + stat.tendencia">
+        @if (stat.cambio) {
+        <div class="stat-change" [class]="'change-' + stat.tendencia">
           <i class="fas" [class]="stat.tendencia === 'up' ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
           {{ stat.cambio }}
         </div>
+        }
       </div>
     </div>
+    }
   </div>
 
-  <!-- 📈 GRÁFICOS Y TABLAS -->
   <div class="charts-grid">
-    <!-- 📊 GRÁFICO DE CITAS POR ESTADO -->
     <div class="chart-card">
       <div class="card-header">
         <h3>Estado de Citas</h3>
@@ -63,7 +63,6 @@
       </div>
     </div>
 
-    <!-- 📅 CITAS DE HOY -->
     <div class="chart-card">
       <div class="card-header">
         <h3>Citas de Hoy</h3>
@@ -72,7 +71,9 @@
       <div class="chart-content">
         @if (citasHoy.length > 0) {
         <div class="citas-list">
-          <div class="cita-item" *ngFor="let cita of citasHoy">
+          @for(cita of citasHoy; track $index) {
+
+          <div class="cita-item">
             <div class="cita-time">{{ cita.hora }}</div>
             <div class="cita-info">
               <div class="cita-paciente">{{ cita.paciente }}</div>
@@ -82,6 +83,7 @@
               {{ cita.estado }}
             </div>
           </div>
+          }
         </div>
         } @else {
         <ng-template #noCitas>
@@ -94,4 +96,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> -->

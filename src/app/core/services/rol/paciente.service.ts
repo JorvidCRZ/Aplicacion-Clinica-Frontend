@@ -1,51 +1,32 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Paciente } from '../../models/users/paciente';
+import { environment } from '../../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PacienteService {
-  private storageKey = 'usuarios';
+  private apiUrl = `${environment.apiUrl}/pacientes`;
 
-  getAll(): Paciente[] {
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    const usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    return usuarios.filter((u: any) => u.rol === 'paciente');
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<Paciente[]> {
+    return this.http.get<Paciente[]>(this.apiUrl);
   }
 
-  getById(id: number): Paciente | undefined {
-    return this.getAll().find(u => u.id === id);
+  getById(id: number): Observable<Paciente> {
+    return this.http.get<Paciente>(`${this.apiUrl}/${id}`);
   }
 
-  add(paciente: Paciente): void {
-    const usuarios = this.getAll();
-    paciente.id = this.getNextId(usuarios);
-    usuarios.push(paciente);
-    this.saveAll(usuarios);
+  add(paciente: Paciente): Observable<Paciente> {
+    return this.http.post<Paciente>(this.apiUrl, paciente);
   }
 
-  update(paciente: Paciente): void {
-    let usuarios = this.getAll();
-    usuarios = usuarios.map(u => u.id === paciente.id ? paciente : u);
-    this.saveAll(usuarios);
+  update(id: number, paciente: Paciente): Observable<Paciente> {
+    return this.http.put<Paciente>(`${this.apiUrl}/${id}`, paciente);
   }
 
-  delete(id: number): void {
-    let usuarios = this.getAll();
-    usuarios = usuarios.filter(u => u.id !== id);
-    this.saveAll(usuarios);
-  }
-
-  private saveAll(pacientes: Paciente[]): void {
-    // Mezclar con otros usuarios si existen
-    const usuariosStr = localStorage.getItem(this.storageKey);
-    let usuarios = usuariosStr ? JSON.parse(usuariosStr) : [];
-    usuarios = usuarios.filter((u: any) => u.rol !== 'paciente');
-    usuarios = [...usuarios, ...pacientes];
-    localStorage.setItem(this.storageKey, JSON.stringify(usuarios));
-  }
-
-  private getNextId(pacientes: Paciente[]): number {
-    return pacientes.length > 0 ? Math.max(...pacientes.map(u => u.id)) + 1 : 1;
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

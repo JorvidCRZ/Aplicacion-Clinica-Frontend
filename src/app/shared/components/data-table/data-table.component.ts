@@ -40,7 +40,6 @@ export class DataTableComponent {
     sortColumn: string = '';
     sortDirection: 'asc' | 'desc' = 'asc';
 
-    // 📄 Paginación
     currentPage: number = 1;
     pageSize: number = 10;
     pageSizeOptions: number[] = [10, 25, 50, 100];
@@ -99,9 +98,8 @@ export class DataTableComponent {
         this.actionClicked.emit({ action, item });
     }
 
-    // 📄 Métodos de paginación
     onPageSizeChange() {
-        this.currentPage = 1; // Reset a la primera página
+        this.currentPage = 1; 
     }
 
     goToPage(page: number) {
@@ -148,11 +146,11 @@ export class DataTableComponent {
 
     private getStatusDisplay(status: string): string {
         const statusMap: { [key: string]: string } = {
-            'activo': '✅ Activo',
-            'inactivo': '❌ Inactivo',
-            'pendiente': '⏳ Pendiente',
-            'completado': '✅ Completado',
-            'cancelado': '❌ Cancelado'
+            'activo': 'Activo',
+            'inactivo': ' Inactivo',
+            'pendiente': ' Pendiente',
+            'completado': ' Completado',
+            'cancelado': ' Cancelado'
         };
         return statusMap[status?.toLowerCase()] || status;
     }

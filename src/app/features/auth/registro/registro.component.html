@@ -5,12 +5,11 @@
             <h4>Ingrese sus datos</h4>
             @if (datosForm && personalesForm && credencialesForm) {
             <mat-horizontal-stepper [linear]="true" #stepper>
-                <!-- Step 1 -->
+
                 <mat-step [stepControl]="datosForm">
                     <form [formGroup]="datosForm">
                         <ng-template matStepLabel>Datos Básicos</ng-template>
 
-                        <!-- Tipo de documento -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Tipo de documento</mat-label>
                             <mat-select formControlName="tipoDocumento">
@@ -28,7 +27,6 @@
                             }
                         </mat-form-field>
 
-                        <!-- Número de documento -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>{{ getNombreTipoDocumento() }}</mat-label>
                             <mat-icon matPrefix>badge</mat-icon>
@@ -48,7 +46,6 @@
                             }
                         </mat-form-field>
 
-                        <!-- Fecha de nacimiento -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Fecha de nacimiento</mat-label>
                             <mat-datepicker-toggle matPrefix [for]="picker"></mat-datepicker-toggle>
@@ -85,23 +82,38 @@
                     </form>
                 </mat-step>
 
-                <!-- Step 2 -->
                 <mat-step [stepControl]="personalesForm">
                     <form [formGroup]="personalesForm">
                         <ng-template matStepLabel>Datos Personales</ng-template>
 
                         <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Nombres</mat-label>
+                            <mat-label>Primer Nombre</mat-label>
                             <mat-icon matPrefix>person</mat-icon>
-                            <input matInput formControlName="nombre" />
-                            @if (personalesForm.get('nombre')?.hasError('required')) {
+                            <input matInput formControlName="nombre1" />
+                            @if (personalesForm.get('nombre1')?.hasError('required')) {
                             <mat-error>
                                 Los nombres son obligatorios
                             </mat-error>
                             }
-                            @if (personalesForm.get('nombre')?.hasError('minlength')) {
+                            @if (personalesForm.get('nombre1')?.hasError('minlength')) {
                             <mat-error>
-                                Los nombres deben tener al menos 2 caracteres
+                                El nombre debe tener al menos 2 caracteres
+                            </mat-error>
+                            }
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Segundo Nombre</mat-label>
+                            <mat-icon matPrefix>person</mat-icon>
+                            <input matInput formControlName="nombre2" />
+                            @if (personalesForm.get('nombre2')?.hasError('required')) {
+                            <mat-error>
+                                Los nombres son obligatorios
+                            </mat-error>
+                            }
+                            @if (personalesForm.get('nombre2')?.hasError('minlength')) {
+                            <mat-error>
+                                El nombre debe tener al menos 2 caracteres
                             </mat-error>
                             }
                         </mat-form-field>
@@ -168,7 +180,6 @@
                             }
                         </mat-form-field>
 
-                        <!-- Departamento -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Departamento</mat-label>
                             <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange($event)">
@@ -185,7 +196,6 @@
                             }
                         </mat-form-field>
 
-                        <!-- Provincia -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Provincia</mat-label>
                             <mat-select formControlName="provincia" (selectionChange)="onProvinciaChange($event)">
@@ -202,7 +212,6 @@
                             }
                         </mat-form-field>
 
-                        <!-- Distrito -->
                         <mat-form-field appearance="outline" class="w-100">
                             <mat-label>Distrito</mat-label>
                             <mat-select formControlName="distrito">
@@ -220,17 +229,17 @@
                         </mat-form-field>
 
                         <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Domicilio</mat-label>
+                            <mat-label>Dirección</mat-label>
                             <mat-icon matPrefix>home</mat-icon>
-                            <input matInput formControlName="domicilio" />
-                            @if (personalesForm.get('domicilio')?.hasError('required')) {
+                            <input matInput formControlName="direccion" />
+                            @if (personalesForm.get('direccion')?.hasError('required')) {
                             <mat-error>
-                                El domicilio es obligatorio
+                                La dirección es obligatoria
                             </mat-error>
                             }
-                            @if (personalesForm.get('domicilio')?.hasError('minlength')) {
+                            @if (personalesForm.get('direccion')?.hasError('minlength')) {
                             <mat-error>
-                                El domicilio debe tener al menos 5 caracteres
+                                La dirección debe tener al menos 5 caracteres
                             </mat-error>
                             }
                         </mat-form-field>
@@ -243,7 +252,6 @@
                     </form>
                 </mat-step>
 
-                <!-- Step 3 -->
                 <mat-step [stepControl]="credencialesForm">
                     <form [formGroup]="credencialesForm">
                         <ng-template matStepLabel>Credenciales</ng-template>
@@ -262,6 +270,11 @@
                             @if (credencialesForm.get('celular')?.hasError('pattern')) {
                             <mat-error>
                                 El número de celular debe tener 9 dígitos
+                            </mat-error>
+                            }
+                            @if (credencialesForm.get('celular')?.hasError('pattern')) {
+                            <mat-error>
+                                Ingrese un número de celular válido debe comenzar con 9 
                             </mat-error>
                             }
                         </mat-form-field>
@@ -342,7 +355,6 @@
     </div>
 </div>
 
-<!-- 🎉 MENSAJE FLOTANTE DE ÉXITO -->
 @if (mostrarMensajeExito) {
 <div class="mensaje-flotante-overlay">
     <div class="mensaje-flotante">

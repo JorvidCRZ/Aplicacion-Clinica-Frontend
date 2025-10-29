@@ -22,16 +22,18 @@ export class HeaderComponent {
 
   get accountLinks() {
     if (!this.authService.isLoggedIn()) return [];
-    const rol = this.authService.currentUser?.rol;
-    if (rol === 'admin') {
-      const rol = this.authService.currentUser?.rol ?? 'paciente';
-      return MENU_DASHBOARD[rol] || [];
-    } else if (rol === 'doctor') {
-      const rol = this.authService.currentUser?.rol ?? 'doctor';
-      return MENU_DASHBOARD[rol] || [];
-    } else { 
-      const rol = this.authService.currentUser?.rol ?? 'admin';
-      return MENU_DASHBOARD[rol] || [];
+
+    const rolNombre = this.authService.getRoleDisplayName().toLowerCase() || '';
+
+    switch (rolNombre) {
+      case 'administrador':
+        return MENU_DASHBOARD['admin'];
+      case 'medico':
+        return MENU_DASHBOARD['doctor'];
+      case 'paciente':
+        return MENU_DASHBOARD['paciente'];
+      default:
+        return [];
     }
   }
 
@@ -40,15 +42,16 @@ export class HeaderComponent {
   }
 
   get nombreUsuario(): string | null {
-    return this.authService.currentUser?.nombre || null;
+    return this.authService.getDisplayName() || null;
   }
 
   get userEmail(): string | null {
-    return this.authService.currentUser?.email || null;
+    return this.authService.currentUser?.correo || null;
   }
 
   get isAdmin(): boolean {
-    return this.authService.currentUser?.rol === 'admin';
+    const rol = this.authService.getRoleDisplayName().toLowerCase();
+    return rol === 'Administrador';
   }
 
   cerrarSesion() {

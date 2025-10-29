@@ -1,6 +1,4 @@
-<!-- 📊 DATA TABLE COMPONENT -->
 <div class="data-table-container">
-    <!-- 🔍 BARRA DE BÚSQUEDA -->
     @if (searchable) {
     <div class="search-bar">
         <div class="search-input-container">
@@ -10,22 +8,18 @@
     </div>
     }
 
-    <!-- 📋 TABLA -->
     <div class="table-wrapper">
         @if (loading) {
-        <!-- ⏳ LOADING STATE -->
         <div class="loading-container">
             <div class="loading-spinner"></div>
             <p>Cargando datos...</p>
         </div>
         } @else if (filteredData.length === 0) {
-        <!-- 📭 EMPTY STATE -->
         <div class="empty-container">
             <i class="fas fa-inbox empty-icon"></i>
             <p>{{ emptyMessage }}</p>
         </div>
         } @else {
-        <!-- 📊 DATA TABLE -->
         <table class="data-table">
             <thead>
                 <tr>
@@ -80,7 +74,6 @@
         }
     </div>
 
-    <!-- � PAGINACIÓN -->
     @if (!loading && paginated && totalPages > 1) {
     <div class="pagination-container">
         <div class="pagination-info">
@@ -88,7 +81,6 @@
         </div>
 
         <div class="pagination-controls">
-            <!-- 📏 Selector de tamaño de página -->
             <div class="page-size-selector">
                 <label for="pageSize">Mostrar:</label>
                 <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
@@ -99,7 +91,6 @@
                 <span>por página</span>
             </div>
 
-            <!-- 🔄 Navegación de páginas -->
             <div class="page-navigation">
                 <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">
                     <i class="fas fa-chevron-left"></i>
@@ -118,7 +109,6 @@
         </div>
     </div>
     }
-
 
     @if (!loading && !paginated && filteredData.length > 0) {
     <div class="table-footer">

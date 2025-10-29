@@ -1,10 +1,8 @@
-import { Usuario } from "./usuario";
+import { Persona } from './persona';
 
-export interface Doctor extends Usuario {
-    especialidad: string;
-    nroColegiado: string;
-    horario?: string;
-    rol: 'doctor';
-    apellidoPaterno: string;
-    apellidoMaterno: string;
+export interface Doctor {
+  idMedico: number;
+  persona: Persona;
+  colegiatura: string;
+  experienciaAnios: number;
 }
