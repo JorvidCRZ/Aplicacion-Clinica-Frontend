@@ -115,6 +115,7 @@ body {
   border-bottom: 1px solid #b3d9ff;
   cursor: pointer;
   font-size: 0.9rem;
+  word-break: break-word;
 }
 
 .data-table tbody tr:nth-child(even) {
@@ -345,6 +346,7 @@ body {
     position: relative;
     padding-left: 50%;
     text-align: left;
+    word-break: break-word;
   }
 
   .data-table td:before {
@@ -357,10 +359,10 @@ body {
   }
 
   .action-buttons {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: flex-start;
     margin-top: 10px;
-    max-width: 80px;
+    max-width: 120px;
   }
 
   .action-btn {
@@ -486,5 +488,25 @@ body {
   .pagination-info {
     text-align: center;
     order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table td:before {
+    width: 42%;
+  }
+  .data-table td {
+    padding-left: 46%;
+  }
+  .action-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    max-width: 140px;
+  }
+  .action-btn {
+    min-width: 56px;
+  }
+  .data-table-container {
+    max-width: 100%;
   }
 }

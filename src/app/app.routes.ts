@@ -35,7 +35,6 @@ export const routes: Routes = [
     },
     { path: 'servicio-formulario', component: ServicioFormularioComponent, canActivate: [AuthGuard] },
 
-    // 🔹 DASHBOARD PACIENTE
     {
         path: 'paciente',
         component: PacienteComponent,
@@ -51,7 +50,6 @@ export const routes: Routes = [
         ]
     },
 
-    // 🔹 DASHBOARD MEDICO
     {
         path: 'medico',
         component: MedicoComponent,
@@ -59,16 +57,15 @@ export const routes: Routes = [
         data: { roles: ['Medico'] },
         children: [
             { path: '', redirectTo: 'resumen', pathMatch: 'full' },
-            // { path: 'resumen', loadComponent: () => import('./features/private/dashboard/medico/resumen/resumen.component').then(m => m.ResumenComponent) },
-            // { path: 'mi-perfil', loadComponent: () => import('./features/private/dashboard/medico/perfil/perfil.component').then(m => m.PerfilComponent) },
-            // { path: 'citas', loadComponent: () => import('./features/private/dashboard/medico/citas/citas.component').then(m => m.CitasComponent) },
-            // { path: 'reporte-personal', loadComponent: () => import('./features/private/dashboard/medico/reporte-personal/reporte-personal.component').then(m => m.ReportePersonalComponent) },
-            // { path: 'horarios', loadComponent: () => import('./features/private/dashboard/medico/horarios/horarios.component').then(m => m.HorariosComponent) },
+            { path: 'resumen', loadComponent: () => import('./features/private/dashboard/medico/resumen/resumen.component').then(m => m.ResumenComponent) },
+            { path: 'mi-perfil', loadComponent: () => import('./features/private/dashboard/medico/perfil/perfil.component').then(m => m.PerfilComponent) },
+            { path: 'citas', loadComponent: () => import('./features/private/dashboard/medico/citas/citas.component').then(m => m.CitasComponent) },
+            { path: 'reporte-personal', loadComponent: () => import('./features/private/dashboard/medico/reporte-personal/reporte-personal.component').then(m => m.ReportePersonalComponent) },
+            { path: 'horarios', loadComponent: () => import('./features/private/dashboard/medico/horarios/horarios.component').then(m => m.HorariosComponent) },
             { path: 'pacientes', loadComponent: () => import('./features/private/dashboard/medico/pacientes/pacientes.component').then(m => m.PacientesComponent) },
         ]
     },
 
-    // 🔹 DASHBOARD ADMIN
     {
         path: 'admin',
         component: AdminComponent,
@@ -76,11 +73,11 @@ export const routes: Routes = [
         data: { roles: ['Administrador'] },
         children: [
             { path: '', redirectTo: 'panel', pathMatch: 'full' },
-            // { path: 'panel', loadComponent: () => import('./features/private/dashboard/admin/panel/panel.component').then(m => m.PanelComponent) },
-            // { path: 'gestion-citas', loadComponent: () => import('./features/private/dashboard/admin/gestion-citas/gestion-citas.component').then(m => m.GestionCitasComponent) },
-            // { path: 'gestion-medicos', loadComponent: () => import('./features/private/dashboard/admin/gestion-medicos/gestion-medicos.component').then(m => m.GestionMedicosComponent) },
-            // { path: 'gestion-pacientes', loadComponent: () => import('./features/private/dashboard/admin/gestion-pacientes/gestion-pacientes.component').then(m => m.GestionPacientesComponent) },
-            // { path: 'gestion-usuarios', loadComponent: () => import('./features/private/dashboard/admin/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent) },
+            { path: 'panel', loadComponent: () => import('./features/private/dashboard/admin/panel/panel.component').then(m => m.PanelComponent) },
+            { path: 'gestion-citas', loadComponent: () => import('./features/private/dashboard/admin/gestion-citas/gestion-citas.component').then(m => m.GestionCitasComponent) },
+            { path: 'gestion-medicos', loadComponent: () => import('./features/private/dashboard/admin/gestion-medicos/gestion-medicos.component').then(m => m.GestionMedicosComponent) },
+            { path: 'gestion-pacientes', loadComponent: () => import('./features/private/dashboard/admin/gestion-pacientes/gestion-pacientes.component').then(m => m.GestionPacientesComponent) },
+            { path: 'gestion-usuarios', loadComponent: () => import('./features/private/dashboard/admin/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent) },
             { path: 'reportes', loadComponent: () => import('./features/private/dashboard/admin/reportes/reportes.component').then(m => m.ReportesComponent) },
         ]
     },

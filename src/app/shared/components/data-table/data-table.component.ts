@@ -32,17 +32,19 @@ export class DataTableComponent {
     @Input() loading: boolean = false;
     @Input() emptyMessage: string = 'No hay datos disponibles';
     @Input() paginated: boolean = true;
+    // Configuración de paginación
+    @Input() pageSize: number = 10;
+    @Input() pageSizeOptions: number[] = [10, 25, 50, 100];
 
     @Output() actionClicked = new EventEmitter<{ action: string, item: any }>();
     @Output() sortChanged = new EventEmitter<{ column: string, direction: 'asc' | 'desc' }>();
+    @Output() pageChanged = new EventEmitter<{ page: number, pageSize: number }>();
 
     searchTerm: string = '';
     sortColumn: string = '';
     sortDirection: 'asc' | 'desc' = 'asc';
 
     currentPage: number = 1;
-    pageSize: number = 10;
-    pageSizeOptions: number[] = [10, 25, 50, 100];
 
     get filteredData() {
         if (!this.searchTerm) return this.data;
@@ -100,23 +102,27 @@ export class DataTableComponent {
 
     onPageSizeChange() {
         this.currentPage = 1; 
+        this.pageChanged.emit({ page: this.currentPage, pageSize: this.pageSize });
     }
 
     goToPage(page: number) {
         if (page >= 1 && page <= this.totalPages) {
             this.currentPage = page;
+            this.pageChanged.emit({ page: this.currentPage, pageSize: this.pageSize });
         }
     }
 
     previousPage() {
         if (this.currentPage > 1) {
             this.currentPage--;
+            this.pageChanged.emit({ page: this.currentPage, pageSize: this.pageSize });
         }
     }
 
     nextPage() {
         if (this.currentPage < this.totalPages) {
             this.currentPage++;
+            this.pageChanged.emit({ page: this.currentPage, pageSize: this.pageSize });
         }
     }
 

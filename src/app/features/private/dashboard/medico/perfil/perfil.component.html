@@ -1,4 +1,4 @@
-<!-- <div class="perfil-usuario-container">
+<div class="perfil-usuario-container">
     <div class="perfil-header-moderno">
         <div class="usuario-card-principal">
             <div class="usuario-avatar-moderno">
@@ -78,7 +78,7 @@
                 <i class="fas fa-user"></i>
                 <span>Información Personal</span>
             </button>
-            @if (usuarioLogueado?.rol === 'doctor') {
+       
             <button (click)="cambiarSeccion('profesional')" [class.active]="seccionActiva === 'profesional'"
                 class="tab-moderno">
                 <i class="fas fa-graduation-cap"></i>
@@ -89,7 +89,7 @@
                 <i class="fas fa-clock"></i>
                 <span>Horarios</span>
             </button>
-            }
+            
         </div>
     </div>
 
@@ -222,7 +222,7 @@
         </div>
         }
 
-        @if (seccionActiva === 'profesional' && usuarioLogueado?.rol === 'doctor') {
+ 
         <div class="seccion-card-moderna">
             <div class="seccion-header-moderna">
                 <div class="titulo-seccion">
@@ -263,9 +263,9 @@
                 </div>
             </div>
         </div>
-        }
+        
 
-        @if (seccionActiva === 'horarios' && usuarioLogueado?.rol === 'doctor') {
+        @if (seccionActiva === 'horarios') {
         <div class="seccion-card-moderna">
             <div class="seccion-header-moderna">
                 <div class="titulo-seccion">
@@ -314,4 +314,4 @@
         </div>
         }
     </div>
-</div> -->
+</div>

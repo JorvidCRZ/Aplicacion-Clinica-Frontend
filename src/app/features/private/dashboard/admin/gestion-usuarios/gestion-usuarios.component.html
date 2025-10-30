@@ -1,4 +1,4 @@
-<!-- <div class="page-container">
+<div class="page-container">
   <div class="page-header">
     <div class="header-left">
       <h2>Gestión de Usuarios</h2>
@@ -124,7 +124,8 @@
   }
 
   <app-data-table [data]="usuarios" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+    [paginated]="true" [pageSize]="10" [pageSizeOptions]="[10,20,50]"
     emptyMessage="No hay usuarios registrados" (actionClicked)="onTableAction($event)"
     (sortChanged)="onSortChange($event)">
   </app-data-table>
-</div> -->
+</div>

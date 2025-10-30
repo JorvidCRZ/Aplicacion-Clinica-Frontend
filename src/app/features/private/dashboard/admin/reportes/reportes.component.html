@@ -4,7 +4,7 @@
     <!-- 🎛️ PANEL DE FILTROS -->
     <div class="filtros-panel">
         <div class="filtros-header">
-            <h2>📊 Reportes y Analíticas</h2>
+            <h2><i class="fas fa-chart-line"></i> Reportes y Analíticas</h2>
             <div class="filtros-actions">
                 <button class="btn-actualizar" (click)="actualizarDatos()" [disabled]="cargandoReporte">
                     <i class="fas fa-sync-alt" [class.spinning]="cargandoReporte"></i>
@@ -16,7 +16,7 @@
         <div class="filtros-content">
             <!-- 📅 Rango de fechas -->
             <div class="filtro-grupo">
-                <label>📅 Período de análisis:</label>
+                <label><i class="fas fa-calendar-alt"></i> Período de análisis:</label>
                 <div class="fecha-inputs">
                     <input type="date" [(ngModel)]="filtro.fechaInicio" (change)="generarReporte()">
                     <span>hasta</span>
@@ -26,28 +26,28 @@
 
             <!-- 📊 Tipo de reporte -->
             <div class="filtro-grupo">
-                <label>📋 Tipo de reporte:</label>
+                <label><i class="fas fa-clipboard-list"></i> Tipo de reporte:</label>
                 <select [(ngModel)]="filtro.tipo" (change)="generarReporte()">
-                    <option value="general">📈 Reporte General</option>
-                    <option value="citas">📅 Análisis de Citas</option>
-                    <option value="doctores">👨‍⚕️ Rendimiento de Doctores</option>
-                    <option value="pacientes">👥 Estadísticas de Pacientes</option>
-                    <option value="ingresos">💰 Análisis de Ingresos</option>
+                    <option value="general">Reporte General</option>
+                    <option value="citas">Análisis de Citas</option>
+                    <option value="doctores">Rendimiento de Doctores</option>
+                    <option value="pacientes">Estadísticas de Pacientes</option>
+                    <option value="ingresos">Análisis de Ingresos</option>
                 </select>
             </div>
 
             <!-- 👀 Formato de vista -->
             <div class="filtro-grupo">
-                <label>👁️ Vista:</label>
+                <label><i class="fas fa-eye"></i> Vista:</label>
                 <div class="vista-botones">
                     <button [class.active]="vistaActual === 'resumen'" (click)="cambiarVista('resumen')">
-                        📋 Resumen
+                        <i class="fas fa-clipboard"></i> Resumen
                     </button>
                     <button [class.active]="vistaActual === 'tabla'" (click)="cambiarVista('tabla')">
-                        📊 Tabla
+                        <i class="fas fa-table"></i> Tabla
                     </button>
                     <button [class.active]="vistaActual === 'grafico'" (click)="cambiarVista('grafico')">
-                        📈 Gráfico
+                        <i class="fas fa-chart-line"></i> Gráfico
                     </button>
                 </div>
             </div>
@@ -72,7 +72,7 @@
             <!-- 📊 Métricas principales -->
             <div class="metricas-grid">
                 <div class="metrica-card total-citas">
-                    <div class="metrica-icon">📅</div>
+                    <div class="metrica-icon"><i class="fas fa-calendar-check"></i></div>
                     <div class="metrica-info">
                         <h3>{{ resumenGeneral.totalCitas }}</h3>
                         <p>Total de Citas</p>
@@ -80,7 +80,7 @@
                 </div>
 
                 <div class="metrica-card total-ingresos">
-                    <div class="metrica-icon">💰</div>
+                    <div class="metrica-icon"><i class="fas fa-coins"></i></div>
                     <div class="metrica-info">
                         <h3>{{ formatearMoneda(resumenGeneral.totalIngresos) }}</h3>
                         <p>Ingresos Totales</p>
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="metrica-card promedio-mensual">
-                    <div class="metrica-icon">📈</div>
+                    <div class="metrica-icon"><i class="fas fa-chart-line"></i></div>
                     <div class="metrica-info">
                         <h3>{{ formatearMoneda(resumenGeneral.promedioMensual) }}</h3>
                         <p>Promedio Mensual</p>
@@ -96,7 +96,7 @@
                 </div>
 
                 <div class="metrica-card crecimiento">
-                    <div class="metrica-icon">📊</div>
+                    <div class="metrica-icon"><i class="fas fa-percentage"></i></div>
                     <div class="metrica-info">
                         <h3 [class]="obtenerClaseTendencia(resumenGeneral.crecimientoMensual)">
                             {{ resumenGeneral.crecimientoMensual }}%
@@ -109,11 +109,11 @@
             <!-- 🏆 Destacados -->
             <div class="destacados-section">
                 <div class="destacado-card">
-                    <h4>👨‍⚕️ Doctor Más Activo</h4>
+                    <h4><i class="fas fa-user-md"></i> Doctor Más Activo</h4>
                     <p class="destacado-valor">{{ resumenGeneral.doctorMasActivo }}</p>
                 </div>
                 <div class="destacado-card">
-                    <h4>🎯 Especialidad Más Demandada</h4>
+                    <h4><i class="fas fa-bullseye"></i> Especialidad Más Demandada</h4>
                     <p class="destacado-valor">{{ resumenGeneral.especialidadMasDemandada }}</p>
                 </div>
             </div>
@@ -127,12 +127,12 @@
             <!-- � Tabla de Resumen General -->
             @if (filtro.tipo === 'general') {
             <div class="tabla-wrapper">
-                <h3>📋 Resumen General de la Clínica</h3>
+                <h3><i class="fas fa-clipboard"></i> Resumen General de la Clínica</h3>
                 <div class="tablas-grid">
 
                     <!-- Tabla de Citas por Estado -->
                     <div class="mini-tabla">
-                        <h4>📅 Estado de Citas</h4>
+                        <h4><i class="fas fa-calendar-alt"></i> Estado de Citas</h4>
                         <table class="reporte-tabla">
                             <thead>
                                 <tr>
@@ -163,7 +163,7 @@
 
                     <!-- Tabla de Top Doctores -->
                     <div class="mini-tabla">
-                        <h4>👨‍⚕️ Top Doctores</h4>
+                        <h4><i class="fas fa-user-md"></i> Top Doctores</h4>
                         <table class="reporte-tabla">
                             <thead>
                                 <tr>
@@ -199,7 +199,7 @@
             <!-- 📅 Tabla de Citas -->
             @if ((filtro.tipo === 'citas') && reporteCitas.length > 0) {
             <div class="tabla-wrapper">
-                <h3>📅 Reporte Detallado de Citas</h3>
+                <h3><i class="fas fa-calendar-alt"></i> Reporte Detallado de Citas</h3>
                 <table class="reporte-tabla">
                     <thead>
                         <tr>
@@ -232,7 +232,7 @@
             <!-- 👨‍⚕️ Tabla de Doctores -->
             @if (filtro.tipo === 'doctores' && reporteDoctores.length > 0) {
             <div class="tabla-wrapper">
-                <h3>👨‍⚕️ Rendimiento de Doctores</h3>
+                <h3><i class="fas fa-user-md"></i> Rendimiento de Doctores</h3>
                 <table class="reporte-tabla">
                     <thead>
                         <tr>
@@ -265,7 +265,7 @@
             <!-- 👥 Tabla de Pacientes -->
             @if (filtro.tipo === 'pacientes' && reportePacientes.length > 0) {
             <div class="tabla-wrapper">
-                <h3>👥 Estadísticas de Pacientes</h3>
+                <h3><i class="fas fa-users"></i> Estadísticas de Pacientes</h3>
                 <table class="reporte-tabla">
                     <thead>
                         <tr>
@@ -294,7 +294,7 @@
             <div class="no-tabla-message">
                 <div class="message-content">
                     <i class="fas fa-chart-line"></i>
-                    <h4>📊 Vista de Gráfico Recomendada</h4>
+                    <h4><i class="fas fa-chart-bar"></i> Vista de Gráfico Recomendada</h4>
                     <p>Para el análisis de ingresos, la vista de gráfico proporciona una mejor visualización de los
                         datos.</p>
                     <button class="btn-cambiar-vista" (click)="cambiarVista('grafico')">
@@ -310,7 +310,7 @@
         <!-- 📈 VISTA GRÁFICO -->
         @if (!cargandoReporte && vistaActual === 'grafico' && datosGrafico.length > 0) {
         <div class="grafico-container">
-            <h3>📈 Visualización de Datos</h3>
+            <h3><i class="fas fa-chart-line"></i> Visualización de Datos</h3>
             <div class="grafico-wrapper">
                 <div class="chart-visual">
                     @for (dato of datosGrafico; track $index) {
@@ -338,7 +338,7 @@
 
     <!-- 📥 PANEL DE EXPORTACIÓN -->
     <div class="exportacion-panel">
-        <h3>📥 Exportar Reporte</h3>
+        <h3><i class="fas fa-file-export"></i> Exportar Reporte</h3>
         <div class="export-buttons">
             <button class="export-btn pdf" (click)="exportarReporte('pdf')">
                 <i class="fas fa-file-pdf"></i>

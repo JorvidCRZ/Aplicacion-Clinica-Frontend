@@ -1,8 +1,7 @@
-<!-- 📊 PANEL DE CONTROL - DASHBOARD PRINCIPAL
 <div class="dashboard-container">
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>Panel de Control</h1>
+  <h1><i class="fas fa-tachometer-alt" style="margin-right:8px;"></i>Panel de Control</h1>
       <p>Resumen general de la clínica</p>
     </div>
     <div class="header-date">
@@ -96,4 +95,21 @@
       </div>
     </div>
   </div>
-</div> -->
+</div>
+
+<!-- Navegación rápida (solo móvil) -->
+<nav class="quick-nav">
+  <a class="quick-item" routerLink="/admin/panel" routerLinkActive="active" aria-label="Panel">
+    <i class="fas fa-tachometer-alt"></i>
+    <span>Panel</span>
+  </a>
+  <a class="quick-item" routerLink="/admin/reportes" routerLinkActive="active" aria-label="Reportes">
+    <i class="fas fa-chart-line"></i>
+    <span>Reportes</span>
+  </a>
+  <!-- Espacios para futuras secciones de admin -->
+  <!-- <a class="quick-item" routerLink="/admin/gestion-citas" routerLinkActive="active" aria-label="Citas">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Citas</span>
+  </a> -->
+</nav>

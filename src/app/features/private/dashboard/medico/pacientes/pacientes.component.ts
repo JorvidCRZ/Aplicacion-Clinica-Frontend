@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CitaService } from '../../../../../core/services/logic/cita.service';
+import { CitaCompleta } from '../../../../../core/models/common/cita';
+import { AuthService } from '../../../../../core/services/auth/auth.service';
 
 // 👤 Interfaces para gestión de pacientes
 interface Paciente {
@@ -52,112 +55,62 @@ export class PacientesComponent implements OnInit {
     diagnosticosFrecuentes: []
   };
 
+  constructor(private citasSrv: CitaService, private auth: AuthService) {}
+
   ngOnInit(): void {
     this.cargarPacientes();
     this.calcularEstadisticas();
     this.filtrarPacientes();
   }
 
-  // 👥 Cargar pacientes de ejemplo
+  // 👥 Cargar pacientes dinámicos desde las Citas, filtrados por especialidad o por el propio médico
   private cargarPacientes(): void {
-    this.pacientesOriginales = [
-      {
-        id: 1,
-        nombre: 'María García López',
-        documento: '12345678',
-        edad: 45,
-        genero: 'femenino',
-        telefono: '3001234567',
-        email: 'maria.garcia@email.com',
-        ultimaCita: '2025-09-25',
-        ultimoDiagnostico: 'Hipertensión Arterial',
-        fechaRegistro: '2023-06-15'
-      },
-      {
-        id: 2,
-        nombre: 'Carlos Rodríguez Méndez',
-        documento: '87654321',
-        edad: 38,
-        genero: 'masculino',
-        telefono: '3009876543',
-        email: 'carlos.rodriguez@email.com',
-        ultimaCita: '2025-09-27',
-        ultimoDiagnostico: 'Control Cardiovascular',
-        fechaRegistro: '2023-08-20'
-      },
-      {
-        id: 3,
-        nombre: 'Ana Martínez Silva',
-        documento: '11223344',
-        edad: 52,
-        genero: 'femenino',
-        telefono: '3005556789',
-        email: 'ana.martinez@email.com',
-        ultimaCita: '2025-09-23',
-        ultimoDiagnostico: 'Diabetes Mellitus Tipo 2',
-        fechaRegistro: '2023-04-10'
-      },
-      {
-        id: 4,
-        nombre: 'Luis Fernández Castro',
-        documento: '55667788',
-        edad: 29,
-        genero: 'masculino',
-        telefono: '3002223333',
-        email: 'luis.fernandez@email.com',
-        ultimaCita: '2025-09-15',
-        ultimoDiagnostico: 'Chequeo General',
-        fechaRegistro: '2023-12-01'
-      },
-      {
-        id: 5,
-        nombre: 'Patricia Jiménez Vega',
-        documento: '99887766',
-        edad: 67,
-        genero: 'femenino',
-        telefono: '3007778888',
-        email: 'patricia.jimenez@email.com',
-        ultimaCita: '2025-09-28',
-        ultimoDiagnostico: 'Arritmia Cardíaca',
-        fechaRegistro: '2023-02-28'
-      },
-      {
-        id: 6,
-        nombre: 'Roberto Sánchez Torres',
-        documento: '44556677',
-        edad: 41,
-        genero: 'masculino',
-        telefono: '3004445555',
-        email: 'roberto.sanchez@email.com',
-        ultimaCita: '2025-09-29',
-        ultimoDiagnostico: 'Post-operatorio Bypass',
-        fechaRegistro: '2025-01-15'
-      },
-      {
-        id: 7,
-        nombre: 'Carmen Delgado Ruiz',
-        documento: '33445566',
-        edad: 33,
-        genero: 'femenino',
-        telefono: '3006667777',
-        email: 'carmen.delgado@email.com',
-        ultimaCita: '2025-09-26',
-        ultimoDiagnostico: 'Prevención Cardiovascular',
-        fechaRegistro: '2025-01-20'
-      },
-      {
-        id: 8,
-        nombre: 'Javier Morales Díaz',
-        documento: '22334455',
-        edad: 56,
-        genero: 'masculino',
-        telefono: '3008889999',
-        email: 'javier.morales@email.com',
-        ultimaCita: '2025-09-24',
-        ultimoDiagnostico: 'Insuficiencia Cardíaca',
-        fechaRegistro: '2023-09-12'
+    const user = this.auth.currentUser;
+    const doctorNombre = (user?.persona as any)?.nombre || `${(user?.persona as any)?.nombre1 || ''} ${(user?.persona as any)?.apellidoPaterno || ''}`.trim();
+
+    // Posible especialidad asociada al médico guardada en localStorage (opcional)
+    // Clave ejemplo: `medico_especialidad:<correo>` -> string nombre de especialidad
+    const correo = user?.correo || '';
+    const especialidadDoctor = localStorage.getItem(`medico_especialidad:${correo}`) || '';
+
+    const citas: CitaCompleta[] = this.citasSrv.obtenerCitas();
+
+    // Filtrar citas que correspondan al médico o a su especialidad (si existe)
+    const citasFiltradas = citas.filter(c => {
+      const porNombre = doctorNombre ? (c.doctorNombre?.toLowerCase() === doctorNombre.toLowerCase()) : false;
+      const porEsp = especialidadDoctor ? (c.especialidad?.toLowerCase() === especialidadDoctor.toLowerCase()) : false;
+      return porNombre || porEsp;
+    });
+
+    // Mapear a pacientes únicos por email (si no hay email, por nombre)
+    const mapa = new Map<string, Paciente>();
+    let genId = 1;
+    for (const c of citasFiltradas) {
+      const key = (c.pacienteEmail || c.pacienteNombre).toLowerCase();
+      const existente = mapa.get(key);
+      if (!existente) {
+        mapa.set(key, {
+          id: genId++,
+          nombre: c.pacienteNombre,
+          documento: '',
+          edad: c.pacienteEdad || 0,
+          genero: 'otro',
+          telefono: c.pacienteTelefono || '',
+          email: c.pacienteEmail || '',
+          ultimaCita: c.fecha,
+          ultimoDiagnostico: c.motivoConsulta || '—',
+          fechaRegistro: c.fechaCreacion
+        });
+      } else {
+        // Actualizar última cita si esta es más reciente
+        if (new Date(c.fecha).getTime() > new Date(existente.ultimaCita).getTime()) {
+          existente.ultimaCita = c.fecha;
+          existente.ultimoDiagnostico = c.motivoConsulta || existente.ultimoDiagnostico;
+        }
       }
-    ];
+    }
+
+    this.pacientesOriginales = Array.from(mapa.values());
   }
 
   // 📊 Calcular estadísticas
