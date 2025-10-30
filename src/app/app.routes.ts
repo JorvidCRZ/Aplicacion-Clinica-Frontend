@@ -7,7 +7,7 @@ import { BlogComponent } from './features/public/pages/blog/blog.component';
 import { ContactoComponent } from './features/public/pages/contacto/contacto.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegistroComponent } from './features/auth/registro/registro.component';
-// import { CheckoutComponent } from './features/private/checkout/checkout.component';
+import { CheckoutComponent } from './features/private/checkout/checkout.component';
 import { ServicioFormularioComponent } from './features/public/components/servicio-formulario/servicio-formulario.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard'; 
@@ -28,7 +28,7 @@ export const routes: Routes = [
     { path: 'contacto', component: ContactoComponent },
     { path: 'login', component: LoginComponent },
     { path: 'registro', component: RegistroComponent },
-    // { path: 'checkout', component: CheckoutComponent },
+        { path: 'checkout', component: CheckoutComponent },
     {
         path: 'recuperar',
         loadComponent: () => import('./features/auth/recuperar/recuperar.component').then(m => m.RecuperarComponent)
@@ -43,11 +43,11 @@ export const routes: Routes = [
         data: { roles: ['Paciente'] },
         children: [
             { path: '', redirectTo: 'mi-resumen', pathMatch: 'full' },
-            // { path: 'mi-resumen', loadComponent: () => import('./features/private/dashboard/paciente/mi-resumen/mi-resumen.component').then(m => m.MiResumenComponent) },
+            { path: 'mi-resumen', loadComponent: () => import('./features/private/dashboard/paciente/mi-resumen/mi-resumen.component').then(m => m.MiResumenComponent) },
             { path: 'mi-perfil', loadComponent: () => import('./features/private/dashboard/paciente/mi-perfil/mi-perfil.component').then(m => m.MiPerfilComponent) },
-            // { path: 'mis-citas', loadComponent: () => import('./features/private/dashboard/paciente/mis-citas/mis-citas.component').then(m => m.MisCitasComponent) },
-            // { path: 'pagos', loadComponent: () => import('./features/private/dashboard/paciente/pagos/pagos.component').then(m => m.PagosComponent) },
-            // { path: 'historial-medico', loadComponent: () => import('./features/private/dashboard/paciente/historial-medico/historial-medico.component').then(m => m.HistorialMedicoComponent) },
+            { path: 'mis-citas', loadComponent: () => import('./features/private/dashboard/paciente/mis-citas/mis-citas.component').then(m => m.MisCitasComponent) },
+            { path: 'pagos', loadComponent: () => import('./features/private/dashboard/paciente/pagos/pagos.component').then(m => m.PagosComponent) },
+            { path: 'historial-medico', loadComponent: () => import('./features/private/dashboard/paciente/historial-medico/historial-medico.component').then(m => m.HistorialMedicoComponent) },
         ]
     },
 

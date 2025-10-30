@@ -161,6 +161,22 @@
                 <h4><i class="fas fa-clipboard-list"></i> Datos de la Cita</h4>
 
                 <div class="campo-formulario">
+                    <label for="subespecialidad">Subespecialidad</label>
+                    @if (subespecialidades.length) {
+                        <select id="subespecialidad" class="form-select" [ngModel]="subespecialidadSeleccionadaId" (ngModelChange)="onSubespecialidadChange($event)">
+                            @for (sub of subespecialidades; track sub.idSubespecialidad) {
+                                <option [value]="sub.idSubespecialidad">{{ sub.nombre }} - S/ {{ sub.precioSubespecial | number:'1.2-2' }}</option>
+                            }
+                        </select>
+                        <small class="text-muted">Precio: <strong>S/ {{ precioSeleccionado ?? 0 | number:'1.2-2' }}</strong></small>
+                    } @else {
+                        <div class="alert alert-info" role="alert" style="padding: .5rem 1rem;">
+                            Selecciona una especialidad para ver subespecialidades y precios.
+                        </div>
+                    }
+                </div>
+
+                <div class="campo-formulario">
                     <label for="motivo">Motivo de la consulta *</label>
                     <textarea id="motivo" [(ngModel)]="datosCita.motivo" class="form-control" rows="3"
                         placeholder="Describe brevemente el motivo de tu consulta..." required>

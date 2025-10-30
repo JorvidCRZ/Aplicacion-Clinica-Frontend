@@ -1,9 +1,19 @@
-<!-- <div class="historial-container">
+<div class="historial-container">
   <div class="historial-header">
     <div class="titulo-seccion">
       <h1 class="titulo">📋 Historial Médico Confidencial</h1>
       <p class="subtitulo">Registro completo de consultas, exámenes y tratamientos médicos</p>
     </div>
+
+    @if (usuarioActual) {
+    <div class="paciente-resumen">
+      <div class="chip"><i class="fas fa-user"></i><span>{{ userService.getDisplayName() }}</span></div>
+      <div class="chip"><i class="fas fa-id-card"></i><span>DNI: {{ dniMostrar }}</span></div>
+      @if (datosPaciente?.altura) { <div class="chip"><i class="fas fa-ruler-vertical"></i><span>{{ datosPaciente?.altura }} cm</span></div> }
+      @if (datosPaciente?.peso) { <div class="chip"><i class="fas fa-weight"></i><span>{{ datosPaciente?.peso }} kg</span></div> }
+      @if (datosPaciente?.tipoSangre) { <div class="chip"><i class="fas fa-tint"></i><span>{{ datosPaciente?.tipoSangre }}</span></div> }
+    </div>
+    }
 
     <div class="aviso-confidencial">
       <div class="icono-confidencial">
@@ -175,4 +185,4 @@
     </div>
   </div>
   }
-</div> -->
+</div>

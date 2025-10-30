@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth/auth.service';
+import { CITAS, HORARIOS_POR_DIA, DIAS_DISPONIBLES, Cita, DiaDisponible } from './citas.data';
+import { SubespecialidadService, Subespecialidad } from '../../../../core/services/pages/subespecialidad.service';
+import { EspecialidadService, Especialidad } from '../../../../core/services/pages/especialidad.service';
 
 @Component({
   selector: 'app-citas',
@@ -17,6 +20,8 @@ export class CitasComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private subespService = inject(SubespecialidadService);
+  private espService = inject(EspecialidadService);
 
   mostrarModal = false;
   citaParaReservar: any = null;
@@ -28,73 +33,33 @@ export class CitasComponent implements OnInit {
     observaciones: ''
   };
 
+  // Subespecialidades dinámicas según la especialidad elegida
+  subespecialidades: Subespecialidad[] = [];
+  subespecialidadSeleccionadaId: number | null = null;
+  precioSeleccionado: number | null = null;
+  idEspecialidadResuelta: number | null = null;
+
   ngOnInit(): void {
     this.resultadosBuscadorDoctor = [];
     this.resultadosBuscadorEspecialidad = [];
 
     this.route.paramMap.subscribe(params => {
-      const idEspecialidad = params.get('idEspecialidad');
-      if (idEspecialidad) {
-        this.selectedEspecialidad = idEspecialidad.toLowerCase();
+      const idEspecialidadParam = params.get('idEspecialidad');
+      if (idEspecialidadParam) {
+        // si es número considerarlo id, si no, tomarlo como nombre minúscula
+        const num = Number(idEspecialidadParam);
+        if (!Number.isNaN(num)) {
+          this.idEspecialidadResuelta = num;
+          this.cargarSubespecialidades(num);
+        } else {
+          this.selectedEspecialidad = idEspecialidadParam.toLowerCase();
+          this.resolverIdEspecialidadPorNombre(this.selectedEspecialidad);
+        }
       }
     });
   }
 
-  citas = [
-    { doctor: 'Dr. Juan Pérez', especialidad: 'Cardiología', paciente: 'Luis Torres', disponibilidad: ['10:00 AM', '11:00 AM', '3:00 PM'] },
-    { doctor: 'Dra. Carmen Aguilar', especialidad: 'Cardiología', paciente: 'Rosa Fernández', disponibilidad: ['9:00 AM', '1:00 PM', '4:30 PM'] },
-    { doctor: 'Dr. Jorge Medina', especialidad: 'Cardiología', paciente: 'Pedro Gutiérrez', disponibilidad: ['8:30 AM', '2:00 PM'] },
-    { doctor: 'Dra. Laura Campos', especialidad: 'Cardiología', paciente: 'Elena Díaz', disponibilidad: ['12:00 PM', '5:15 PM'] },
-
-    { doctor: 'Dra. María López', especialidad: 'Dermatología', paciente: 'Ana Castillo', disponibilidad: ['2:00 PM', '4:30 PM'] },
-    { doctor: 'Dr. Luis Romero', especialidad: 'Dermatología', paciente: 'Carlos Vargas', disponibilidad: ['9:45 AM', '3:00 PM'] },
-    { doctor: 'Dra. Silvia Torres', especialidad: 'Dermatología', paciente: 'Julia Herrera', disponibilidad: ['10:15 AM', '1:30 PM', '6:00 PM'] },
-    { doctor: 'Dr. Daniel Flores', especialidad: 'Dermatología', paciente: 'Gabriela Rojas', disponibilidad: ['11:00 AM', '5:00 PM'] },
-
-    { doctor: 'Dr. Ricardo Morales', especialidad: 'Traumatología', paciente: 'Raúl Peña', disponibilidad: ['9:00 AM', '11:30 AM', '2:00 PM'] },
-    { doctor: 'Dra. Patricia Sánchez', especialidad: 'Traumatología', paciente: 'Andrea Salas', disponibilidad: ['8:15 AM', '3:15 PM'] },
-    { doctor: 'Dr. Esteban Cruz', especialidad: 'Traumatología', paciente: 'Héctor Ramos', disponibilidad: ['10:45 AM', '4:00 PM'] },
-    { doctor: 'Dra. Fabiola Herrera', especialidad: 'Traumatología', paciente: 'Marcelo Paredes', disponibilidad: ['12:30 PM', '6:15 PM'] },
-
-    { doctor: 'Dr. Alberto Gómez', especialidad: 'Oftalmología', paciente: 'Diego Fernández', disponibilidad: ['11:15 AM', '4:00 PM'] },
-    { doctor: 'Dra. Carolina Vega', especialidad: 'Oftalmología', paciente: 'Sofía Delgado', disponibilidad: ['9:30 AM', '1:00 PM'] },
-    { doctor: 'Dr. Martín Cárdenas', especialidad: 'Oftalmología', paciente: 'Paola Ruiz', disponibilidad: ['8:00 AM', '12:15 PM', '5:30 PM'] },
-    { doctor: 'Dra. Elena Quispe', especialidad: 'Oftalmología', paciente: 'Rodrigo Mendoza', disponibilidad: ['2:45 PM', '6:00 PM'] },
-
-    { doctor: 'Dra. Sofía Medina', especialidad: 'Ginecología', paciente: 'Carmen Ruiz', disponibilidad: ['8:00 AM', '12:15 PM', '5:00 PM'] },
-    { doctor: 'Dr. Andrés Navarro', especialidad: 'Ginecología', paciente: 'Lucía Morales', disponibilidad: ['9:45 AM', '2:30 PM'] },
-    { doctor: 'Dra. Teresa Chávez', especialidad: 'Ginecología', paciente: 'Milagros Castillo', disponibilidad: ['10:30 AM', '4:45 PM'] },
-    { doctor: 'Dr. Javier Campos', especialidad: 'Ginecología', paciente: 'Verónica Salazar', disponibilidad: ['11:15 AM', '3:15 PM'] },
-
-    { doctor: 'Dr. Carlos Ramos', especialidad: 'Pediatría', paciente: 'Miguel Díaz', disponibilidad: ['9:30 AM', '1:00 PM'] },
-    { doctor: 'Dra. Natalia Guzmán', especialidad: 'Pediatría', paciente: 'Valeria Flores', disponibilidad: ['8:45 AM', '12:00 PM', '5:00 PM'] },
-    { doctor: 'Dr. Felipe Lozano', especialidad: 'Pediatría', paciente: 'Esteban Bravo', disponibilidad: ['10:00 AM', '2:15 PM'] },
-    { doctor: 'Dra. Andrea Torres', especialidad: 'Pediatría', paciente: 'Camila Serrano', disponibilidad: ['11:30 AM', '4:00 PM'] },
-
-    { doctor: 'Dr. Mario Vargas', especialidad: 'Medicina General', paciente: 'Fernando Ríos', disponibilidad: ['8:00 AM', '10:30 AM', '1:00 PM'] },
-    { doctor: 'Dra. Beatriz Acosta', especialidad: 'Medicina General', paciente: 'Claudia Romero', disponibilidad: ['9:15 AM', '3:45 PM'] },
-    { doctor: 'Dr. Julio Castañeda', especialidad: 'Medicina General', paciente: 'Ignacio Torres', disponibilidad: ['11:00 AM', '5:30 PM'] },
-    { doctor: 'Dra. Gabriela Núñez', especialidad: 'Medicina General', paciente: 'Álvaro Quispe', disponibilidad: ['2:00 PM', '6:15 PM'] },
-
-    { doctor: 'Dra. Paula Benítez', especialidad: 'Odontología', paciente: 'Liliana Vargas', disponibilidad: ['9:00 AM', '11:30 AM', '2:45 PM'] },
-    { doctor: 'Dr. Ernesto Salazar', especialidad: 'Odontología', paciente: 'Hugo Castro', disponibilidad: ['8:30 AM', '1:15 PM'] },
-    { doctor: 'Dra. Valentina Rojas', especialidad: 'Odontología', paciente: 'Mariana Peña', disponibilidad: ['10:15 AM', '4:00 PM'] },
-    { doctor: 'Dr. Ricardo Gálvez', especialidad: 'Odontología', paciente: 'Nicolás Herrera', disponibilidad: ['12:00 PM', '5:30 PM'] },
-
-    { doctor: 'Dra. Mónica Fuentes', especialidad: 'Psiquiatría', paciente: 'Santiago León', disponibilidad: ['9:00 AM', '11:00 AM', '3:00 PM'] },
-    { doctor: 'Dr. Alberto Castillo', especialidad: 'Psiquiatría', paciente: 'Isabel Moreno', disponibilidad: ['10:30 AM', '1:30 PM'] },
-    { doctor: 'Dra. Claudia Rivas', especialidad: 'Psiquiatría', paciente: 'Fernando Salinas', disponibilidad: ['8:15 AM', '2:45 PM'] },
-    { doctor: 'Dr. Gustavo Ponce', especialidad: 'Psiquiatría', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] },
-
-    { doctor: 'Dr. Enrique Palacios', especialidad: 'Neurología', paciente: 'Patricia Gómez', disponibilidad: ['9:00 AM', '1:00 PM'] },
-
-    { doctor: 'Dra. Mirtha Valdez', especialidad: 'Endocrinología', paciente: 'Roberto Lozano', disponibilidad: ['10:30 AM', '3:45 PM'] },
-
-    { doctor: 'Dr. Francisco Rojas', especialidad: 'Reumatología', paciente: 'Cecilia Vargas', disponibilidad: ['8:15 AM', '12:30 PM'] },
-
-    { doctor: 'Dra. Elena Bustamante', especialidad: 'Urología', paciente: 'Oscar Medina', disponibilidad: ['11:00 AM', '4:00 PM'] }
-
-  ];
+  citas: Cita[] = CITAS;
 
   selectedEspecialidad: string | null = null;
   busqueda: any[] = [];
@@ -104,21 +69,9 @@ export class CitasComponent implements OnInit {
 
   cardStates: { [doctorName: string]: { diaSeleccionado: string, horarioSeleccionado: string } } = {};
 
-  horariosPorDia: { [key: string]: string[] } = {
-    'jueves': ['10:20', '10:40', '11:00', '11:20', '11:40', '12:00'],
-    'viernes': ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'],
-    'sabado': ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'],
-    'lunes': ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'],
-    'martes': ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00']
-  };
+  horariosPorDia: Record<string, string[]> = HORARIOS_POR_DIA;
 
-  diasDisponibles = [
-    { codigo: 'jueves', nombre: 'Jue', fecha: '04 Sep' },
-    { codigo: 'viernes', nombre: 'Vie', fecha: '05 Sep' },
-    { codigo: 'sabado', nombre: 'Sáb', fecha: '06 Sep' },
-    { codigo: 'lunes', nombre: 'Lun', fecha: '08 Sep' },
-    { codigo: 'martes', nombre: 'Mar', fecha: '09 Sep' }
-  ];
+  diasDisponibles: DiaDisponible[] = DIAS_DISPONIBLES;
 
   onBuscarDoctor(resultados: any[]) {
     this.resultadosBuscadorDoctor = resultados;
@@ -212,6 +165,9 @@ export class CitasComponent implements OnInit {
     this.citaParaReservar = cita;
     this.horarioParaReservar = state.horarioSeleccionado;
     this.mostrarModal = true;
+
+    // Resolver subespecialidades para la especialidad de la tarjeta
+    this.resolverIdEspecialidadPorNombre(cita.especialidad);
   }
 
   verificarYContinuar() {
@@ -266,11 +222,64 @@ export class CitasComponent implements OnInit {
           doctor: this.citaParaReservar.doctor,
           especialidad: this.citaParaReservar.especialidad,
           fecha: new Date().toISOString().split('T')[0],
-          hora: this.horarioParaReservar
+          hora: this.horarioParaReservar,
+          idEspecialidad: this.idEspecialidadResuelta ?? undefined,
+          idSubespecialidad: this.subespecialidadSeleccionadaId ?? undefined
         }
       });
     }
     this.cerrarModal();
+  }
+
+  // Helpers para subespecialidades
+  private normalizar(t: string): string {
+    return (t || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .trim();
+  }
+
+  private resolverIdEspecialidadPorNombre(nombre: string) {
+    if (!nombre) return;
+    const objetivo = this.normalizar(nombre);
+    this.espService.getEspecialidades().subscribe({
+      next: (lista: Especialidad[]) => {
+        const esp = lista.find(e => this.normalizar(e.nombre) === objetivo);
+        if (esp) {
+          this.idEspecialidadResuelta = esp.idEspecialidad;
+          this.cargarSubespecialidades(esp.idEspecialidad);
+        }
+      }
+    });
+  }
+
+  private cargarSubespecialidades(idEspecialidad: number) {
+    if (!idEspecialidad) return;
+    this.subespecialidades = [];
+    this.subespService.getSubespecialidadesPorEspecialidad(idEspecialidad).subscribe({
+      next: (subs: Subespecialidad[]) => {
+        this.subespecialidades = subs;
+        if (subs && subs.length) {
+          this.subespecialidadSeleccionadaId = subs[0].idSubespecialidad;
+          this.precioSeleccionado = subs[0].precioSubespecial;
+        } else {
+          this.subespecialidadSeleccionadaId = null;
+          this.precioSeleccionado = null;
+        }
+      },
+      error: () => {
+        this.subespecialidadSeleccionadaId = null;
+        this.precioSeleccionado = null;
+      }
+    });
+  }
+
+  onSubespecialidadChange(idStr: string) {
+    const id = Number(idStr);
+    this.subespecialidadSeleccionadaId = Number.isNaN(id) ? null : id;
+    const sel = this.subespecialidades.find(s => s.idSubespecialidad === this.subespecialidadSeleccionadaId!);
+    this.precioSeleccionado = sel?.precioSubespecial ?? null;
   }
 
   cerrarModal() {

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../../core/services/auth/auth.service';
+import { CitaService } from '../../../../../core/services/logic/cita.service';
+import { CitaCompleta } from '../../../../../core/models/common/cita';
 
 interface Cita {
   id: number;
@@ -34,6 +36,7 @@ interface Cita {
 })
 export class MisCitasComponent implements OnInit {
   private authService = inject(AuthService);
+  private citaService = inject(CitaService);
   private router = inject(Router);
 
   // Datos del paciente
@@ -74,7 +77,7 @@ export class MisCitasComponent implements OnInit {
   }
 
   cargarCitas() {
-    // Simulación de datos - en producción vendría del servicio
+    // Base mock de ejemplo
     this.citas = [
       {
         id: 1,
@@ -137,9 +140,64 @@ export class MisCitasComponent implements OnInit {
       }
     ];
 
+    // Mezclar con citas guardadas localmente (por email del paciente actual)
+    this.cargarCreadasPorPaciente();
+
     this.calcularEstadisticas();
     this.separarCitas();
     this.aplicarFiltros();
+  }
+
+  private cargarCreadasPorPaciente() {
+    const correo = this.pacienteActual?.correo;
+    if (!correo) return;
+    const todas: CitaCompleta[] = this.citaService.obtenerCitas();
+    const mias = todas.filter(c => (c.pacienteEmail || '').toLowerCase() === correo.toLowerCase());
+    const mapeadas: Cita[] = mias.map(c => ({
+      id: c.id,
+      fecha: c.fecha,
+      hora: c.hora,
+      doctor: {
+        nombre: c.doctorNombre.split(' ')[0] || c.doctorNombre,
+        apellido: c.doctorNombre.split(' ').slice(1).join(' '),
+        especialidad: c.especialidad
+      },
+      tipo: c.tipoConsulta,
+      motivo: c.motivoConsulta,
+      estado: (c.estado === 'confirmada' ? 'programada' : (c.estado as any)),
+      // Usar el precio guardado en la cita (desde checkout). Si no existe, hacer fallback por especialidad.
+      precio: (c as any).precio ?? this.obtenerPrecioPorEspecialidad(c.especialidad),
+      consultorio: 'Por asignar',
+      duracion: c.duracionEstimada || 30,
+      puedeReagendar: true,
+      puedeCancelar: true
+    }));
+
+    const idsExistentes = new Set(this.citas.map(ci => ci.id));
+    for (const ci of mapeadas) {
+      if (!idsExistentes.has(ci.id)) {
+        this.citas.unshift(ci);
+      }
+    }
+  }
+
+  private obtenerPrecioPorEspecialidad(especialidad: string): number {
+    const precios: Record<string, number> = {
+      'Cardiología': 150,
+      'Dermatología': 120,
+      'Pediatría': 100,
+      'Ginecología': 130,
+      'Medicina General': 80,
+      'Traumatología': 140,
+      'Psicología': 110,
+      'Odontología': 90,
+      'Oftalmología': 110,
+      'Neurología': 160,
+      'Endocrinología': 150,
+      'Reumatología': 140,
+      'Urología': 130
+    };
+    return precios[especialidad] ?? 100;
   }
 
   calcularEstadisticas() {
@@ -215,9 +273,11 @@ export class MisCitasComponent implements OnInit {
   }
 
   limpiarFiltros() {
+    // Resetear todos los filtros de búsqueda y volver a la vista 'todas'
     this.filtroFecha = '';
     this.filtroEstado = '';
     this.filtroDoctorEspecialidad = '';
+    this.filtroActivo = 'todas';
     this.paginaActual = 1;
     this.aplicarFiltros();
   }

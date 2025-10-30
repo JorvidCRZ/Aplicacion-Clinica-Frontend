@@ -1,4 +1,4 @@
-<!-- <div class="pagos-container">
+<div class="pagos-container">
     <div class="pagos-header">
         <div class="titulo-seccion">
             <h1 class="titulo">Historial de Pagos</h1>
@@ -16,7 +16,7 @@
     </div>
 
     @if (facturasRecientes.length > 0) {
-    <section class="facturas-recientes" *ngIf="facturasRecientes.length > 0">
+    <section class="facturas-recientes">
         <h2>🔔 Facturas recientes</h2>
         <div class="lista-recientes">
             @for ( f of facturasRecientes; track $index) {
@@ -45,18 +45,23 @@
         </div>
         }
 
-        @if (facturasPagadas.length === 0) {
-        <div class="historial-lista" *ngIf="facturasPagadas.length > 0">
+        @if (facturasPagadas.length > 0) {
+        <div class="historial-lista">
             @for (factura of facturasPagadas; track $index) {
             <div class="pago-historial">
                 <div class="pago-info">
                     <div class="pago-header">
                         <h4>{{ factura.numeroFactura }}</h4>
-                        <span class="fecha-pago">{{ factura.fechaPago | date:'dd/MM/yyyy HH:mm' }}</span>
+                        <span class="fecha-pago"><i class="fas fa-calendar-day"></i> {{ factura.fechaPago |
+                            date:'dd/MM/yyyy HH:mm' }}</span>
                     </div>
                     <p class="concepto">{{ factura.concepto }}</p>
                     <div class="pago-detalles">
-                        <span class="metodo">{{ factura.metodoPago }}</span>
+                        <span class="metodo"><i class="fas fa-receipt"></i> {{ factura.metodoPago }}</span>
+                        <span class="estado" [style.background-color]="obtenerColorEstado(factura.estado)"
+                            style="color: var(--blanco); padding: 0.15rem 0.5rem; border-radius: 999px; display:inline-flex; align-items:center; gap:0.3rem;">
+                            <i [class]="obtenerIconoEstado(factura.estado)"></i> {{ factura.estado | titlecase }}
+                        </span>
                         <span class="transaccion">{{ factura.numeroTransaccion }}</span>
                     </div>
                 </div>
@@ -70,5 +75,4 @@
         </div>
         }
     </section>
-
-</div> -->
+</div>

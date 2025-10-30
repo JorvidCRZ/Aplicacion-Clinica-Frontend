@@ -19,6 +19,8 @@ export interface CitaCompleta {
   pacienteNombre: string;
   doctorNombre: string;
   especialidad: string;
+  // Nombre de la subespecialidad seleccionada (si aplica)
+  subespecialidad?: string;
   fecha: string;
   hora: string;
   estado: 'pendiente' | 'confirmada' | 'completada' | 'cancelada';
@@ -33,6 +35,9 @@ export interface CitaCompleta {
   motivoConsulta: string;
   sintomas?: string;
   notasAdicionales?: string;
+
+  // Precio base pagado por la consulta (sin comisión del método de pago)
+  precio?: number;
 
   // Metadatos
   fechaCreacion: string;

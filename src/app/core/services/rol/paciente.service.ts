@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Paciente } from '../../models/users/paciente';
 import { Persona } from '../../models/users/persona';
 import { environment } from '../../../../environments/environment';
-import { UserService } from '../auth/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class PacienteService {
@@ -14,9 +13,8 @@ export class PacienteService {
   private apiUrlUsuario = `${environment.apiUrl}/usuarios`;
   private apiUrlPersona = `${environment.apiUrl}/personas`;
 
-  constructor(private http: HttpClient
-
-  ) { }
+  constructor(
+    private http: HttpClient) { }
 
   getAll(): Observable<Paciente[]> {
     return this.http.get<Paciente[]>(this.apiUrl);
@@ -31,6 +29,7 @@ export class PacienteService {
   }
 
   update(idPaciente: number, paciente: Paciente): Observable<Paciente> {
+    
     const body: any = {
       idPersona: paciente.persona?.idPersona,
       tipoSangre: paciente.tipoSangre,
@@ -61,7 +60,7 @@ export class PacienteService {
     }
 
     if (paciente.usuario?.idUsuario && paciente.usuario?.correo) {
-      body.usuarioAgrego = {
+      body.usuario = {
         idUsuario: paciente.usuario.idUsuario,
         correo: paciente.usuario.correo
       };

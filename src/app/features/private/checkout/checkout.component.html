@@ -1,4 +1,4 @@
-<!-- <div class="checkout-container my-5">
+<div class="checkout-container my-5">
   <div class="checkout-header">
     <button class="btn-volver" (click)="volver()">
       <i class="fas fa-arrow-left"></i>
@@ -200,10 +200,13 @@
 
           <div class="resumen-detalle">
             <div class="item-resumen">
-              <span>Consulta {{ citaSeleccionada.especialidad }}</span>
+              <span>
+                Consulta {{ citaSeleccionada.especialidad }}
+                @if (citaSeleccionada.subespecialidad) { — {{ citaSeleccionada.subespecialidad }} }
+              </span>
               <span>S/ {{ citaSeleccionada.precio | number:'1.2-2' }}</span>
             </div>
-            
+
             @if (calcularComision() > 0) {
               <div class="item-resumen comision">
                 <span>Comisión {{ metodoPagoSeleccionado.nombre }}</span>
@@ -214,7 +217,7 @@
             <hr>
             
             <div class="item-resumen total">
-              <span><strong>Total a Pagar</strong></span>
+              <span><strong>Total a Pagar</strong> <small style="opacity:.7">@if(calcularComision()>0){ (incluye comisión) }</small></span>
               <span><strong>S/ {{ calcularTotal() | number:'1.2-2' }}</strong></span>
             </div>
           </div>
@@ -252,8 +255,12 @@
           <h3>Detalles de tu cita:</h3>
           <p><strong>Doctor:</strong> {{ citaSeleccionada.doctor }}</p>
           <p><strong>Especialidad:</strong> {{ citaSeleccionada.especialidad }}</p>
+              @if (citaSeleccionada.subespecialidad) {
+                <p><strong>Subespecialidad:</strong> {{ citaSeleccionada.subespecialidad }}</p>
+              }
           <p><strong>Fecha:</strong> {{ citaSeleccionada.fecha | date:'dd/MM/yyyy' }}</p>
           <p><strong>Hora:</strong> {{ citaSeleccionada.hora }}</p>
+              <p><strong>Precio:</strong> S/ {{ citaSeleccionada.precio | number:'1.2-2' }}</p>
         </div>
       }
       <button class="btn-confirmar" (click)="irAMisCitas()">
@@ -276,4 +283,4 @@
       </button>
     </div>
   }
-</div> -->
+</div>

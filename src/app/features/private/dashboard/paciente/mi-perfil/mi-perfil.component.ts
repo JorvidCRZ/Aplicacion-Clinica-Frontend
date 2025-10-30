@@ -86,7 +86,6 @@ export class MiPerfilComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error al cargar paciente por usuario:', err);
-                // fallback por si el backend mapea distinto:
                 this.pacienteService.getById(this.userService.getIdUsuario()).subscribe({
                     next: (d) => {
                         const anyD: any = d;
@@ -153,12 +152,10 @@ export class MiPerfilComponent implements OnInit {
         this.editandoEmergencia = false;
     }
 
-    // helper para mostrar placeholder de correo
     get correoActual(): string {
         return this.userService.getCorreoUsuarioActual() || '';
     }
 
-    // Si prefieres two-way binding, mantén este handler para inicializar usuario
     onCorreoChange(value: string): void {
         if (!this.perfilPaciente.usuario) {
             this.perfilPaciente.usuario = {
@@ -173,43 +170,59 @@ export class MiPerfilComponent implements OnInit {
     }
 
     private guardarCambios(mensaje: string, tipo: 'paciente' | 'persona' = 'paciente') {
-        // si editamos persona/contacto -> mandamos persona + usuarioAgrego (si hay correo) al endpoint paciente
         if (tipo === 'persona') {
-            // asegurar que exista idPaciente
             if (!this.perfilPaciente.idPaciente) {
                 console.warn('No hay idPaciente definido, no se puede actualizar persona desde paciente.');
                 return;
             }
 
-            // Asegurarnos que usuario tenga idUsuario (si corresponde al mismo usuario)
-            if (!this.perfilPaciente.usuario || !this.perfilPaciente.usuario.idUsuario) {
+            if (!this.perfilPaciente.usuario) {
                 this.perfilPaciente.usuario = {
                     idUsuario: this.userService.getIdUsuario(),
-                    correo: this.perfilPaciente.usuario?.correo || this.userService.getCorreoUsuarioActual() || '',
+                    correo: this.userService.getCorreoUsuarioActual() || '',
                     rol: this.userService.current?.rol || { idRol: 3, nombre: 'Paciente' },
                     persona: this.perfilPaciente.persona as any
                 };
+            } else if (!this.perfilPaciente.usuario.idUsuario) {
+                this.perfilPaciente.usuario.idUsuario = this.userService.getIdUsuario();
             }
-            // antes de llamar pacienteService.update(...)
-            this.perfilPaciente.usuario = this.perfilPaciente.usuario || {
-                idUsuario: this.userService.getIdUsuario(),
-                correo: this.userService.getCorreoUsuarioActual() || ''
-            };
-            
-            this.pacienteService.update(this.perfilPaciente.idPaciente, this.perfilPaciente)
+
+            this.pacienteService.update(this.perfilPaciente.idPaciente!, this.perfilPaciente)
                 .subscribe({
                     next: (actualizado) => {
                         this.perfilPaciente = actualizado;
+                        const anyResp: any = actualizado;
+                        const usuarioResp = anyResp.usuario || anyResp.usuarioAgrego || null;
+
+                        const currentId = this.userService.getIdUsuario();
+
+                        if (usuarioResp && usuarioResp.idUsuario === currentId) {
+                            this.userService.updateLocalUser({
+                                idUsuario: usuarioResp.idUsuario,
+                                correo: usuarioResp.correo,
+                                persona: usuarioResp.persona
+                            });
+                        } else {
+                            const perfilUsuario = this.perfilPaciente.usuario;
+                            if (perfilUsuario && perfilUsuario.idUsuario === currentId && perfilUsuario.correo) {
+                                this.userService.updateLocalUser({
+                                    idUsuario: perfilUsuario.idUsuario,
+                                    correo: perfilUsuario.correo,
+                                    persona: perfilUsuario.persona
+                                });
+                            }
+                        }
+
                         this.mostrarMensaje(mensaje);
                     },
                     error: (err) => {
                         console.error('Error al actualizar persona/contacto:', err);
                     }
                 });
+
             return;
         }
 
-        // caso 'paciente' (info médica y emergencia)
         if (this.perfilPaciente.idPaciente) {
             this.pacienteService.update(this.perfilPaciente.idPaciente, this.perfilPaciente)
                 .subscribe({
@@ -223,6 +236,7 @@ export class MiPerfilComponent implements OnInit {
             console.warn('No hay idPaciente definido, no se puede actualizar');
         }
     }
+
 
     calcularIMC(): string {
         const peso = this.perfilPaciente.peso;

@@ -1,17 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
+import { Usuario } from '../../models/users/usuario';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
     constructor(private auth: AuthService) { }
 
-    get current() {
-        return this.auth.currentUser;
-    }
+    get current() { return this.auth.currentUser; }
 
-    getCorreoUsuarioActual(): string | undefined {
-        return this.current?.correo;
-    }
+    getCorreoUsuarioActual(): string | undefined { return this.current?.correo; }
+
+    getIdUsuario(): number { return this.current?.idUsuario || 0; }
 
     getDisplayName(): string {
         const persona = this.current?.persona;
@@ -31,7 +30,7 @@ export class UserService {
         return 'fa-solid fa-user';
     }
 
-    getIdUsuario(): number {
-        return this.current?.idUsuario || 0;
+    updateLocalUser(data: Partial<Usuario>) {
+        this.auth.updateUser(data);
     }
 }

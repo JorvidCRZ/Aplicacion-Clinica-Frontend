@@ -34,6 +34,32 @@
   margin: 0;
 }
 
+/* Resumen del Paciente (chips) */
+.paciente-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--blanco);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.chip i {
+  width: 18px;
+  text-align: center;
+}
+
 /* Aviso de Confidencialidad */
 .aviso-confidencial {
   display: flex;

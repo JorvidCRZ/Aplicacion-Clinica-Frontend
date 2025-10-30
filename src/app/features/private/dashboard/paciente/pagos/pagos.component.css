@@ -243,8 +243,9 @@
 }
 
 .fecha-emision {
-  color: var(--gris);
-  font-size: 0.9rem;
+  color: var(--gris-oscuro);
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .estado-badge .estado {
@@ -298,7 +299,7 @@
   gap: 0.3rem;
 }
 
-.montos > div {
+.montos>div {
   display: flex;
   justify-content: space-between;
   padding: 0.2rem 0;
@@ -340,7 +341,8 @@
   border-top: 1px solid #f0f0f0;
 }
 
-.fecha-vencimiento, .fecha-pago {
+.fecha-vencimiento,
+.fecha-pago {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -384,7 +386,7 @@
 }
 
 .btn-descargar {
-  background: var(--gris);
+  background: var(--azul);
   color: var(--blanco);
   border: none;
   padding: 0.6rem;
@@ -396,10 +398,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(26, 78, 141, 0.25);
 }
 
 .btn-descargar:hover {
-  background: var(--gris-oscuro);
+  background: var(--azul-oscuro);
   transform: translateY(-2px);
 }
 
@@ -456,7 +459,7 @@
 }
 
 .btn-volver {
-  background: var(--gris);
+  background: var(--azul);
   color: var(--blanco);
   border: none;
   padding: 0.8rem 1.5rem;
@@ -470,7 +473,7 @@
 }
 
 .btn-volver:hover {
-  background: var(--gris-oscuro);
+  background: var(--azul-oscuro);
   transform: translateY(-2px);
 }
 
@@ -489,12 +492,7 @@
   font-weight: 600;
 }
 
-.concepto {
-  margin: 0 0 0.5rem 0;
-  color: var(--gris-oscuro);
-  font-size: 1.1rem;
-  font-weight: 500;
-}
+
 
 .descripcion {
   margin: 0 0 1.5rem 0;
@@ -752,8 +750,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Vista de Historial */
@@ -805,15 +808,15 @@
   font-weight: 600;
 }
 
-.fecha-pago {
-  color: var(--gris);
-  font-size: 0.9rem;
+.pago-header .fecha-pago {
+  color: var(--gris-oscuro);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.concepto {
-  margin: 0 0 0.5rem 0;
-  color: var(--gris-oscuro);
-}
 
 .pago-detalles {
   display: flex;
@@ -870,7 +873,7 @@
   background: var(--blanco);
   border-radius: 10px;
   padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -886,8 +889,13 @@
 
 .reciente-card .info .concepto {
   margin: 0;
-  color: var(--gris);
+  color: var(--gris-oscuro);
   font-size: 0.9rem;
+}
+
+.reciente-card .info small {
+  color: var(--gris-oscuro);
+  font-weight: 600;
 }
 
 .historial-pagos {
@@ -918,49 +926,49 @@
   .pagos-container {
     padding: 1rem;
   }
-  
+
   .titulo {
     font-size: 1.8rem;
   }
-  
+
   .estadisticas-financieras {
     grid-template-columns: 1fr;
   }
-  
+
   .pestanas-navegacion {
     flex-direction: column;
   }
-  
+
   .controles-facturas {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .factura-contenido {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .factura-footer {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .planes-pago {
     grid-template-columns: 1fr;
   }
-  
+
   .metodos-pago {
     grid-template-columns: 1fr;
   }
-  
+
   .pago-historial {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .pago-monto {
     text-align: left;
   }
@@ -970,13 +978,13 @@
   .pago-container {
     padding: 1rem;
   }
-  
+
   .resumen-header {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
-  
+
   .btn-procesar {
     width: 100%;
     justify-content: center;
