@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
-import { AuthService } from '../services/rol/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,36 +13,38 @@ export class RoleGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot): boolean | UrlTree {
-    const usuario = this.authService.getUsuarioActual();
-    const rolesPermitidos = route.data['roles'] as string[];
+    const rolesPermitidos = route.data['roles'] as string[] | undefined;
 
-    if (!usuario) {
+    const usuario = this.authService.currentUser;
+    if (!this.authService.isLoggedIn() || !usuario) {
       return this.router.parseUrl('/login');
     }
 
-    // 🔸 Accedemos al nombre del rol desde el objeto
-    const rolUsuario = usuario.rol?.nombre?.toLowerCase();
+    const userRoleKey = this.normalizeRoleKey((usuario.rol?.nombre || '').toString());
 
-    if (!rolUsuario) {
-      return this.router.parseUrl('/login');
+    if (!rolesPermitidos || rolesPermitidos.length === 0) {
+      return true;
     }
 
-    // 🔸 Comparamos con los roles permitidos (en minúsculas por seguridad)
-    const rolesValidos = rolesPermitidos.map(r => r.toLowerCase());
-    if (!rolesValidos.includes(rolUsuario)) {
-      // 🔸 Redirigir al dashboard correspondiente si intenta acceder a otra ruta
-      switch (rolUsuario) {
-        case 'administrador':
-          return this.router.parseUrl('/admin');
-        case 'medico':
-          return this.router.parseUrl('/doctor');
-        case 'paciente':
-          return this.router.parseUrl('/paciente');
-        default:
-          return this.router.parseUrl('/login');
-      }
+    const allowedKeys = rolesPermitidos.map(r => this.normalizeRoleKey(String(r)));
+    if (allowedKeys.includes(userRoleKey)) {
+      return true;
     }
 
-    return true;
+    const routeByRole: Record<string, string> = {
+      admin: '/admin',
+      medico: '/medico',
+      paciente: '/paciente'
+    };
+    return this.router.parseUrl(routeByRole[userRoleKey] || '/login');
+  }
+
+  private normalizeRoleKey(raw: string): 'admin' | 'medico' | 'paciente' | string {
+    let r = raw.toLowerCase().trim();
+    r = r.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (r.includes('admin')) return 'admin';
+    if (r.includes('medic') || r.includes('medico') || r.includes('doctor')) return 'medico';
+    if (r.includes('pacient') || r.includes('paciente')) return 'paciente';
+    return r;
   }
 }

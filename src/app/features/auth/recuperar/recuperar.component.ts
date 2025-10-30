@@ -34,13 +34,11 @@ export class RecuperarComponent {
     if (this.form.valid) {
       console.log('✅ Correo ingresado:', this.form.value.gmail);
       alert('Correo validado correctamente');
-      // Aquí podrías redirigir al formulario de cambio de contraseña
-      // this.router.navigate(['/cambiar-password']);
     }
   }
 
   cancelar() {
     console.log('❌ Proceso cancelado');
-    this.router.navigate(['/login']); // o la ruta que corresponda en tu app
+    this.router.navigate(['/login']);
   }
 }

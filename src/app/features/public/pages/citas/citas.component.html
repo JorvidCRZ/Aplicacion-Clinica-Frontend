@@ -8,13 +8,11 @@
     </div>
 
     <div class="row mb-4 ">
-        <!-- Buscador por Doctor -->
         <div class="col-12 col-md-6 mb-2 buscador">
             <app-buscador placeholder="Buscar por doctor..." [data]="citas" key="doctor" (resultado)="onBuscarDoctor($event)">
             </app-buscador>
         </div>
 
-        <!-- Buscador por Especialidad -->
         <div class="col-12 col-md-6 mb-2 buscador">
             <app-buscador placeholder="Buscar por especialidad..." [data]="citas" key="especialidad"
                 (resultado)="onBuscarEspecialidad($event)">
@@ -23,21 +21,17 @@
     </div>
 
 
-    <!-- Cards de doctores -->
     <div class="row">
         @for (cita of citasFiltradas; track cita.doctor) {
         <div class="col-12 mb-4">
             <div class="doctor-card-clean">
 
-                <!-- Header con especialidad -->
                 <div class="especialidad-header-clean">
                     {{ cita.especialidad.toUpperCase() }}
                 </div>
 
-                <!-- Contenido principal -->
                 <div class="card-content-clean">
 
-                    <!-- Lado izquierdo: Doctor info -->
                     <div class="doctor-side">
                         <div class="doctor-avatar-clean">
                             <i class="fas fa-user-md"></i>
@@ -56,10 +50,8 @@
                         </div>
                     </div>
 
-                    <!-- Lado derecho: Disponibilidad -->
                     <div class="disponibilidad-side">
 
-                        <!-- Selector de días -->
                         <div class="dias-clean">
                             @for (dia of diasDisponibles; track dia.codigo) {
                             <button class="dia-btn-clean" 
@@ -73,7 +65,6 @@
                             }
                         </div>
 
-                        <!-- Grid de horarios -->
                         <div class="horarios-clean">
                             @for (horario of getHorariosDelDia(cita.doctor); track horario) {
                             <button class="horario-btn-clean" 
@@ -90,7 +81,6 @@
                             }
                         </div>
 
-                        <!-- Botón de reserva -->
                         <button class="btn-reservar-clean" (click)="reservarCita(cita)"
                             [disabled]="!getCardState(cita.doctor).horarioSeleccionado">
                             @if (getCardState(cita.doctor).horarioSeleccionado) {
@@ -111,11 +101,9 @@
         }
     </div>
 
-    <!-- 🔔 MODAL DE RESERVA DE CITA -->
     @if (mostrarModal) {
     <div class="modal-overlay" (click)="cerrarModal()">
         <div class="modal-content" (click)="$event.stopPropagation()">
-            <!-- Header del Modal -->
             <div class="modal-header">
                 <h3><i class="fas fa-calendar-plus"></i> Reservar Cita</h3>
                 <button class="btn-close" (click)="cerrarModal()">
@@ -123,7 +111,6 @@
                 </button>
             </div>
 
-            <!-- Información de la cita seleccionada -->
             <div class="cita-seleccionada">
                 <div class="doctor-info-modal">
                     <img src="https://vivamas.aviva.pe/professionals/default.png" alt="Doctor"
@@ -139,7 +126,6 @@
                 </div>
             </div>
 
-            <!-- Verificación de autenticación -->
             @if (!estaLogueado) {
             <div class="auth-required">
                 <div class="auth-message">
@@ -171,7 +157,6 @@
                 </div>
             </div>
             } @else {
-            <!-- Formulario de datos de la cita -->
             <div class="formulario-cita">
                 <h4><i class="fas fa-clipboard-list"></i> Datos de la Cita</h4>
 
@@ -200,7 +185,6 @@
                 </div>
             </div>
 
-            <!-- Botones de acción -->
             <div class="modal-actions">
                 <button class="btn btn-secondary" (click)="cerrarModal()">
                     <i class="fas fa-times"></i>

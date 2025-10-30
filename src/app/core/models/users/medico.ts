@@ -1,6 +1,6 @@
 import { Persona } from './persona';
 
-export interface Doctor {
+export interface Medico {
   idMedico: number;
   persona: Persona;
   colegiatura: string;

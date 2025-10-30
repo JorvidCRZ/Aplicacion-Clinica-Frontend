@@ -20,11 +20,11 @@
         <div class="offcanvas-header d-flex align-items-center justify-content-between">
             <app-logo></app-logo>
             <div class="d-flex flex-column align-items-center">
-                <i class="iconos {{ authService.getUserIcon() }}"
-                    [style.font-size]="authService.getRoleDisplayName() ? '1rem' : '1.5rem'"></i>
-                <span class="fw-semibold mt-1" [style.font-size]="authService.getRoleDisplayName() ? '0.75rem' : '1rem'"
+                <i class="iconos {{ userAuthService.getUserIcon() }}"
+                    [style.font-size]="userAuthService.getRoleDisplayName() ? '1rem' : '1.5rem'"></i>
+                <span class="fw-semibold mt-1" [style.font-size]="userAuthService.getRoleDisplayName() ? '0.75rem' : '1rem'"
                     style="color:var(--blanco); line-height: 1;">
-                    {{ authService.getRoleDisplayName() | titlecase }}
+                    {{ userAuthService.getRoleDisplayName() | titlecase }}
                 </span>
             </div>
             <button type="button" class="btn-close" style="filter: brightness(0) invert(1);" data-bs-dismiss="offcanvas"

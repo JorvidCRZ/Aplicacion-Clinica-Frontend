@@ -1,7 +1,8 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/services/rol/auth.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
+import { UserService } from '../../../../core/services/auth/user.service';
 
 @Component({
   selector: 'app-account-menu',
@@ -16,4 +17,5 @@ export class AccountMenuComponent {
   @Input() menuItems: any[] = [];
   @Input() mobile: boolean = false;
   public authService = inject(AuthService);
+  public userAuthService = inject(UserService);
 }

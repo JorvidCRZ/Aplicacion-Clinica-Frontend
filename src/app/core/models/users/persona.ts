@@ -1,3 +1,5 @@
+import { Usuario } from "./usuario";
+
 export interface Persona {
     idPersona?: number;
     tipoDocumento: string;
@@ -6,7 +8,7 @@ export interface Persona {
     nombre2: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
-    fechaNacimiento: Date;
+    fechaNacimiento: string | Date;
     genero: string;
     pais: string;
     departamento: string;
@@ -14,4 +16,5 @@ export interface Persona {
     distrito: string;
     direccion: string;
     telefono: string;
+    usuario?: Usuario;
 }

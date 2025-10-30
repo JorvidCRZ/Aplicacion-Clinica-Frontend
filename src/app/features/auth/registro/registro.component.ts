@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,13 +10,14 @@ import { MatOption } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { UbigeoService, Departamento, Provincia, Distrito } from '../../../core/services/forms/ubigeo.service';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TipoDocumento, } from '../../../core/models/common/tipo-documento';
 import { TipoDocumentoService } from '../../../core/services/forms/tipoDocumento.service';
 import { UsuarioService } from '../../../core/services/rol/usuario.service';
 import { UsuarioRegistro } from '../../../core/models/users/registro';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { UbigeoService, Departamento, Provincia, Distrito } from '../../../core/services/forms/ubigeo.service';
 
 @Component({
   selector: 'app-registro',

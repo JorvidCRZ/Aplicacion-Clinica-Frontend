@@ -1,322 +1,239 @@
-// import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { CommonModule } from '@angular/common';
-// import { FormsModule } from '@angular/forms';
-// import { Subscription } from 'rxjs';
-// import { AuthService, AuthState } from '../../../../../core/services/rol/auth.service';
-// import { Paciente } from '../../../../../core/models/users/paciente';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Paciente } from '../../../../../core/models/users/paciente';
+import { PacienteService } from '../../../../../core/services/rol/paciente.service';
+import { UserService } from '../../../../../core/services/auth/user.service';
 
-// interface ContactoEmergencia {
-//   nombre: string;
-//   relacion: string;
-//   telefono: string;
-//   telefonoAlt: string;
-// }
+@Component({
+    selector: 'app-perfil-paciente',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
+    templateUrl: './mi-perfil.component.html',
+    styleUrls: ['./mi-perfil.component.css'],
+})
+export class MiPerfilComponent implements OnInit {
 
-// interface PerfilPaciente {
-//   // Información Personal
-//   nombres: string;
-//   apellidos: string;
-//   dni: string;
-//   fechaNacimiento: string;
-//   genero: string;
-//   estadoCivil: string;
-  
-//   // Información de Contacto
-//   email: string;
-//   telefono: string;
-//   telefonoEmergencia: string;
-//   direccion: string;
-  
-//   // Información Médica
-//   tipoSangre: string;
-//   peso: number;
-//   altura: number;
-//   alergias: string;
-//   medicamentosActuales: string;
-//   antecedentesMedicos: string;
-  
-//   // Contacto de Emergencia
-//   contactoEmergencia: ContactoEmergencia;
-// }
+    editandoPersonal = false;
+    editandoContacto = false;
+    editandoMedica = false;
+    editandoEmergencia = false;
 
-// @Component({
-//   selector: 'app-mi-perfil',
-//   imports: [CommonModule, FormsModule],
-//   templateUrl: './mi-perfil.component.html',
-//   styleUrls: ['./mi-perfil.component.css']
-// })
-// export class MiPerfilComponent implements OnInit, OnDestroy {
+    mensajeGuardado: string | null = null;
 
-//   // Estados de edición
-//   editandoPersonal: boolean = false;
-//   editandoContacto: boolean = false;
-//   editandoMedica: boolean = false;
-//   editandoEmergencia: boolean = false;
+    perfilPaciente: Paciente = {
+        persona: {
+            tipoDocumento: '',
+            dni: '',
+            nombre1: '',
+            nombre2: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            fechaNacimiento: '',
+            genero: '',
+            pais: '',
+            departamento: '',
+            provincia: '',
+            distrito: '',
+            direccion: '',
+            telefono: ''
+        },
+        usuario: {
+            idUsuario: undefined,
+            correo: '',
+            rol: { idRol: 3, nombre: 'Paciente' },
+            persona: {} as any
+        },
+        tipoSangre: '',
+        peso: undefined,
+        altura: undefined,
+        contactoEmergenciaNombre: '',
+        contactoEmergenciaRelacion: '',
+        contactoEmergenciaTelefono: '',
+    };
 
-//   // Mensaje de confirmación
-//   mensajeGuardado: string = '';
+    private copiaBackup: any = {};
 
-//   // Usuario actual
-//   usuarioActual: Paciente | null = null;
-//   authSubscription: Subscription | null = null;
+    constructor(
+        private pacienteService: PacienteService,
+        private userService: UserService
+    ) { }
 
-//   // Datos del perfil
-//   perfilPaciente: PerfilPaciente = {
-//     // Información Personal
-//     nombres: '',
-//     apellidos: '',
-//     dni: '',
-//     fechaNacimiento: '',
-//     genero: 'masculino',
-//     estadoCivil: 'soltero',
-    
-//     // Información de Contacto
-//     email: '',
-//     telefono: '',
-//     telefonoEmergencia: '',
-//     direccion: '',
-    
-//     // Información Médica
-//     tipoSangre: 'O+',
-//     peso: 0,
-//     altura: 0,
-//     alergias: '',
-//     medicamentosActuales: '',
-//     antecedentesMedicos: '',
-    
-//     // Contacto de Emergencia
-//     contactoEmergencia: {
-//       nombre: '',
-//       relacion: 'Padre/Madre',
-//       telefono: '',
-//       telefonoAlt: ''
-//     }
-//   };
+    ngOnInit(): void {
+        const idUsuario = this.userService.getIdUsuario();
+        console.log('ID usuario actual:', idUsuario);
 
-//   // Copias de respaldo para cancelar cambios
-//   private respaldoPersonal: any = {};
-//   private respaldoContacto: any = {};
-//   private respaldoMedica: any = {};
-//   private respaldoEmergencia: any = {};
+        this.pacienteService.getByUsuario(idUsuario).subscribe({
+            next: (data) => {
+                const anyData: any = data;
+                this.perfilPaciente = data;
 
-//   constructor(private authService: AuthService) {}
+                if (!this.perfilPaciente.usuario && anyData.usuarioAgrego) {
+                    this.perfilPaciente.usuario = anyData.usuarioAgrego;
+                }
 
-//   ngOnInit(): void {
-//     // Suscribirse al estado de autenticación
-//     this.authSubscription = this.authService.authState$.subscribe((authState: AuthState) => {
-//       if (authState.user && authState.user.rol === 'paciente') {
-//         this.usuarioActual = authState.user as Paciente;
-//         this.cargarPerfilPaciente();
-//       }
-//     });
-//   }
+                const currentId = this.userService.getIdUsuario();
+                if (this.perfilPaciente.usuario && this.perfilPaciente.usuario.idUsuario !== currentId) {
+                    this.perfilPaciente.usuario = {
+                        idUsuario: currentId,
+                        correo: this.userService.getCorreoUsuarioActual() || this.perfilPaciente.usuario.correo,
+                        rol: this.userService.current?.rol || { idRol: 3, nombre: 'Paciente' },
+                        persona: this.perfilPaciente.persona as any
+                    };
+                }
 
-//   ngOnDestroy(): void {
-//     // Cancelar suscripción para evitar memory leaks
-//     if (this.authSubscription) {
-//       this.authSubscription.unsubscribe();
-//     }
-//   }
+                console.log('Paciente cargado:', this.perfilPaciente);
+            },
+            error: (err) => {
+                console.error('Error al cargar paciente por usuario:', err);
+                // fallback por si el backend mapea distinto:
+                this.pacienteService.getById(this.userService.getIdUsuario()).subscribe({
+                    next: (d) => {
+                        const anyD: any = d;
+                        this.perfilPaciente = d;
+                        if (!this.perfilPaciente.usuario && anyD.usuarioAgrego) {
+                            this.perfilPaciente.usuario = anyD.usuarioAgrego;
+                        }
+                    },
+                    error: (e) => console.error('Fallback también falló:', e)
+                });
+            }
+        });
+    }
 
-//   private cargarPerfilPaciente(): void {
-//     if (this.usuarioActual) {
-//       // Mapear datos del usuario logueado al perfil
-//       this.perfilPaciente = {
-//         // Información Personal
-//         nombres: this.usuarioActual.nombre || '',
-//         apellidos: `${this.usuarioActual.apellidoPaterno || ''} ${this.usuarioActual.apellidoMaterno || ''}`.trim(),
-//         dni: this.usuarioActual.numeroDocumento || '',
-//         fechaNacimiento: this.formatearFecha(this.usuarioActual.fechaNacimiento),
-//         genero: this.usuarioActual.genero || 'masculino',
-//         estadoCivil: 'soltero', // No disponible en el modelo actual
-        
-//         // Información de Contacto
-//         email: this.usuarioActual.email || '',
-//         telefono: this.usuarioActual.telefono || '',
-//         telefonoEmergencia: '', // No disponible en el modelo actual
-//         direccion: this.usuarioActual.domicilio || '',
-        
-//         // Información Médica
-//         tipoSangre: 'O+', // No disponible en el modelo actual
-//         peso: 0, // No disponible en el modelo actual
-//         altura: 0, // No disponible en el modelo actual
-//         alergias: Array.isArray(this.usuarioActual.alergias) ? this.usuarioActual.alergias.join(', ') : (this.usuarioActual.alergias || ''),
-//         medicamentosActuales: '', // No disponible en el modelo actual
-//         antecedentesMedicos: this.usuarioActual.historialMedico || '',
-        
-//         // Contacto de Emergencia
-//         contactoEmergencia: {
-//           nombre: this.usuarioActual.contactoEmergencia?.nombre || '',
-//           relacion: this.usuarioActual.contactoEmergencia?.relacion || 'Padre/Madre',
-//           telefono: this.usuarioActual.contactoEmergencia?.telefono || '',
-//           telefonoAlt: '' // No disponible en el modelo actual
-//         }
-//       };
-      
-//       console.log('Perfil del paciente cargado desde usuario actual:', this.usuarioActual.nombre);
-//     }
-//   }
+    editarInformacionPersonal() {
+        this.copiaBackup = structuredClone(this.perfilPaciente);
+        this.editandoPersonal = true;
+    }
+    guardarInformacionPersonal() {
+        this.guardarCambios('Información personal guardada correctamente', 'persona');
+        this.editandoPersonal = false;
+    }
+    cancelarEdicionPersonal() {
+        this.perfilPaciente = structuredClone(this.copiaBackup);
+        this.editandoPersonal = false;
+    }
 
-//   private formatearFecha(fecha: Date | string | undefined): string {
-//     if (!fecha) return '';
-    
-//     try {
-//       // Si es string, intentar convertir a Date
-//       if (typeof fecha === 'string') {
-//         const fechaObj = new Date(fecha);
-//         if (isNaN(fechaObj.getTime())) return '';
-//         return fechaObj.toISOString().split('T')[0];
-//       }
-      
-//       // Si es Date, usar directamente
-//       if (fecha instanceof Date) {
-//         if (isNaN(fecha.getTime())) return '';
-//         return fecha.toISOString().split('T')[0];
-//       }
-      
-//       return '';
-//     } catch (error) {
-//       console.warn('Error al formatear fecha:', error);
-//       return '';
-//     }
-//   }
+    editarContacto() {
+        this.copiaBackup = structuredClone(this.perfilPaciente);
+        this.editandoContacto = true;
+    }
+    guardarContacto() {
+        this.guardarCambios('Información de contacto actualizada', 'persona');
+        this.editandoContacto = false;
+    }
+    cancelarEdicionContacto() {
+        this.perfilPaciente = structuredClone(this.copiaBackup);
+        this.editandoContacto = false;
+    }
 
-//   // Métodos de edición - Información Personal
-//   editarInformacionPersonal(): void {
-//     this.editandoPersonal = true;
-//     this.respaldoPersonal = {
-//       nombres: this.perfilPaciente.nombres,
-//       apellidos: this.perfilPaciente.apellidos,
-//       dni: this.perfilPaciente.dni,
-//       fechaNacimiento: this.perfilPaciente.fechaNacimiento,
-//       genero: this.perfilPaciente.genero,
-//       estadoCivil: this.perfilPaciente.estadoCivil
-//     };
-//   }
+    editarInformacionMedica() {
+        this.copiaBackup = structuredClone(this.perfilPaciente);
+        this.editandoMedica = true;
+    }
+    guardarInformacionMedica() {
+        this.guardarCambios('Información médica guardada', 'paciente');
+        this.editandoMedica = false;
+    }
+    cancelarEdicionMedica() {
+        this.perfilPaciente = structuredClone(this.copiaBackup);
+        this.editandoMedica = false;
+    }
 
-//   guardarInformacionPersonal(): void {
-//     // Validaciones básicas
-//     if (!this.perfilPaciente.nombres || !this.perfilPaciente.apellidos) {
-//       alert('Los nombres y apellidos son obligatorios');
-//       return;
-//     }
+    editarEmergencia() {
+        this.copiaBackup = structuredClone(this.perfilPaciente);
+        this.editandoEmergencia = true;
+    }
+    guardarEmergencia() {
+        this.guardarCambios('Contacto de emergencia actualizado', 'paciente');
+        this.editandoEmergencia = false;
+    }
+    cancelarEdicionEmergencia() {
+        this.perfilPaciente = structuredClone(this.copiaBackup);
+        this.editandoEmergencia = false;
+    }
 
-//     this.editandoPersonal = false;
-//     this.mostrarMensajeGuardado('Información personal actualizada correctamente');
-    
-//     // Aquí enviarías los datos al backend
-//     console.log('Guardando información personal:', this.respaldoPersonal);
-//   }
+    // helper para mostrar placeholder de correo
+    get correoActual(): string {
+        return this.userService.getCorreoUsuarioActual() || '';
+    }
 
-//   cancelarEdicionPersonal(): void {
-//     this.perfilPaciente.nombres = this.respaldoPersonal.nombres;
-//     this.perfilPaciente.apellidos = this.respaldoPersonal.apellidos;
-//     this.perfilPaciente.dni = this.respaldoPersonal.dni;
-//     this.perfilPaciente.fechaNacimiento = this.respaldoPersonal.fechaNacimiento;
-//     this.perfilPaciente.genero = this.respaldoPersonal.genero;
-//     this.perfilPaciente.estadoCivil = this.respaldoPersonal.estadoCivil;
-//     this.editandoPersonal = false;
-//   }
+    // Si prefieres two-way binding, mantén este handler para inicializar usuario
+    onCorreoChange(value: string): void {
+        if (!this.perfilPaciente.usuario) {
+            this.perfilPaciente.usuario = {
+                idUsuario: this.userService.getIdUsuario(),
+                correo: value,
+                rol: this.userService.current?.rol || { idRol: 3, nombre: 'Paciente' },
+                persona: this.perfilPaciente.persona as any
+            };
+        } else {
+            this.perfilPaciente.usuario.correo = value;
+        }
+    }
 
-//   // Métodos de edición - Contacto
-//   editarContacto(): void {
-//     this.editandoContacto = true;
-//     this.respaldoContacto = {
-//       email: this.perfilPaciente.email,
-//       telefono: this.perfilPaciente.telefono,
-//       telefonoEmergencia: this.perfilPaciente.telefonoEmergencia,
-//       direccion: this.perfilPaciente.direccion
-//     };
-//   }
+    private guardarCambios(mensaje: string, tipo: 'paciente' | 'persona' = 'paciente') {
+        // si editamos persona/contacto -> mandamos persona + usuarioAgrego (si hay correo) al endpoint paciente
+        if (tipo === 'persona') {
+            // asegurar que exista idPaciente
+            if (!this.perfilPaciente.idPaciente) {
+                console.warn('No hay idPaciente definido, no se puede actualizar persona desde paciente.');
+                return;
+            }
 
-//   guardarContacto(): void {
-//     if (!this.perfilPaciente.email || !this.perfilPaciente.telefono) {
-//       alert('El email y teléfono son obligatorios');
-//       return;
-//     }
+            // Asegurarnos que usuario tenga idUsuario (si corresponde al mismo usuario)
+            if (!this.perfilPaciente.usuario || !this.perfilPaciente.usuario.idUsuario) {
+                this.perfilPaciente.usuario = {
+                    idUsuario: this.userService.getIdUsuario(),
+                    correo: this.perfilPaciente.usuario?.correo || this.userService.getCorreoUsuarioActual() || '',
+                    rol: this.userService.current?.rol || { idRol: 3, nombre: 'Paciente' },
+                    persona: this.perfilPaciente.persona as any
+                };
+            }
+            // antes de llamar pacienteService.update(...)
+            this.perfilPaciente.usuario = this.perfilPaciente.usuario || {
+                idUsuario: this.userService.getIdUsuario(),
+                correo: this.userService.getCorreoUsuarioActual() || ''
+            };
+            
+            this.pacienteService.update(this.perfilPaciente.idPaciente, this.perfilPaciente)
+                .subscribe({
+                    next: (actualizado) => {
+                        this.perfilPaciente = actualizado;
+                        this.mostrarMensaje(mensaje);
+                    },
+                    error: (err) => {
+                        console.error('Error al actualizar persona/contacto:', err);
+                    }
+                });
+            return;
+        }
 
-//     this.editandoContacto = false;
-//     this.mostrarMensajeGuardado('Información de contacto actualizada correctamente');
-//   }
+        // caso 'paciente' (info médica y emergencia)
+        if (this.perfilPaciente.idPaciente) {
+            this.pacienteService.update(this.perfilPaciente.idPaciente, this.perfilPaciente)
+                .subscribe({
+                    next: (actualizado) => {
+                        this.perfilPaciente = actualizado;
+                        this.mostrarMensaje(mensaje);
+                    },
+                    error: (err) => console.error('Error al actualizar paciente:', err),
+                });
+        } else {
+            console.warn('No hay idPaciente definido, no se puede actualizar');
+        }
+    }
 
-//   cancelarEdicionContacto(): void {
-//     this.perfilPaciente.email = this.respaldoContacto.email;
-//     this.perfilPaciente.telefono = this.respaldoContacto.telefono;
-//     this.perfilPaciente.telefonoEmergencia = this.respaldoContacto.telefonoEmergencia;
-//     this.perfilPaciente.direccion = this.respaldoContacto.direccion;
-//     this.editandoContacto = false;
-//   }
+    calcularIMC(): string {
+        const peso = this.perfilPaciente.peso;
+        const alturaM = this.perfilPaciente.altura ? this.perfilPaciente.altura / 100 : 0;
+        if (!peso || !alturaM) return '';
+        const imc = peso / (alturaM * alturaM);
+        return imc.toFixed(2);
+    }
 
-//   // Métodos de edición - Información Médica
-//   editarInformacionMedica(): void {
-//     this.editandoMedica = true;
-//     this.respaldoMedica = {
-//       tipoSangre: this.perfilPaciente.tipoSangre,
-//       peso: this.perfilPaciente.peso,
-//       altura: this.perfilPaciente.altura,
-//       alergias: this.perfilPaciente.alergias,
-//       medicamentosActuales: this.perfilPaciente.medicamentosActuales,
-//       antecedentesMedicos: this.perfilPaciente.antecedentesMedicos
-//     };
-//   }
-
-//   guardarInformacionMedica(): void {
-//     this.editandoMedica = false;
-//     this.mostrarMensajeGuardado('Información médica actualizada correctamente');
-//   }
-
-//   cancelarEdicionMedica(): void {
-//     this.perfilPaciente.tipoSangre = this.respaldoMedica.tipoSangre;
-//     this.perfilPaciente.peso = this.respaldoMedica.peso;
-//     this.perfilPaciente.altura = this.respaldoMedica.altura;
-//     this.perfilPaciente.alergias = this.respaldoMedica.alergias;
-//     this.perfilPaciente.medicamentosActuales = this.respaldoMedica.medicamentosActuales;
-//     this.perfilPaciente.antecedentesMedicos = this.respaldoMedica.antecedentesMedicos;
-//     this.editandoMedica = false;
-//   }
-
-//   // Métodos de edición - Contacto de Emergencia
-//   editarEmergencia(): void {
-//     this.editandoEmergencia = true;
-//     this.respaldoEmergencia = { ...this.perfilPaciente.contactoEmergencia };
-//   }
-
-//   guardarEmergencia(): void {
-//     if (!this.perfilPaciente.contactoEmergencia.nombre || !this.perfilPaciente.contactoEmergencia.telefono) {
-//       alert('El nombre y teléfono del contacto de emergencia son obligatorios');
-//       return;
-//     }
-
-//     this.editandoEmergencia = false;
-//     this.mostrarMensajeGuardado('Contacto de emergencia actualizado correctamente');
-//   }
-
-//   cancelarEdicionEmergencia(): void {
-//     this.perfilPaciente.contactoEmergencia = { ...this.respaldoEmergencia };
-//     this.editandoEmergencia = false;
-//   }
-
-//   // Utilidades
-//   calcularIMC(): string {
-//     if (this.perfilPaciente.peso && this.perfilPaciente.altura) {
-//       const alturaMetros = this.perfilPaciente.altura / 100;
-//       const imc = this.perfilPaciente.peso / (alturaMetros * alturaMetros);
-      
-//       let categoria = '';
-//       if (imc < 18.5) categoria = 'Bajo peso';
-//       else if (imc < 25) categoria = 'Normal';
-//       else if (imc < 30) categoria = 'Sobrepeso';
-//       else categoria = 'Obesidad';
-      
-//       return `${imc.toFixed(1)} (${categoria})`;
-//     }
-//     return 'No calculado';
-//   }
-
-//   private mostrarMensajeGuardado(mensaje: string): void {
-//     this.mensajeGuardado = mensaje;
-//     setTimeout(() => {
-//       this.mensajeGuardado = '';
-//     }, 3000);
-//   }
-// }
+    private mostrarMensaje(mensaje: string) {
+        this.mensajeGuardado = mensaje;
+        setTimeout(() => (this.mensajeGuardado = null), 3000);
+    }
+}

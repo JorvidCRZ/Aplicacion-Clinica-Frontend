@@ -16,3 +16,6 @@ a,h6 {
     text-decoration: none !important;
 }
 
+a{
+    cursor: pointer;
+}

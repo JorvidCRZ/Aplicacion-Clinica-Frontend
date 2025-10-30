@@ -11,4 +11,5 @@ export interface LoginResponse {
     nombre2?: string;
     apellidoPaterno: string;
     apellidoMaterno?: string;
+    token?: string;
 }

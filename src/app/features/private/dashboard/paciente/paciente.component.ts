@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../../../core/services/rol/auth.service';
-import { MENU_DASHBOARD } from '../../../../core/config/menu-dasboard.config';
-import { MenuItem } from '../../../../core/models/common/menu-items';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../../public/components/sidebar/sidebar.component';
+import { UserService } from '../../../../core/services/auth/user.service';
+import { MENU_DASHBOARD } from '../../../../core/config/menu-dasboard.config';
+import { MenuItem } from '../../../../core/models/common/menu-items';
 
 @Component({
   selector: 'app-paciente',
@@ -18,16 +19,12 @@ import { SidebarComponent } from '../../../public/components/sidebar/sidebar.com
   ]
 })
 export class PacienteComponent {
-  currentUser: any;
   sidebarItems: MenuItem[] = [];
 
-  constructor(private authService: AuthService) {
-    this.currentUser = this.authService.currentUser;
-    const rol = this.currentUser?.rol ?? 'paciente';
-    this.sidebarItems = MENU_DASHBOARD[rol];
-  }
-
-  cerrarSesion() {
-    this.authService.logout();
+  constructor(
+    public authService: AuthService,
+    public userAuthService: UserService
+  ) {
+    this.sidebarItems = MENU_DASHBOARD['paciente'] || [];
   }
 }

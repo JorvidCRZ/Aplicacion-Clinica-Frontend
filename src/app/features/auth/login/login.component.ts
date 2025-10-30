@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/rol/auth.service';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { AuthNavigationService } from '../../../core/services/auth/navigation.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -41,8 +42,9 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private authNav: AuthNavigationService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -63,14 +65,14 @@ export class LoginComponent implements OnInit {
     const { email, password } = this.loginForm.value;
 
     this.authService.login(email, password).subscribe({
-      next: (user) => {
-        const redirectTo = this.authService.getRedirectAfterLogin();
-        this.authService.clearRedirectAfterLogin();
+      next: () => {
+        const redirectTo = this.authNav.getRedirectAfterLogin();
+        this.authNav.clearRedirectAfterLogin();
 
         if (redirectTo) {
           this.router.navigate([redirectTo]);
         } else {
-          this.authService.redirectByRole(user);
+          this.authNav.redirectByRole();
         }
       },
       error: (err) => {

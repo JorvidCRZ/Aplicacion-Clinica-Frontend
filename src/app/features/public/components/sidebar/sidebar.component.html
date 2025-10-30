@@ -1,12 +1,12 @@
 <nav class="sidebar">
-    @if (currentUser) {
+    @if (authService.isLoggedIn()) {
     <div class="user-profile">
         <div class="user-avatar">
-            <i [class]="getUserIcon()"></i>
+            <i [class]="userAuthService.getUserIcon()"></i>
         </div>
         <div class="user-info">
-            <h6 class="user-name">{{ currentUser?.nombre }}</h6>
-            <small class="user-email">{{ currentUser?.email }}</small>
+            <h6 class="user-name">{{ userAuthService.getDisplayName() }}</h6>
+            <small class="user-email">{{ userAuthService.getCorreoUsuarioActual() }}</small>
         </div>
     </div>
     }
@@ -36,7 +36,7 @@
                 </a>
             </li>
             <li class="menu-item">
-                <a (click)="logout()">
+                <a (click)="authService.logout()">
                     <i class="fas fa-sign-out-alt"></i>
                     Cerrar Sesión
                 </a>

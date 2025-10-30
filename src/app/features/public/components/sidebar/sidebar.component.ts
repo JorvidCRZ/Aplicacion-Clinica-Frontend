@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuItem } from '../../../../core/models/common/menu-items';
-import { AuthService } from '../../../../core/services/rol/auth.service';
+import { UserService } from '../../../../core/services/auth/user.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,13 +17,15 @@ export class SidebarComponent {
   @Input() title: string = 'Navegación';
   @Input() currentUser: any = null;
 
-  constructor(private authService: AuthService) {}
+  public authService = inject(AuthService);
+  public userAuthService = inject(UserService);
 
-  getUserIcon(): string {
-    return this.authService.getUserIcon();
-  }
-
-  logout(): void {
-    this.authService.logout();
+  ngOnInit(): void {
+    if (!this.currentUser) {
+      this.currentUser = this.authService.currentUser;
+    }
+    if (!this.menuItems || this.menuItems.length === 0) {
+      this.menuItems = this.authService.getAccountLinks();
+    }
   }
 }

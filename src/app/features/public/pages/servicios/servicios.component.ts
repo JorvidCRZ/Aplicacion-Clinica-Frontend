@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Navigation, NavigationSkipped, RouterModule } from '@angular/router';
 import { Card } from '../../../../core/models/utils/card';
 import { CardGalleryComponent } from '../../../../shared/components/card-gallery/card-gallery.component';
-import { AuthService } from '../../../../core/services/rol/auth.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
+import { UserService } from '../../../../core/services/auth/user.service';
+import { AuthNavigationService } from '../../../../core/services/auth/navigation.service';
 
 @Component({
   selector: 'app-servicios',
@@ -36,12 +38,12 @@ export class ServiciosComponent {
   ];
 
   constructor(
-    private authService: AuthService,
+    private navigationAuthService: AuthNavigationService,
     private router: Router
   ) { }
 
   agendarCita(): void {
-    if (this.authService.requireAuth('/servicio-formulario')) {
+    if (this.navigationAuthService.requireAuth('/servicio-formulario')) {
       this.router.navigate(['/servicio-formulario']);
     }
   }
