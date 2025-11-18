@@ -1,0 +1,166 @@
+
+.container {
+    height: 100vh;
+    background: var(--gris-claro);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.panel-recuperacion {
+    display: flex;
+    width: 1100px;
+    max-width: 95%;
+    min-height: 600px;
+    background: var(--blanco);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+.panel-left {
+    flex: 1;
+    background: 
+        linear-gradient(rgba(13, 71, 161, 0.85), rgba(13, 71, 161, 0.85)),
+        url('/assets/fondos/fondo-login.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--blanco);
+    padding: 2rem;
+    position: relative;
+}
+
+.logo-left {
+    width: 100px;
+    margin-bottom: 1.2rem;
+    filter: invert(1), brightness(0.8);
+    padding: 10px;
+}
+
+.panel-left h2 {
+    font-weight: 600;
+    font-size: 1.8rem;
+    margin-bottom: 0.7rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: var(--blanco);
+}
+
+.panel-left p {
+    font-size: 1rem;
+    opacity: 0.95;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    color: var(--blanco);
+}
+
+.panel-right {
+    flex: 1;
+    background: #1976d2;
+    padding: 3rem 2.5rem;
+    color: var(--blanco);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.panel-right h2 {
+    font-weight: 600;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitulo {
+    font-size: 1rem;
+    color: #e3f2fd;
+    margin-bottom: 2rem;
+}
+
+mat-form-field {
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+mat-label {
+    color: #e3f2fd !important;
+}
+
+input {
+    color: var(--blanco) !important;
+}
+
+.mat-form-field-outline {
+    color: #90caf9 !important;
+}
+
+.mat-form-field-ripple {
+    background-color: #bbdefb !important;
+}
+
+/* Botón validar */
+.btn-validar {
+    background-color: #0d47a1 !important;
+    color: var(--blanco) !important;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.9rem;
+    width: 100%;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-validar:hover {
+    background-color: #1565c0 !important;
+    transform: scale(1.03);
+}
+
+/* Botón cancelar */
+.btn-cancelar {
+    margin-top: 1.2rem;
+    color: #ffcdd2 !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.btn-cancelar:hover {
+    color: #ff8a80 !important;
+    text-decoration: underline;
+}
+
+/* Animación */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive (móvil: una sola columna) */
+@media (max-width: 768px) {
+    .panel-recuperacion {
+        flex-direction: column;
+        width: 95%;
+        min-height: auto;
+    }
+
+    .panel-left,
+    .panel-right {
+        flex: none;
+        width: 100%;
+        padding: 2rem;
+    }
+
+    .panel-right {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+}

@@ -1,0 +1,192 @@
+.contenedor-blog {
+    background-color: var(--gris);
+    border-radius: 20px;
+}
+
+.blog-container {
+    min-height: 100vh;
+    color: var(--blanco);
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+/* Header principal */
+.blog-header {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--azul-oscuro);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenido principal */
+.blog-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Secciones del blog */
+.blog-section {
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--blanco);
+    margin-bottom: 1.5rem;
+    text-align: left;
+    border-bottom: 2px solid var(--verde);
+    padding-bottom: 0.5rem;
+}
+
+.subsection-title {
+    font-size: 1.3rem;
+    color: var(--verde);
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+/* Layout de contenido */
+.section-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.two-column {
+    flex-direction: row;
+}
+
+.text-content {
+    flex: 2;
+}
+
+.image-placeholder {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Texto e introducción */
+.intro-text,
+.section-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--blanco);
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.future-text {
+    background: rgba(76, 175, 80, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--verde);
+    margin-top: 1rem;
+}
+
+/* Listas de consejos y recomendaciones */
+.health-tips,
+.recommendations,
+.medical-advances {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.health-tips li,
+.recommendations li,
+.medical-advances li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    border-left: 4px solid var(--verde);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.health-tips li strong,
+.recommendations li strong,
+.medical-advances li strong {
+    color: var(--verde);
+}
+
+/* Subtítulos con iconos */
+h4 {
+    color: var(--verde);
+    font-size: 1.1rem;
+    margin: 1.5rem 0 0.8rem 0;
+    font-weight: 600;
+}
+
+/* Imágenes del blog */
+.blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+    }
+
+    .section-content,
+    .two-column {
+        flex-direction: column;
+    }
+
+    .image-placeholder {
+        min-width: auto;
+        margin-top: 1rem;
+    }
+
+    .blog-content {
+        padding: 1rem;
+    }
+
+    .blog-section {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 1.4rem;
+    }
+
+    .blog-header {
+        padding: 1rem;
+    }
+
+    .health-tips li,
+    .recommendations li,
+    .medical-advances li {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+    }
+}

@@ -1,0 +1,693 @@
+/* Contenedor Principal */
+.historial-container {
+  padding: 1.5rem;
+  background: var(--gris-claro);
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header del Historial */
+.historial-header {
+  background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+  color: var(--blanco);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.3);
+}
+
+.titulo-seccion {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.titulo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitulo {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Resumen del Paciente (chips) */
+.paciente-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--blanco);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.chip i {
+  width: 18px;
+  text-align: center;
+}
+
+/* Aviso de Confidencialidad */
+.aviso-confidencial {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.2rem;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.aviso-confidencial::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--verde), var(--amarillo), var(--verde));
+  animation: confidencial-glow 3s ease-in-out infinite;
+}
+
+@keyframes confidencial-glow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.icono-confidencial {
+  font-size: 2.5rem;
+  color: var(--blanco);
+  animation: pulse-confidencial 2s ease-in-out infinite;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse-confidencial {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.texto-confidencial h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--blanco);
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.texto-confidencial p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Controles y Filtros */
+.controles-historial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--blanco);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filtros {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filtro-grupo label {
+  font-weight: 600;
+  color: var(--gris-oscuro);
+  font-size: 0.9rem;
+}
+
+.filtro-select {
+  padding: 0.7rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background: var(--blanco);
+  font-size: 0.9rem;
+  color: var(--gris-oscuro);
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(26, 78, 141, 0.1);
+}
+
+/* Checkbox Confidencial */
+.checkbox-confidencial {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gris-oscuro);
+  position: relative;
+}
+
+.checkbox-confidencial input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--azul);
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checkbox-confidencial input[type="checkbox"]:checked {
+  background: var(--azul);
+  border-color: var(--azul);
+}
+
+.checkbox-confidencial input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--blanco);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Estadísticas */
+.stats-historial {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+  color: var(--blanco);
+  border-radius: 10px;
+  min-width: 80px;
+}
+
+.stat-numero {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Lista de Registros */
+.registros-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.registro-card {
+  background: var(--blanco);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid var(--azul);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.registro-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.registro-card.confidencial {
+  border-left-color: var(--rojo);
+  background: linear-gradient(135deg, #fff, #fefefe);
+}
+
+.registro-card.confidencial::before {
+  content: '🔒';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.2rem;
+  opacity: 0.7;
+}
+
+.registro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.tipo-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tipo-info i {
+  font-size: 2rem;
+  color: var(--azul);
+  width: 40px;
+  text-align: center;
+}
+
+.tipo-texto h3 {
+  margin: 0 0 0.2rem 0;
+  color: var(--gris-oscuro);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.especialidad {
+  color: var(--gris);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.fecha-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.fecha {
+  font-size: 0.9rem;
+  color: var(--gris);
+  font-weight: 500;
+}
+
+.estado {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  color: var(--blanco);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-confidencial {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 0.2rem 0.6rem;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.registro-contenido {
+  margin-bottom: 1rem;
+}
+
+.doctor-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  color: var(--gris-oscuro);
+  font-weight: 500;
+}
+
+.doctor-info i {
+  color: var(--verde);
+  font-size: 1rem;
+}
+
+.diagnostico, .tratamiento {
+  margin-bottom: 0.5rem;
+  color: var(--gris-oscuro);
+  line-height: 1.5;
+}
+
+.diagnostico strong, .tratamiento strong {
+  color: var(--azul);
+}
+
+.registro-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ver-detalle {
+  color: var(--azul);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.registro-footer i {
+  color: var(--azul);
+  font-size: 0.9rem;
+}
+
+/* Sin Registros */
+.sin-registros {
+  text-align: center;
+  padding: 3rem;
+  background: var(--blanco);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sin-registros i {
+  font-size: 3rem;
+  color: var(--gris);
+  margin-bottom: 1rem;
+}
+
+.sin-registros h3 {
+  color: var(--gris-oscuro);
+  margin-bottom: 0.5rem;
+}
+
+.sin-registros p {
+  color: var(--gris);
+}
+
+/* Modal de Detalle */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-detalle {
+  background: var(--blanco);
+  border-radius: 15px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid #f0f0f0;
+  background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+  color: var(--blanco);
+  border-radius: 15px 15px 0 0;
+}
+
+.titulo-modal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.titulo-modal i {
+  font-size: 1.8rem;
+}
+
+.titulo-modal h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.badge-confidencial-grande {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 1rem;
+}
+
+.btn-cerrar {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: var(--blanco);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cerrar:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.modal-contenido {
+  padding: 2rem;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.detalle-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.detalle-item label {
+  font-weight: 600;
+  color: var(--azul);
+  font-size: 0.9rem;
+}
+
+.detalle-item span {
+  color: var(--gris-oscuro);
+  font-size: 1rem;
+}
+
+.estado-detalle {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  color: var(--blanco);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.diagnostico-completo, .tratamiento-completo {
+  margin-bottom: 1.5rem;
+}
+
+.diagnostico-completo h4, .tratamiento-completo h4 {
+  color: var(--azul);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.diagnostico-completo p, .tratamiento-completo p {
+  color: var(--gris-oscuro);
+  line-height: 1.6;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--azul);
+}
+
+.observaciones-completas {
+  margin-bottom: 1.5rem;
+}
+
+.observaciones-completas h4 {
+  color: var(--rojo);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.observaciones-contenido {
+  background: #f8f9fa;
+  border: 2px solid var(--rojo);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.observaciones-contenido::before {
+  content: '🔒 CONFIDENCIAL';
+  position: absolute;
+  top: -12px;
+  left: 1rem;
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.observaciones-contenido pre {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--gris-oscuro);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+  text-align: center;
+}
+
+.btn-cerrar-modal {
+  background: var(--gris);
+  color: var(--blanco);
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cerrar-modal:hover {
+  background: var(--gris-oscuro);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .historial-container {
+    padding: 1rem;
+  }
+  
+  .titulo {
+    font-size: 1.8rem;
+  }
+  
+  .controles-historial {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filtros {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .stats-historial {
+    justify-content: center;
+  }
+  
+  .registro-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .fecha-estado {
+    align-items: flex-start;
+  }
+  
+  .aviso-confidencial {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.8rem;
+  }
+  
+  .modal-detalle {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .detalle-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .titulo-modal {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .badge-confidencial-grande {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-contenido {
+    padding: 1rem;
+  }
+  
+  .modal-header {
+    padding: 1rem;
+  }
+  
+  .titulo-modal h2 {
+    font-size: 1.2rem;
+  }
+}

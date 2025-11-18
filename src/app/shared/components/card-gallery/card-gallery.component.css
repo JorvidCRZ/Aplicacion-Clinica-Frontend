@@ -1,0 +1,15 @@
+.container h2 {
+    font-weight: 800;
+    color: var(--azul);
+    font-size: 2.5rem;
+}
+
+.row {
+    margin-top: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+    .container h2 {
+        font-size: 2rem;
+    }
+}

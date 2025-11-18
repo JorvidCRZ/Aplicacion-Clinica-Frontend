@@ -1,0 +1,98 @@
+<div class="admin-info-card">
+  <div class="admin-header">
+    <div class="avatar"> <i class="fas fa-user-shield"></i> </div>
+    <div class="admin-meta">
+      <div class="admin-nombre">{{ nombre || 'Administrador' }}</div>
+      <div class="admin-correo">{{ correo }}</div>
+      <div class="admin-rol">{{ rol }}</div>
+    </div>
+    <div class="admin-actions">
+      @if (!editando) {
+        <button class="btn-editar" (click)="editar()">Editar</button>
+      } @else {
+        <div class="edit-actions">
+          <button class="btn-guardar" (click)="guardar()">Guardar</button>
+          <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="admin-stats">
+    <div class="stat-box">
+      <div class="stat-value">{{ totalCitas }}</div>
+      <div class="stat-label">Citas Totales</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{ totalMedicos }}</div>
+      <div class="stat-label">Médicos</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value">{{ totalPacientes }}</div>
+      <div class="stat-label">Pacientes</div>
+    </div>
+  </div>
+
+  <div class="admin-edit-form">
+    <div class="section-card">
+      <div class="section-header">
+        <h4><i class="fas fa-user"></i> Información Personal</h4>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Primer Nombre</label>
+          <input type="text" [(ngModel)]="editablePersona.nombre1" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Segundo Nombre</label>
+          <input type="text" [(ngModel)]="editablePersona.nombre2" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Apellido Paterno</label>
+          <input type="text" [(ngModel)]="editablePersona.apellidoPaterno" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Apellido Materno</label>
+          <input type="text" [(ngModel)]="editablePersona.apellidoMaterno" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>DNI</label>
+          <input type="text" [(ngModel)]="editablePersona.dni" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Fecha de Nacimiento</label>
+          <input type="date" [(ngModel)]="editablePersona.fechaNacimiento" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Género</label>
+          <select [(ngModel)]="editablePersona.genero" [disabled]="!editando">
+            @if (editablePersona && editablePersona.genero && ['Masculino','Femenino','Otro'].indexOf(editablePersona.genero) === -1) {
+              <option value="{{ editablePersona.genero }}">{{ editablePersona.genero }}</option>
+            }
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" style="margin-top:0.9rem">
+      <div class="section-header">
+        <h4><i class="fas fa-phone"></i> Información de Contacto</h4>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="editablePersona.telefono" [readonly]="!editando" />
+        </div>
+        <div class="form-row">
+          <label>Correo Electrónico</label>
+          <input type="email" [(ngModel)]="editablePersona.email" [readonly]="true" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+:root{
+    --gris: #eee;
+    --negro: #000;
+    --blanco: #fff;
+    --azul: #1A4E8D;
+    --plomo: #e5e5e5;
+    --verde:  #4CAF50;
+    --celeste: #8fddff;
+    --azul-medio: #2363B9;
+    --azul-claro: #2B78E4;
+    --azul-oscuro: #042c52;
+    --gris-oscuro: #767676;
+    --gris-claro: #f8f9fa;
+    --negro-sombra: rgba(0, 0, 0, 0.5);
+    --rojo: #d30b1f;
+    --amarillo: #ff9800;
+}

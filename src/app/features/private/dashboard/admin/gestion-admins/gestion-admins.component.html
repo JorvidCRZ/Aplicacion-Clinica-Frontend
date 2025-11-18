@@ -1,0 +1,112 @@
+<div class="page-container">
+	<div class="page-header">
+		<div class="header-left">
+			<h2>Gestión de Administradores</h2>
+			<p>Administra los usuarios internos del panel</p>
+		</div>
+		<div class="header-left">
+			<button class="btn btn-primary">
+				<i class="fas fa-file-alt"></i>
+				Reporte de Admin
+			</button>
+		</div>
+		<div class="header-right">
+			<button class="btn btn-primary" (click)="agregarAdmin()">
+				<i class="fas fa-plus"></i>
+				Nuevo Admin
+			</button>
+		</div>
+	</div>
+
+	<app-data-table [data]="admins" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+		[pageSize]="tablePageSize" [pageSizeOptions]="pageSizeOptions" emptyMessage="No hay administradores registrados"
+		(actionClicked)="onTableAction($event)" (sortChanged)="onSortChange($event)"
+		(pageChanged)="onPageChanged($event)">
+	</app-data-table>
+
+	@if (mostrarModalVer && adminActual) {
+	<div class="admin-modal">
+		<div class="modal-card">
+			<button type="button" class="close-btn" aria-label="Cerrar" (click)="cancelarFormulario()">&times;</button>
+			<h3>Detalles del Administrador</h3>
+			<div class="modal-grid">
+				<div class="field">
+					<span class="label">Nombre completo</span>
+					<span class="value">{{ adminActual.nombreCompleto }}</span>
+				</div>
+				<div class="field">
+					<span class="label">Correo</span>
+					<span class="value">{{ adminActual.correo || '—' }}</span>
+				</div>
+				<div class="field">
+					<span class="label">Teléfono</span>
+					<span class="value">{{ adminActual.telefono || '—' }}</span>
+				</div>
+				<div class="field">
+					<span class="label">Cargo</span>
+					<span class="value">{{ adminActual.cargo }}</span>
+				</div>
+				<div class="field">
+					<span class="label">Nivel de acceso</span>
+					<span class="value">{{ adminActual.nivelAcceso | titlecase }}</span>
+				</div>
+				<div class="field">
+					<span class="label">Estado</span>
+					<span class="value status" [class.active]="adminActual.estado === 'activo'">
+						{{ adminActual.estado | titlecase }}
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	}
+
+	@if (adminActual && !mostrarModalVer) {
+	<div class="admin-modal">
+		<div class="modal-card">
+			<button type="button" class="close-btn" aria-label="Cerrar" (click)="cancelarFormulario()">&times;</button>
+			<h3>{{ modoEdicion ? 'Editar Administrador' : 'Nuevo Administrador' }}</h3>
+			<form (ngSubmit)="guardarAdmin()" #formAdmin="ngForm">
+				<div class="form-grid">
+					<label>
+						<span>Nombre completo</span>
+						<input [(ngModel)]="adminActual.nombreCompleto" name="nombre" required>
+					</label>
+					<label>
+						<span>Correo</span>
+						<input [(ngModel)]="adminActual.correo" name="correo" type="email" required>
+					</label>
+					<label>
+						<span>Teléfono</span>
+						<input [(ngModel)]="adminActual.telefono" name="telefono" type="tel">
+					</label>
+					<label>
+						<span>Cargo</span>
+						<input [(ngModel)]="adminActual.cargo" name="cargo" required>
+					</label>
+					<label>
+						<span>Nivel de acceso</span>
+						<select [(ngModel)]="adminActual.nivelAcceso" name="nivelAcceso" required>
+							@for (nivel of nivelesAcceso; track nivel) {
+							<option [value]="nivel">{{ nivel | titlecase }}</option>
+							}
+						</select>
+					</label>
+					<label>
+						<span>Estado</span>
+						<select [(ngModel)]="adminActual.estado" name="estado" required>
+							@for (estado of estadosDisponibles; track estado) {
+							<option [value]="estado">{{ estado | titlecase }}</option>
+							}
+						</select>
+					</label>
+				</div>
+				<div class="form-actions">
+					<button type="submit" [disabled]="formAdmin.invalid">Guardar</button>
+					<button type="button" class="btn-secondary" (click)="cancelarFormulario()">Cancelar</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	}
+</div>

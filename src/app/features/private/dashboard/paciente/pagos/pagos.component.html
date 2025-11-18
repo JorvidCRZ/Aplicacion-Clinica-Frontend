@@ -1,0 +1,78 @@
+<div class="pagos-container">
+    <div class="pagos-header">
+        <div class="titulo-seccion">
+            <h1 class="titulo">Historial de Pagos</h1>
+            <p class="subtitulo">Solo se muestran los pagos realizados y las facturas pagadas recientemente.</p>
+        </div>
+        <div class="estadisticas-financieras">
+            <div class="stat-card pagado">
+                <div class="stat-icono"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <span class="stat-valor">S/ {{ totalPagado.toFixed(2) }}</span>
+                    <span class="stat-label">Total pagado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (facturasRecientes.length > 0) {
+    <section class="facturas-recientes">
+        <h2>🔔 Facturas recientes</h2>
+        <div class="lista-recientes">
+            @for ( f of facturasRecientes; track $index) {
+
+            <div class="reciente-card">
+                <div class="info">
+                    <h4>{{ f.numeroFactura }}</h4>
+                    <p class="concepto">{{ f.concepto }}</p>
+                    <small>Pagado: {{ f.fechaPago | date:'dd/MM/yyyy' }}</small>
+                </div>
+                <div class="monto">S/ {{ f.total.toFixed(2) }}</div>
+            </div>
+            }
+        </div>
+
+    </section>
+    }
+
+    <section class="historial-pagos">
+        <h2>📚 Historial completo</h2>
+
+        @if(facturasPagadas.length === 0) {
+        <div class="sin-historial">
+            <i class="fas fa-file-invoice"></i>
+            <p>No hay pagos realizados aún.</p>
+        </div>
+        }
+
+        @if (facturasPagadas.length > 0) {
+        <div class="historial-lista">
+            @for (factura of facturasPagadas; track $index) {
+            <div class="pago-historial">
+                <div class="pago-info">
+                    <div class="pago-header">
+                        <h4>{{ factura.numeroFactura }}</h4>
+                        <span class="fecha-pago"><i class="fas fa-calendar-day"></i> {{ factura.fechaPago |
+                            date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <p class="concepto">{{ factura.concepto }}</p>
+                    <div class="pago-detalles">
+                        <span class="metodo"><i class="fas fa-receipt"></i> {{ factura.metodoPago }}</span>
+                        <span class="estado" [style.background-color]="obtenerColorEstado(factura.estado)"
+                            style="color: var(--blanco); padding: 0.15rem 0.5rem; border-radius: 999px; display:inline-flex; align-items:center; gap:0.3rem;">
+                            <i [class]="obtenerIconoEstado(factura.estado)"></i> {{ factura.estado | titlecase }}
+                        </span>
+                        <span class="transaccion">{{ factura.numeroTransaccion }}</span>
+                    </div>
+                </div>
+                <div class="pago-monto">
+                    <span class="monto">S/ {{ factura.total.toFixed(2) }}</span>
+                    <button class="btn-descargar" (click)="descargarFactura(factura)"><i
+                            class="fas fa-download"></i></button>
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </section>
+</div>

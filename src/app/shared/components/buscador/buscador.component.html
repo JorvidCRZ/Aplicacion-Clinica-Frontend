@@ -1,0 +1,18 @@
+<div class="buscador-container d-flex position-relative">
+    <input type="text" class="form-control buscador-input" [(ngModel)]="texto" (input)="filtrar()"
+        (keyup.enter)="buscar()" [placeholder]="placeholder">
+
+    <button class="buscador-btn" type="button" (click)="buscar()">
+        <i class="fas fa-search"></i>
+    </button>
+
+    @if (sugerencias.length > 0) {
+    <ul class="list-group position-absolute w-100 sugerencias-list">
+        @for (sugerencia of sugerencias; track $index) {
+        <li class="list-group-item list-group-item-action sugerencia-item" (click)="seleccionar(sugerencia)">
+            {{ sugerencia }}
+        </li>
+        }
+    </ul>
+    }
+</div>

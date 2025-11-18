@@ -1,0 +1,77 @@
+.footer {
+    background: linear-gradient(90deg, var(--azul-oscuro) 0%, var(--azul) 100%);
+    color: var(--blanco);
+    padding: 1rem;
+
+    position: relative;
+    z-index: 1;
+
+    .contenedor-footer {
+        margin-bottom: .5rem;
+
+        span {
+            cursor: pointer;
+
+            &:hover {
+                color: var(--azul);
+                background-color: var(--blanco);
+                border-radius: 10px;
+                padding: 3px;
+            }
+        }
+    }
+}
+
+.footer .title-footer {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer a {
+    color: var(--blanco);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.footer .logo-footer {
+    height: 5rem;
+    object-fit: contain;
+    filter: invert(100%) brightness(1000%);
+
+    &:hover {
+        cursor: pointer;
+        filter: invert(0) brightness(0);
+    }
+}
+
+.footer .brand-footer {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.footer .tarjetas-footer {
+    max-height: 40px;
+}
+
+.footer ul li {
+    margin-bottom: 5px;
+}
+
+.footer i {
+    font-size: 2rem;
+    color: var(--blanco);
+    transition: color 0.3s;
+
+    &:hover {
+        color: var(--celeste);
+        font-size: 2.2rem;
+        transition: all 0.3s;
+    }
+}
+
+.footer .tarjetas {
+    object-fit: scale-down;
+}

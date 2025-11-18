@@ -1,0 +1,120 @@
+<div class="data-table-container">
+    @if (searchable) {
+    <div class="search-bar">
+        <div class="search-input-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar..." class="search-input">
+        </div>
+    </div>
+    }
+
+    <div class="table-wrapper">
+        @if (loading) {
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Cargando datos...</p>
+        </div>
+        } @else if (filteredData.length === 0) {
+        <div class="empty-container">
+            <i class="fas fa-inbox empty-icon"></i>
+            <p>{{ emptyMessage }}</p>
+        </div>
+        } @else {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    @for (column of columns; track column.key) {
+                    <th [class.sortable]="column.sortable" [style.width]="column.width" (click)="onSort(column)">
+                        <div class="th-content">
+                            <span>{{ column.label }}</span>
+                            @if (column.sortable) {
+                            <i class="fas fa-sort sort-icon"
+                                [class.fa-sort-up]="sortColumn === column.key && sortDirection === 'asc'"
+                                [class.fa-sort-down]="sortColumn === column.key && sortDirection === 'desc'">
+                            </i>
+                            }
+                        </div>
+                    </th>
+                    }
+                    @if (actions.length > 0) {
+                    <th class="actions-column">Acciones</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of paginatedData; track item.id || $index) {
+                <tr class="table-row">
+                    @for (column of columns; track column.key) {
+                    <td [attr.data-label]="column.label">
+                        @if (column.type === 'status') {
+                        <span class="status-badge" [class]="'status-' + item[column.key]?.toLowerCase()">
+                            {{ getColumnValue(item, column) }}
+                        </span>
+                        } @else {
+                        {{ getColumnValue(item, column) }}
+                        }
+                    </td>
+                    }
+                    @if (actions.length > 0) {
+                    <td class="actions-cell" data-label="Acciones">
+                        <div class="action-buttons">
+                            @for (action of actions; track action.action) {
+                            <button type="button" class="action-btn" [class]="action.class || 'btn-primary'"
+                                [title]="action.label" (click)="onAction(action.action, item)">
+                                <i [class]="action.icon"></i>
+                            </button>
+                            }
+                        </div>
+                    </td>
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
+        }
+    </div>
+
+    @if (!loading && paginated && totalPages > 1) {
+    <div class="pagination-container">
+        <div class="pagination-info">
+            <span>Mostrando {{ startItem }} - {{ endItem }} de {{ totalItems }} resultados</span>
+        </div>
+
+        <div class="pagination-controls">
+            <div class="page-size-selector">
+                <label for="pageSize">Mostrar:</label>
+                <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                    @for (size of pageSizeOptions; track size) {
+                    <option [value]="size">{{ size }}</option>
+                    }
+                </select>
+                <span>por página</span>
+            </div>
+
+            <div class="page-navigation">
+                <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                @for (page of pageNumbers; track page) {
+                <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">
+                    {{ page }}
+                </button>
+                }
+
+                <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (!loading && !paginated && filteredData.length > 0) {
+    <div class="table-footer">
+        <span class="results-info">
+            Mostrando {{ filteredData.length }} de {{ data.length }} resultados
+        </span>
+    </div>
+    }
+</div>

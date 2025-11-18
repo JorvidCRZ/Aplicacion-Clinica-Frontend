@@ -1,0 +1,380 @@
+/* 📊 PANEL DE CONTROL - ESTILOS PRINCIPALES */
+
+.dashboard-container {
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+/* 📋 HEADER DEL DASHBOARD */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(35, 99, 185, 0.1);
+    margin-bottom: 30px;
+    border-left: 5px solid #2363B9;
+}
+
+.header-content h1 {
+    color: #042c52;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+}
+
+.header-content p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.header-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e6f3ff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    color: #2363B9;
+    font-weight: 600;
+}
+
+.header-date i {
+    font-size: 1.2rem;
+}
+
+/* 📊 GRID DE ESTADÍSTICAS */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-left: 5px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card:nth-child(1) {
+    border-left-color: #28a745;
+}
+
+.stat-card:nth-child(2) {
+    border-left-color: #007bff;
+}
+
+.stat-card:nth-child(3) {
+    border-left-color: #ffc107;
+}
+
+.stat-card:nth-child(4) {
+    border-left-color: #dc3545;
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #042c52;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.stat-change {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.change-up {
+    color: #28a745;
+}
+
+.change-down {
+    color: #dc3545;
+}
+
+/* 📈 GRID DE GRÁFICOS */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border-left: 5px solid #2363B9;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #2363B9 0%, #042c52 100%);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.card-header i {
+    font-size: 1.5rem;
+    opacity: 0.8;
+}
+
+.chart-content {
+    padding: 25px;
+}
+
+/* 📊 ESTADÍSTICAS DEL GRÁFICO */
+.chart-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.chart-item:hover {
+    background: #e9ecef;
+}
+
+.chart-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.chart-color.confirmada {
+    background: #28a745;
+}
+
+.chart-color.pendiente {
+    background: #ffc107;
+}
+
+.chart-color.completada {
+    background: #007bff;
+}
+
+.chart-color.cancelada {
+    background: #dc3545;
+}
+
+.chart-percentage {
+    margin-left: auto;
+    font-weight: 600;
+    color: #2363B9;
+}
+
+/* 📅 LISTA DE CITAS */
+.citas-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.cita-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.3s ease;
+}
+
+.cita-item:last-child {
+    border-bottom: none;
+}
+
+.cita-item:hover {
+    background: #f8f9fa;
+}
+
+.cita-time {
+    font-weight: 700;
+    color: #2363B9;
+    font-size: 1.1rem;
+    min-width: 80px;
+}
+
+.cita-info {
+    flex: 1;
+}
+
+.cita-paciente {
+    font-weight: 600;
+    color: #042c52;
+    margin-bottom: 3px;
+}
+
+.cita-doctor {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.cita-estado {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.confirmada {
+    background: #d4edda;
+    color: #155724;
+}
+
+.pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.completada {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.cancelada {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.no-citas {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.no-citas i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+/* 📱 RESPONSIVO */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .dashboard-container {
+        padding: 15px 15px 80px;
+        /* espacio para la barra inferior */
+    }
+}
+
+@media (max-width: 480px) {
+    .header-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+/* 🔽 Navegación rápida (móvil) */
+.quick-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    background: #ffffff;
+    border-top: 1px solid #e9ecef;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
+    padding: env(safe-area-inset-bottom, 0) 10px 10px;
+    z-index: 1000;
+}
+
+.quick-nav .quick-item {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #6c757d;
+    text-decoration: none;
+    padding: 10px 8px;
+    font-weight: 600;
+}
+
+.quick-nav .quick-item i {
+    font-size: 1.2rem;
+}
+
+.quick-nav .quick-item.active,
+.quick-nav .quick-item:hover {
+    color: #2363B9;
+}
+
+@media (max-width: 768px) {
+    .quick-nav {
+        display: flex;
+        gap: 10px;
+    }
+}

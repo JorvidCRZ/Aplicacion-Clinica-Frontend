@@ -1,0 +1,133 @@
+<div class="horarios-wrapper">
+    <!-- Layout Principal -->
+    <main class="main-layout">
+
+        <!-- Sidebar: Agregar Horario -->
+        <aside class="sidebar">
+            <div class="add-form">
+                <h3>Nuevo Horario</h3>
+                <form (ngSubmit)="agregarHorario()" #horarioForm="ngForm">
+
+                    <div class="field">
+                        <label>Día</label>
+                        <select [(ngModel)]="diaSeleccionado" name="dia" required>
+                            @for (dia of diasSemana; track dia.id) {
+                                <option [value]="dia.id">{{ dia.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label>Inicio</label>
+                            <input type="time" [(ngModel)]="nuevoHorario.horaInicio" name="horaInicio" required>
+                        </div>
+                        <div class="field">
+                            <label>Fin</label>
+                            <input type="time" [(ngModel)]="nuevoHorario.horaFin" name="horaFin" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Tipo</label>
+                        <select [(ngModel)]="nuevoHorario.tipo" name="tipo" required>
+                            @for (tipo of tiposHorario; track tipo.value) {
+                                <option [value]="tipo.value">{{ tipo.label }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn primary" [disabled]="!nuevoHorario.horaInicio || !nuevoHorario.horaFin">
+                            Agregar
+                        </button>
+                        <button type="button" class="btn secondary" (click)="resetearFormulario()">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+                 <div class="save-section">
+                    <button class="btn success" (click)="guardarHorarios()" [disabled]="guardandoHorarios">
+                        @if (!guardandoHorarios) {
+                            <span>💾 Guardar Todo</span>
+                        }
+                        @if (guardandoHorarios) {
+                            <span>⏳ Guardando...</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenido: Calendario Semanal -->
+        <section class="calendar">
+
+            <!-- Stats Rápidas -->
+            <div class="quick-stats">
+                <div class="stat">
+                    <span class="number">{{ obtenerDiasActivos() }}</span>
+                    <span class="label">Días Activos</span>
+                </div>
+                <div class="stat">
+                    <span class="number">{{ formatearHoras(obtenerHorasSemanalesTotales()) }}</span>
+                    <span class="label">Horas/Semana</span>
+                </div>
+                <div class="stat">
+                    <span class="number">{{ formatearHoras(obtenerHorasMensuales()) }}</span>
+                    <span class="label">Horas/Mes</span>
+                </div>
+            </div>
+
+            <!-- Grilla de Días -->
+            <div class="days-grid">
+                @for (dia of diasSemana; track dia.id) {
+                    <div class="day-card" [class.active]="dia.activo">
+
+                    <!-- Header del Día -->
+                    <div class="day-header">
+                        <h4>{{ dia.nombre }}</h4>
+                        <label class="toggle">
+                            <input type="checkbox" [checked]="dia.activo" (change)="toggleDia(dia.id)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Horarios del Día -->
+                    <div class="day-content">
+
+                        <!-- Estado Vacío -->
+                        @if (dia.horarios.length === 0) {
+                            <div class="empty">
+                                @if (dia.activo) {
+                                    <span>Sin horarios</span>
+                                }
+                                @if (!dia.activo) {
+                                    <span>Descanso</span>
+                                }
+                            </div>
+                        }
+
+                        <!-- Lista de Horarios -->
+                        @for (horario of dia.horarios; track horario.id) {
+                            <div class="schedule-item" [attr.data-type]="horario.tipo">
+                                <div class="schedule-info">
+                                    <span class="time">{{ horario.horaInicio }} - {{ horario.horaFin }}</span>
+                                    <span class="type">{{ obtenerLabelTipo(horario.tipo) }}</span>
+                                </div>
+                                <button class="delete-btn" (click)="eliminarHorario(dia.id, horario.id)">×</button>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Footer del Día -->
+                    @if (dia.activo && dia.horarios.length > 0) {
+                        <div class="day-footer">
+                            <span class="total-hours">{{ calcularTotalHoras(dia) }}</span>
+                        </div>
+                    }
+                </div>
+            }
+            </div>
+        </section>
+    </main>
+</div>

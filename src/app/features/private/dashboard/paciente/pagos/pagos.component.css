@@ -1,0 +1,992 @@
+/* Contenedor Principal */
+.pagos-container {
+  padding: 1.5rem;
+  background: var(--gris-claro);
+  min-height: 100vh;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header del Sistema de Pagos */
+.pagos-header {
+  background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+  color: var(--blanco);
+  padding: 2rem;
+  border-radius: 15px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.3);
+}
+
+.titulo-seccion {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.titulo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitulo {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Estadísticas Financieras */
+.estadisticas-financieras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.pendiente {
+  border-left: 4px solid var(--amarillo);
+}
+
+.stat-card.pagado {
+  border-left: 4px solid var(--verde);
+}
+
+.stat-card.vencido {
+  border-left: 4px solid var(--rojo);
+}
+
+.stat-icono {
+  font-size: 2.5rem;
+  color: var(--blanco);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-valor {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--blanco);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navegación de Pestañas */
+.pestanas-navegacion {
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  background: var(--blanco);
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pestana {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--gris);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.pestana:hover {
+  background: #f8f9fa;
+  color: var(--azul);
+}
+
+.pestana.activa {
+  background: var(--azul);
+  color: var(--blanco);
+  box-shadow: 0 2px 8px rgba(26, 78, 141, 0.3);
+}
+
+.pestana i {
+  font-size: 1.1rem;
+}
+
+/* Controles de Facturas */
+.controles-facturas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--blanco);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filtros {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filtro-grupo label {
+  font-weight: 600;
+  color: var(--gris-oscuro);
+  font-size: 0.9rem;
+}
+
+.filtro-select {
+  padding: 0.7rem 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background: var(--blanco);
+  font-size: 0.9rem;
+  color: var(--gris-oscuro);
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(26, 78, 141, 0.1);
+}
+
+.info-facturas {
+  color: var(--gris);
+  font-weight: 500;
+}
+
+/* Lista de Facturas */
+.facturas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.factura-card {
+  background: var(--blanco);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid var(--azul);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.factura-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.factura-card.pendiente {
+  border-left-color: var(--amarillo);
+}
+
+.factura-card.pagado {
+  border-left-color: var(--verde);
+}
+
+.factura-card.vencido {
+  border-left-color: var(--rojo);
+}
+
+.factura-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.factura-numero h3 {
+  margin: 0 0 0.3rem 0;
+  color: var(--gris-oscuro);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.fecha-emision {
+  color: var(--gris-oscuro);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.estado-badge .estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  color: var(--blanco);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.factura-contenido {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.servicio-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--azul);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.servicio-info p {
+  margin: 0 0 1rem 0;
+  color: var(--gris-oscuro);
+  line-height: 1.5;
+}
+
+.doctor-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+.doctor-info i {
+  color: var(--verde);
+}
+
+.montos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.montos>div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem 0;
+}
+
+.montos .label {
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+.montos .valor {
+  color: var(--gris-oscuro);
+  font-weight: 600;
+}
+
+.montos .total {
+  border-top: 2px solid #f0f0f0;
+  padding-top: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.montos .total .label {
+  color: var(--azul);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.montos .total .valor {
+  color: var(--azul);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.factura-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.fecha-vencimiento,
+.fecha-pago {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--gris);
+}
+
+.fecha-vencimiento.vencido {
+  color: var(--rojo);
+  font-weight: 600;
+}
+
+.fecha-pago {
+  color: var(--verde);
+  font-weight: 600;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-pagar {
+  background: var(--verde);
+  color: var(--blanco);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-pagar:hover {
+  background: #22c55e;
+  transform: translateY(-2px);
+}
+
+.btn-descargar {
+  background: var(--azul);
+  color: var(--blanco);
+  border: none;
+  padding: 0.6rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(26, 78, 141, 0.25);
+}
+
+.btn-descargar:hover {
+  background: var(--azul-oscuro);
+  transform: translateY(-2px);
+}
+
+/* Sin Facturas */
+.sin-facturas {
+  text-align: center;
+  padding: 3rem;
+  background: var(--blanco);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sin-facturas i {
+  font-size: 3rem;
+  color: var(--gris);
+  margin-bottom: 1rem;
+}
+
+.sin-facturas h3 {
+  color: var(--gris-oscuro);
+  margin-bottom: 0.5rem;
+}
+
+.sin-facturas p {
+  color: var(--gris);
+}
+
+/* Vista de Pago */
+.vista-pago {
+  background: var(--blanco);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.pago-container {
+  padding: 2rem;
+}
+
+.resumen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.resumen-header h2 {
+  margin: 0;
+  color: var(--azul);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.btn-volver {
+  background: var(--azul);
+  color: var(--blanco);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.btn-volver:hover {
+  background: var(--azul-oscuro);
+  transform: translateY(-2px);
+}
+
+.factura-detalle {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid var(--azul);
+  margin-bottom: 2rem;
+}
+
+.factura-detalle h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--azul);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+
+
+.descripcion {
+  margin: 0 0 1.5rem 0;
+  color: var(--gris);
+  line-height: 1.5;
+}
+
+.montos-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.monto-linea {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  color: var(--gris-oscuro);
+}
+
+.monto-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+  border-top: 2px solid var(--azul);
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+/* Sección de Pago */
+.seccion-pago {
+  margin-bottom: 2rem;
+}
+
+.seccion-pago h3 {
+  margin: 0 0 1rem 0;
+  color: var(--azul);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Planes de Pago */
+.planes-pago {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.plan-card {
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--blanco);
+}
+
+.plan-card:hover {
+  border-color: var(--azul);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.1);
+}
+
+.plan-card.seleccionado {
+  border-color: var(--azul);
+  background: #f0f7ff;
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.2);
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.plan-header h4 {
+  margin: 0;
+  color: var(--gris-oscuro);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.interes {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sin-interes {
+  background: var(--verde);
+  color: var(--blanco);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.plan-descripcion {
+  margin: 0 0 1rem 0;
+  color: var(--gris);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.plan-detalle {
+  background: rgba(26, 78, 141, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.cuota-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.cuota-info .label {
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+.cuota-info .valor {
+  color: var(--azul);
+  font-weight: 600;
+}
+
+/* Métodos de Pago */
+.metodos-pago {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metodo-card {
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--blanco);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metodo-card:hover {
+  border-color: var(--azul);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.1);
+}
+
+.metodo-card.seleccionado {
+  border-color: var(--azul);
+  background: #f0f7ff;
+  box-shadow: 0 4px 15px rgba(26, 78, 141, 0.2);
+}
+
+.metodo-card.no-disponible {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.metodo-icono {
+  font-size: 2.5rem;
+  color: var(--azul);
+  margin-bottom: 1rem;
+}
+
+.metodo-info h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--gris-oscuro);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.comision {
+  color: var(--rojo);
+  font-size: 0.8rem;
+}
+
+.sin-comision {
+  color: var(--verde);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.seleccionado-check {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--verde);
+  font-size: 1.2rem;
+}
+
+/* Procesar Pago */
+.procesar-pago {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.btn-procesar {
+  background: linear-gradient(135deg, var(--verde), #22c55e);
+  color: var(--blanco);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn-procesar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+.btn-procesar:disabled {
+  background: var(--gris);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.procesando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--azul);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--azul);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Vista de Historial */
+.vista-historial {
+  background: var(--blanco);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.vista-historial h2 {
+  margin: 0 0 2rem 0;
+  color: var(--azul);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.historial-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pago-historial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-left: 4px solid var(--verde);
+}
+
+.pago-info {
+  flex: 1;
+}
+
+.pago-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.pago-header h4 {
+  margin: 0;
+  color: var(--gris-oscuro);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.pago-header .fecha-pago {
+  color: var(--gris-oscuro);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+
+.pago-detalles {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.metodo {
+  color: var(--azul);
+  font-weight: 500;
+}
+
+.transaccion {
+  color: var(--gris);
+  font-family: 'Courier New', monospace;
+}
+
+.pago-monto {
+  text-align: right;
+}
+
+.monto {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--verde);
+  margin-bottom: 0.3rem;
+}
+
+.estado-pago {
+  color: var(--verde);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Nuevas clases para la vista simplificada (facturas recientes + historial) */
+.facturas-recientes {
+  margin-bottom: 1.5rem;
+}
+
+.facturas-recientes h2 {
+  margin: 0 0 1rem 0;
+  color: var(--azul);
+  font-size: 1.2rem;
+}
+
+.lista-recientes {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reciente-card {
+  background: var(--blanco);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 240px;
+  flex: 1 1 240px;
+}
+
+.reciente-card .info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  color: var(--gris-oscuro);
+}
+
+.reciente-card .info .concepto {
+  margin: 0;
+  color: var(--gris-oscuro);
+  font-size: 0.9rem;
+}
+
+.reciente-card .info small {
+  color: var(--gris-oscuro);
+  font-weight: 600;
+}
+
+.historial-pagos {
+  margin-top: 2rem;
+}
+
+.sin-historial {
+  text-align: center;
+  padding: 2rem;
+  background: var(--blanco);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.sin-historial i {
+  font-size: 2.2rem;
+  color: var(--gris);
+  margin-bottom: 0.5rem;
+}
+
+.historial-lista .pago-historial {
+  border-left-color: var(--verde);
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pagos-container {
+    padding: 1rem;
+  }
+
+  .titulo {
+    font-size: 1.8rem;
+  }
+
+  .estadisticas-financieras {
+    grid-template-columns: 1fr;
+  }
+
+  .pestanas-navegacion {
+    flex-direction: column;
+  }
+
+  .controles-facturas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .factura-contenido {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .factura-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .planes-pago {
+    grid-template-columns: 1fr;
+  }
+
+  .metodos-pago {
+    grid-template-columns: 1fr;
+  }
+
+  .pago-historial {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .pago-monto {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .pago-container {
+    padding: 1rem;
+  }
+
+  .resumen-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .btn-procesar {
+    width: 100%;
+    justify-content: center;
+  }
+}

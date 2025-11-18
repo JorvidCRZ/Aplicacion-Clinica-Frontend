@@ -1,0 +1,17 @@
+<div class="container my-5 mt-7 pt-6 contenido-seccion">
+    <h2 class="text-center mb-4">{{ title }}</h2>
+    <div class="text-center mb-1">
+        <div class="descripcion-servicios">
+            <p class="lead">
+                Ofrecemos atención médica integral para tu mascota con los más altos estándares de calidad y
+                profesionalismo.
+            </p>
+        </div>
+        <div class="mt-4 mb-1">
+            <button class="btn btn-lg btn-warning" (click)="agendarCita()">
+                <i class="bi bi-calendar-plus"></i> Agendar Cita
+            </button>
+        </div>
+    </div>
+    <app-card-gallery [items]="servicios" [title]="''"></app-card-gallery>
+</div>

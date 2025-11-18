@@ -1,0 +1,725 @@
+/* 📅 ESTILOS PARA MIS CITAS - PACIENTE */
+
+.mis-citas-container {
+    padding: 2rem;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+}
+
+/* 🎯 Header con información */
+.citas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-title h2 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-title h2 i {
+    color: var(--azul);
+    font-size: 1.5rem;
+}
+
+.subtitle {
+    margin: 0;
+    color: #6c757d;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.stats-quick {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 120px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.stat-card.programadas .stat-icon {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.stat-card.completadas .stat-icon {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.stat-card.total .stat-icon {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.stat-info .number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stat-info .label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 🔍 Filtros de navegación */
+.filtros-navegacion {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabs-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 2px solid #e9ecef;
+    color: #6c757d;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    border-color: var(--azul);
+    color: var(--azul);
+    background: rgba(26, 78, 141, 0.1);
+}
+
+.tab-btn.active {
+    background: var(--azul);
+    color: white;
+    border-color: var(--azul);
+}
+
+/* 🔍 Filtros de búsqueda */
+.filtros-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.filtros-grupo {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.filtro-fecha,
+.filtro-estado,
+.filtro-busqueda {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.filtro-fecha label,
+.filtro-estado label,
+.filtro-busqueda label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(26, 78, 141, 0.1);
+}
+
+.filtros-acciones {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: 2px solid transparent;
+}
+
+.btn-outline-secondary {
+    background: white;
+    color: #6c757d;
+    border-color: #e9ecef;
+}
+
+.btn-outline-secondary:hover {
+    background: #f8f9fa;
+    border-color: #6c757d;
+    color: #495057;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    color: white;
+    border-color: var(--azul);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 78, 141, 0.3);
+    color: white;
+}
+
+/* 📋 Grid de citas */
+.citas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* 📄 Tarjeta de cita */
+.cita-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 4px solid #e9ecef;
+}
+
+.cita-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.cita-card.estado-programada {
+    border-left-color: #ff9800;
+}
+
+.cita-card.estado-completada {
+    border-left-color: #4CAF50;
+}
+
+.cita-card.estado-cancelada {
+    border-left-color: #f44336;
+}
+
+.cita-card.estado-no-show {
+    border-left-color: #ff5722;
+}
+
+/* Header de la cita */
+.cita-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.fecha-hora {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fecha,
+.hora {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.fecha {
+    font-size: 1rem;
+}
+
+.hora {
+    font-size: 1.1rem;
+    color: var(--azul);
+}
+
+.estado-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.estado-badge.estado-programada {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+}
+
+.estado-badge.estado-completada {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+}
+
+.estado-badge.estado-cancelada {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.estado-badge.estado-no-show {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    color: #8b6914;
+}
+
+/* Información del doctor */
+.doctor-info {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.doctor-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.doctor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.doctor-datos h4 {
+    margin: 0 0 0.25rem 0;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.especialidad {
+    margin: 0 0 0.5rem 0;
+    color: var(--azul);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.consultorio {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Detalles de la cita */
+.cita-detalles {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.detalle-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.detalle-item:last-child {
+    margin-bottom: 0;
+}
+
+.detalle-item .label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.detalle-item .valor {
+    color: #2c3e50;
+    text-align: right;
+}
+
+.detalle-item.precio {
+    border-top: 1px solid #f1f3f4;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.precio-valor {
+    font-weight: 700;
+    color: var(--azul);
+    font-size: 1.1rem;
+}
+
+/* Instrucciones */
+.instrucciones {
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.instrucciones h5 {
+    margin: 0 0 0.5rem 0;
+    color: #495057;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.instrucciones p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Acciones de la cita */
+.cita-acciones {
+    padding: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    border: none;
+}
+
+.btn-info:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(23, 162, 184, 0.4);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: #212529;
+    border: none;
+}
+
+.btn-warning:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(255, 193, 7, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(220, 53, 69, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* 🌐 Estado vacío */
+.estado-vacio {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.estado-vacio i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #dee2e6;
+}
+
+.estado-vacio h4 {
+    margin-bottom: 0.75rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+.estado-vacio p {
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* 📃 Paginación */
+.paginacion-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.paginacion-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.paginacion-controles {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-paginacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 2px solid #e9ecef;
+    color: var(--azul);
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+    background: var(--azul);
+    color: white;
+    border-color: var(--azul);
+    transform: translateY(-1px);
+}
+
+.btn-paginacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f8f9fa;
+    color: #999;
+}
+
+.numeros-pagina {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 1rem;
+}
+
+.btn-numero {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #e9ecef;
+    background: white;
+    color: var(--azul);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.btn-numero:hover {
+    background: #f8f9fa;
+    border-color: var(--azul);
+    transform: translateY(-1px);
+}
+
+.btn-numero.activa {
+    background: var(--azul);
+    color: white;
+    border-color: var(--azul);
+    box-shadow: 0 2px 8px rgba(26, 78, 141, 0.3);
+}
+
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+    .citas-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .mis-citas-container {
+        padding: 1rem;
+    }
+    
+    .citas-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .stats-quick {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .stat-card {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filtros-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filtros-grupo {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filtro-fecha,
+    .filtro-estado,
+    .filtro-busqueda {
+        min-width: auto;
+    }
+    
+    .tabs-container {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .tab-btn {
+        justify-content: center;
+    }
+    
+    .citas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cita-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .doctor-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .cita-acciones {
+        justify-content: center;
+    }
+    
+    .paginacion-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .paginacion-controles {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+    
+    .btn-paginacion {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .numeros-pagina {
+        margin: 0;
+        justify-content: center;
+    }
+}

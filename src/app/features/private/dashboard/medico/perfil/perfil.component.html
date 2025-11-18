@@ -1,0 +1,343 @@
+<div class="perfil-usuario-container">
+    <div class="perfil-header-moderno">
+        <div class="usuario-card-principal">
+            <div class="usuario-avatar-moderno">
+                <div class="avatar-container">
+                    <div class="avatar-iniciales">{{ iniciales }}</div>
+                </div>
+                @if (editando) {
+                <button (click)="cambiarFoto()" class="btn-cambiar-foto-moderno">
+                    <i class="fas fa-camera"></i>
+                </button>
+                }
+                <div class="rol-badge" [class]="'rol-' + rolUsuario">
+                    <i
+                        [class]="rolUsuario === 'doctor' ? 'fas fa-user-md' : rolUsuario === 'admin' ? 'fas fa-user-shield' : 'fas fa-user'"></i>
+                    <span>{{ rolFormateado }}</span>
+                </div>
+            </div>
+
+            <div class="usuario-info-moderno">
+                <div class="nombre-rol">
+                    <h1>{{ nombreCompletoConTitulo }}</h1>
+                    <div class="info-badges">
+                        <div class="especialidad-badge">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>{{ doctor.especialidad }}</span>
+                        </div>
+                        @if (doctor.numeroRegistro) {
+                        <div class="registro-badge">
+                            <i class="fas fa-id-card"></i>
+                            <span>{{ doctor.numeroRegistro }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="detalles-usuario">
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ doctor.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ doctor.telefono || 'No especificado' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="acciones-modernas">
+        @if (!editando) {
+        <button (click)="activarEdicion()" class="btn-moderno primary">
+            <i class="fas fa-edit"></i>
+            <span>Editar Perfil</span>
+        </button>
+        } @else {
+        <button (click)="guardarCambios()" class="btn-moderno success" [disabled]="!formularioValido || guardando">
+            @if (guardando) {
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Guardando...</span>
+            } @else {
+            <i class="fas fa-save"></i>
+            <span>Guardar Cambios</span>
+            }
+        </button>
+        <button (click)="cancelarEdicion()" class="btn-moderno secondary" [disabled]="guardando">
+            <i class="fas fa-times"></i>
+            <span>Cancelar</span>
+        </button>
+        }
+    </div>
+
+    <div class="secciones-nav-moderna">
+        <div class="nav-tabs-container">
+            <button (click)="cambiarSeccion('informacion')" [class.active]="seccionActiva === 'informacion'"
+                class="tab-moderno">
+                <i class="fas fa-user"></i>
+                <span>Información Personal</span>
+            </button>
+       
+            <button (click)="cambiarSeccion('profesional')" [class.active]="seccionActiva === 'profesional'"
+                class="tab-moderno">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Datos Profesionales</span>
+            </button>
+            <button (click)="cambiarSeccion('horarios')" [class.active]="seccionActiva === 'horarios'"
+                class="tab-moderno">
+                <i class="fas fa-clock"></i>
+                <span>Horarios</span>
+            </button>
+            
+        </div>
+    </div>
+
+    <div class="secciones-contenido-moderno">
+        @if (seccionActiva === 'informacion') {
+        <div class="seccion-card-moderna">
+            <div class="seccion-header-moderna">
+                <div class="titulo-seccion">
+                    <i class="fas fa-user icono-seccion"></i>
+                    <h3>Información Personal</h3>
+                </div>
+                <div class="seccion-badge personal">
+                    <i class="fas fa-id-card"></i>
+                    <span>Datos Personales</span>
+                </div>
+            </div>
+
+            <div class="form-grid-moderno">
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-user"></i>
+                        <span>Nombres</span>
+                    </label>
+                    @if (editando) {
+                    <input type="text" [(ngModel)]="doctor.nombre" class="input-moderno"
+                        placeholder="Ingrese sus nombres">
+                    } @else {
+                    <div class="value-display">{{ doctor.nombre || 'No especificado' }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-user"></i>
+                        <span>Apellidos</span>
+                    </label>
+                    @if (editando) {
+                    <input type="text" [(ngModel)]="doctor.apellidos" class="input-moderno"
+                        placeholder="Ingrese sus apellidos">
+                    } @else {
+                    <div class="value-display">{{ doctor.apellidos || 'No especificado' }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-id-card"></i>
+                        <span>{{ tipoDocumento }}</span>
+                    </label>
+                    @if (editando) {
+                    <input type="text" [(ngModel)]="doctor.cedula" class="input-moderno"
+                        placeholder="Número de documento">
+                    } @else {
+                    <div class="value-display">{{ doctor.cedula || 'No especificado' }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-calendar"></i>
+                        <span>Fecha de Nacimiento</span>
+                    </label>
+                    @if (editando) {
+                    <input type="date" [(ngModel)]="doctor.fechaNacimiento" class="input-moderno">
+                    } @else {
+                    <div class="value-display">
+                        {{ doctor.fechaNacimiento ? (doctor.fechaNacimiento | date:'dd/MM/yyyy') : 'No especificada' }}
+                        @if (edadCalculada > 0) {
+                        <span class="edad-info">({{ edadCalculada }} años)</span>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-venus-mars"></i>
+                        <span>Género</span>
+                    </label>
+                    @if (editando) {
+                    <select [(ngModel)]="doctor.genero" class="select-moderno">
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    } @else {
+                    <div class="value-display">{{ doctor.genero | titlecase }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-phone"></i>
+                        <span>Teléfono</span>
+                    </label>
+                    @if (editando) {
+                    <input type="tel" [(ngModel)]="doctor.telefono" class="input-moderno"
+                        placeholder="Número de teléfono">
+                    } @else {
+                    <div class="value-display">{{ doctor.telefono || 'No especificado' }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno full-width">
+                    <label class="label-moderno">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </label>
+                    @if (editando) {
+                    <input type="email" [(ngModel)]="doctor.email" class="input-moderno"
+                        placeholder="Correo electrónico">
+                    } @else {
+                    <div class="value-display">{{ doctor.email }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno full-width">
+                    <label class="label-moderno">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Dirección</span>
+                    </label>
+                    @if (editando) {
+                    <textarea [(ngModel)]="doctor.direccion" class="textarea-moderno" placeholder="Dirección completa"
+                        rows="2"></textarea>
+                    } @else {
+                    <div class="value-display">{{ direccionCompleta }}</div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+
+ 
+        <div class="seccion-card-moderna">
+            <div class="seccion-header-moderna">
+                <div class="titulo-seccion">
+                    <i class="fas fa-graduation-cap icono-seccion"></i>
+                    <h3>Información Profesional</h3>
+                </div>
+                <div class="seccion-badge profesional">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Datos Médicos</span>
+                </div>
+            </div>
+
+            <div class="form-grid-moderno">
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-user-md"></i>
+                        <span>Especialidad</span>
+                    </label>
+                    @if (editando) {
+                    <input type="text" [(ngModel)]="doctor.especialidad" class="input-moderno"
+                        placeholder="Especialidad médica">
+                    } @else {
+                    <div class="value-display destacado" >{{ doctor.especialidad }}</div>
+                    }
+                </div>
+
+                <div class="form-group-moderno">
+                    <label class="label-moderno">
+                        <i class="fas fa-certificate"></i>
+                        <span>Número de Registro</span>
+                    </label>
+                    @if (editando) {
+                    <input type="text" [(ngModel)]="doctor.numeroRegistro" class="input-moderno"
+                        placeholder="Registro profesional">
+                    } @else {
+                    <div class="value-display">{{ doctor.numeroRegistro }}</div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+
+        @if (seccionActiva === 'horarios') {
+        <div class="seccion-card-moderna">
+            <div class="seccion-header-moderna">
+                <div class="titulo-seccion">
+                    <i class="fas fa-clock icono-seccion"></i>
+                    <h3>Horarios de Atención</h3>
+                </div>
+                <div class="seccion-badge horarios">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Disponibilidad Semanal</span>
+                </div>
+            </div>
+
+            <div class="horarios-grid-moderno">
+                @for (horario of doctor.horarioAtencion; track horario.dia) {
+                <div class="horario-card-moderno" [class.disponible]="horario.disponible">
+                    <div class="dia-nombre">{{ horario.dia }}</div>
+                    <div class="horario-info">
+                        @if (editando && horario.disponible) {
+                        <div class="inputs-horario">
+                            <input type="time" [(ngModel)]="horario.horaInicio" class="input-time-moderno">
+                            <span class="separador">-</span>
+                            <input type="time" [(ngModel)]="horario.horaFin" class="input-time-moderno">
+                        </div>
+                        } @else {
+                        <div class="horario-display">{{ obtenerTextoHorario(horario) }}</div>
+                        }
+                    </div>
+                    @if (editando) {
+                    <div class="toggle-disponibilidad">
+                        <label class="switch-moderno">
+                            <input type="checkbox" [(ngModel)]="horario.disponible">
+                            <span class="slider-moderno"></span>
+                        </label>
+                    </div>
+                    } @else {
+                    <div class="estado-disponibilidad">
+                        <span class="badge-disponibilidad" [class]="horario.disponible ? 'activo' : 'inactivo'">
+                            <i [class]="horario.disponible ? 'fas fa-check' : 'fas fa-times'"></i>
+                            {{ horario.disponible ? 'Disponible' : 'No disponible' }}
+                        </span>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+</div>
+    <!-- Confirmación de cancelar edición -->
+    <div class="modal-overlay" *ngIf="showConfirmCancel">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-card-header">
+                <h4>Confirmar</h4>
+            </div>
+            <div class="modal-card-body">
+                <p>¿Estás seguro de que deseas descartar los cambios?</p>
+            </div>
+            <div class="modal-card-actions">
+                <button class="btn-moderno secondary" (click)="cancelarConfirmacion()">No, continuar editando</button>
+                <button class="btn-moderno primary" (click)="confirmarCancelarEdicion()">Sí, descartar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de resultado (éxito / error) -->
+    <div class="toast-overlay" *ngIf="showResultModal" (click)="cerrarResultModal()">
+        <div class="toast-card" [class.success]="resultModalType === 'success'" [class.error]="resultModalType === 'error'" [class.fade-out]="resultFading" (click)="$event.stopPropagation()">
+            <div class="toast-ico">{{ resultModalType === 'success' ? '✔' : '⚠' }}</div>
+            <div class="toast-content">
+                <div class="toast-message">{{ resultModalMessage }}</div>
+            </div>
+            <button class="toast-close" (click)="cerrarResultModal()">×</button>
+        </div>
+    </div>

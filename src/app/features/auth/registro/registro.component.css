@@ -1,0 +1,279 @@
+:host {
+	--primary: var(--azul);
+	--accent: var(--verde);
+	--bg: var(--gris-claro);
+
+	.mdc-text-field--outlined {
+		outline: var(--blanco) !important;
+	}
+
+	/* Opcional: también cuando está en focus */
+	.mdc-text-field--outlined.mdc-text-field--focused {
+		border-color: var(--blanco) !important;
+	}
+}
+
+.container {
+	background-color: var(--bg);
+	width: 80vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.registro-card {
+	background-color: var(--azul-claro);
+	border-radius: 16px;
+	box-shadow: 0 8px 24px var(--azul);
+}
+
+mat-horizontal-stepper {
+	background: linear-gradient(180deg, var(--azul-claro) 0%, var(--azul-medio) 100%);
+}
+
+h2 {
+	color: var(--azul-oscuro);
+	font-weight: bold;
+	font-size: 2rem;
+	margin-bottom: 2rem;
+}
+
+mat-form-field {
+	margin-bottom: 1.5rem;
+	font-size: 1.1rem;
+}
+
+mat-label {
+	font-size: 1.1rem;
+	color: var(---blanco);
+}
+
+::ng-deep .mat-datepicker-toggle-default-icon {
+	color: var(---blanco) !important;
+	fill: var(--blanco) !important;
+}
+
+::ng-deep .mat-datepicker-toggle .mat-mdc-icon-button {
+	color: var(--blanco) !important;
+}
+
+::ng-deep .mat-datepicker-toggle svg {
+	fill: var(--blanco) !important;
+}
+
+input {
+	font-size: 1.1rem;
+	height: 2.8rem;
+}
+
+mat-horizontal-stepper {
+	font-size: 1.1rem;
+}
+
+button[mat-raised-button] {
+	font-size: 1.1rem;
+	padding: 0 2rem;
+	border-radius: 10px;
+}
+
+button[mat-raised-button][color='primary'] {
+	background-color: var(--primary);
+	color: var(--blanco);
+}
+
+button[mat-raised-button][color='accent'] {
+	background-color: var(--accent);
+	color: var(--blanco);
+}
+
+button[mat-button] {
+	color: var(--azul-medio);
+	font-weight: 600;
+	font-size: 1rem;
+}
+
+.formheight {
+	min-height: 320px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 1rem;
+}
+
+@media screen and (max-width: 767px) {
+	.d-flex.justify-content-between {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.d-flex.justify-content-end {
+		justify-content: center;
+	}
+
+	.registro-card {
+		width: 100vw;
+	}
+}
+
+.input-group {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.input-group input {
+	flex: 1;
+	padding-right: 2.5rem;
+}
+
+.icon-btn {
+	position: absolute;
+	right: 0.5rem;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+@keyframes countdown {
+	from {
+		width: 0%;
+	}
+
+	to {
+		width: 100%;
+	}
+}
+
+.alert-success {
+	border-left: 4px solid #28a745;
+	background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
+.progress {
+	background-color: rgba(40, 167, 69, 0.2);
+}
+
+.progress-bar {
+	background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+/* ✅ MENSAJE FLOTANTE DE ÉXITO - ESTILO CLÍNICA */
+
+.mensaje-flotante-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(13, 71, 161, 0.15);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+	backdrop-filter: blur(3px);
+	animation: fadeInSuave 0.4s ease-out;
+}
+
+.mensaje-flotante {
+	background: linear-gradient(145deg, var(--blanco) 0%, #f8fafe 100%);
+	border: 1px solid rgba(13, 71, 161, 0.1);
+	border-radius: 12px;
+	padding: 2.5rem;
+	box-shadow: 0 8px 32px rgba(13, 71, 161, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+	max-width: 420px;
+	min-width: 350px;
+	text-align: center;
+	transform: translateY(20px);
+	opacity: 0;
+	animation: aparecerElegante 0.5s ease-out 0.1s forwards;
+}
+
+.mensaje-contenido {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.icono-exito {
+	font-size: 3.5rem;
+	color: #0d47a1;
+	background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 1.5rem;
+	box-shadow: 0 4px 12px rgba(13, 71, 161, 0.2);
+}
+
+.titulo-exito {
+	color: #0d47a1;
+	font-weight: 600;
+	margin-bottom: 0.75rem;
+	font-size: 1.4rem;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.texto-exito {
+	color: #455a64;
+	margin-bottom: 2rem;
+	line-height: 1.6;
+	font-size: 0.95rem;
+}
+
+.contador {
+	color: #0d47a1;
+	font-weight: 500;
+	font-size: 0.9rem;
+}
+
+.progress-container {
+	width: 100%;
+	height: 3px;
+	background: rgba(13, 71, 161, 0.1);
+	border-radius: 3px;
+	overflow: hidden;
+	margin-top: 0.5rem;
+}
+
+.progress-bar-flotante {
+	height: 100%;
+	background: linear-gradient(90deg, #0d47a1, #1976d2);
+	border-radius: 3px;
+	animation: countdown 3s linear forwards;
+}
+
+/* Animaciones elegantes y profesionales */
+@keyframes fadeInSuave {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes aparecerElegante {
+	0% {
+		transform: translateY(30px);
+		opacity: 0;
+	}
+
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes countdown {
+	from {
+		width: 0%;
+	}
+
+	to {
+		width: 100%;
+	}
+}

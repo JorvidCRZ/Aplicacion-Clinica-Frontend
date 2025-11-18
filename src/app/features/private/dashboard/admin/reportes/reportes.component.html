@@ -1,0 +1,354 @@
+<!-- 📊 REPORTES Y ANALÍTICAS - VISTA PRINCIPAL -->
+<div class="reportes-container">
+
+    <!-- 🎛️ PANEL DE FILTROS -->
+    <div class="filtros-panel">
+        <div class="filtros-header">
+            <h2><i class="fas fa-chart-line"></i> Reportes y Analíticas</h2>
+            <div class="filtros-actions">
+                <button class="btn-actualizar" (click)="actualizarDatos()" [disabled]="cargandoReporte">
+                    <i class="fas fa-sync-alt" [class.spinning]="cargandoReporte"></i>
+                    {{ cargandoReporte ? 'Cargando...' : 'Actualizar' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="filtros-content">
+            <!-- 📅 Rango de fechas -->
+            <div class="filtro-grupo">
+                <label><i class="fas fa-calendar-alt"></i> Período de análisis:</label>
+                <div class="fecha-inputs">
+                    <input type="date" [(ngModel)]="filtro.fechaInicio" (change)="generarReporte()">
+                    <span>hasta</span>
+                    <input type="date" [(ngModel)]="filtro.fechaFin" (change)="generarReporte()">
+                </div>
+            </div>
+
+            <!-- 📊 Tipo de reporte -->
+            <div class="filtro-grupo">
+                <label><i class="fas fa-clipboard-list"></i> Tipo de reporte:</label>
+                <select [(ngModel)]="filtro.tipo" (change)="generarReporte()">
+                    <option value="general">Reporte General</option>
+                    <option value="citas">Análisis de Citas</option>
+                    <option value="doctores">Rendimiento de Doctores</option>
+                    <option value="pacientes">Estadísticas de Pacientes</option>
+                    <option value="ingresos">Análisis de Ingresos</option>
+                </select>
+            </div>
+
+            <!-- 👀 Formato de vista -->
+            <div class="filtro-grupo">
+                <label><i class="fas fa-eye"></i> Vista:</label>
+                <div class="vista-botones">
+                    <button [class.active]="vistaActual === 'resumen'" (click)="cambiarVista('resumen')">
+                        <i class="fas fa-clipboard"></i> Resumen
+                    </button>
+                    <button [class.active]="vistaActual === 'tabla'" (click)="cambiarVista('tabla')">
+                        <i class="fas fa-table"></i> Tabla
+                    </button>
+                    <button [class.active]="vistaActual === 'grafico'" (click)="cambiarVista('grafico')">
+                        <i class="fas fa-chart-line"></i> Gráfico
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📊 CONTENIDO DEL REPORTE -->
+    <div class="reporte-content">
+
+        <!-- ⏳ INDICADOR DE CARGA -->
+        @if (cargandoReporte) {
+        <div class="loading-indicator">
+            <div class="spinner"></div>
+            <p>Generando reporte...</p>
+        </div>
+        }
+
+        <!-- 📋 VISTA RESUMEN -->
+        @if (!cargandoReporte && vistaActual === 'resumen') {
+        <div class="resumen-dashboard">
+
+            <!-- 📊 Métricas principales -->
+            <div class="metricas-grid">
+                <div class="metrica-card total-citas">
+                    <div class="metrica-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="metrica-info">
+                        <h3>{{ resumenGeneral.totalCitas }}</h3>
+                        <p>Total de Citas</p>
+                    </div>
+                </div>
+
+                <div class="metrica-card total-ingresos">
+                    <div class="metrica-icon"><i class="fas fa-coins"></i></div>
+                    <div class="metrica-info">
+                        <h3>{{ formatearMoneda(resumenGeneral.totalIngresos) }}</h3>
+                        <p>Ingresos Totales</p>
+                    </div>
+                </div>
+
+                <div class="metrica-card promedio-mensual">
+                    <div class="metrica-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="metrica-info">
+                        <h3>{{ formatearMoneda(resumenGeneral.promedioMensual) }}</h3>
+                        <p>Promedio Mensual</p>
+                    </div>
+                </div>
+
+                <div class="metrica-card crecimiento">
+                    <div class="metrica-icon"><i class="fas fa-percentage"></i></div>
+                    <div class="metrica-info">
+                        <h3 [class]="obtenerClaseTendencia(resumenGeneral.crecimientoMensual)">
+                            {{ resumenGeneral.crecimientoMensual }}%
+                        </h3>
+                        <p>Crecimiento Mensual</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🏆 Destacados -->
+            <div class="destacados-section">
+                <div class="destacado-card">
+                    <h4><i class="fas fa-user-md"></i> Doctor Más Activo</h4>
+                    <p class="destacado-valor">{{ resumenGeneral.doctorMasActivo }}</p>
+                </div>
+                <div class="destacado-card">
+                    <h4><i class="fas fa-bullseye"></i> Especialidad Más Demandada</h4>
+                    <p class="destacado-valor">{{ resumenGeneral.especialidadMasDemandada }}</p>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- 📊 VISTA TABLA -->
+        @if (!cargandoReporte && vistaActual === 'tabla') {
+        <div class="tabla-container">
+
+            <!-- � Tabla de Resumen General -->
+            @if (filtro.tipo === 'general') {
+            <div class="tabla-wrapper">
+                <h3><i class="fas fa-clipboard"></i> Resumen General de la Clínica</h3>
+                <div class="tablas-grid">
+
+                    <!-- Tabla de Citas por Estado -->
+                    <div class="mini-tabla">
+                        <h4><i class="fas fa-calendar-alt"></i> Estado de Citas</h4>
+                        <table class="reporte-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Estado</th>
+                                    <th>Cantidad</th>
+                                    <th>Porcentaje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="confirmadas">Confirmadas</td>
+                                    <td>267</td>
+                                    <td>78%</td>
+                                </tr>
+                                <tr>
+                                    <td class="pendientes">Pendientes</td>
+                                    <td>51</td>
+                                    <td>15%</td>
+                                </tr>
+                                <tr>
+                                    <td class="canceladas">Canceladas</td>
+                                    <td>24</td>
+                                    <td>7%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tabla de Top Doctores -->
+                    <div class="mini-tabla">
+                        <h4><i class="fas fa-user-md"></i> Top Doctores</h4>
+                        <table class="reporte-tabla">
+                            <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Especialidad</th>
+                                    <th>Citas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="doctor-nombre">Dr. Carlos Rodríguez</td>
+                                    <td>Cardiología</td>
+                                    <td class="numero-total">85</td>
+                                </tr>
+                                <tr>
+                                    <td class="doctor-nombre">Dra. Ana Martínez</td>
+                                    <td>Pediatría</td>
+                                    <td class="numero-total">72</td>
+                                </tr>
+                                <tr>
+                                    <td class="doctor-nombre">Dr. Luis García</td>
+                                    <td>Traumatología</td>
+                                    <td class="numero-total">65</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            }
+
+            <!-- 📅 Tabla de Citas -->
+            @if ((filtro.tipo === 'citas') && reporteCitas.length > 0) {
+            <div class="tabla-wrapper">
+                <h3><i class="fas fa-calendar-alt"></i> Reporte Detallado de Citas</h3>
+                <table class="reporte-tabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Confirmadas</th>
+                            <th>Completadas</th>
+                            <th>Canceladas</th>
+                            <th>Pendientes</th>
+                            <th>Ingresos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (cita of reporteCitas; track $index) {
+                        <tr>
+                            <td>{{ cita.fecha }}</td>
+                            <td class="numero-total">{{ cita.total }}</td>
+                            <td class="confirmadas">{{ cita.confirmadas }}</td>
+                            <td class="completadas">{{ cita.completadas }}</td>
+                            <td class="canceladas">{{ cita.canceladas }}</td>
+                            <td class="pendientes">{{ cita.pendientes }}</td>
+                            <td class="ingresos">{{ formatearMoneda(cita.ingresos) }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- 👨‍⚕️ Tabla de Doctores -->
+            @if (filtro.tipo === 'doctores' && reporteDoctores.length > 0) {
+            <div class="tabla-wrapper">
+                <h3><i class="fas fa-user-md"></i> Rendimiento de Doctores</h3>
+                <table class="reporte-tabla">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Especialidad</th>
+                            <th>Total Citas</th>
+                            <th>Completadas</th>
+                            <th>Canceladas</th>
+                            <th>Ingresos</th>
+                            <th>Promedio Diario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (doctor of reporteDoctores; track $index) {
+                        <tr>
+                            <td class="doctor-nombre">{{ doctor.doctor }}</td>
+                            <td>{{ doctor.especialidad }}</td>
+                            <td class="numero-total">{{ doctor.totalCitas }}</td>
+                            <td class="completadas">{{ doctor.citasCompletadas }}</td>
+                            <td class="canceladas">{{ doctor.citasCanceladas }}</td>
+                            <td class="ingresos">{{ formatearMoneda(doctor.ingresosTotales) }}</td>
+                            <td class="promedio">{{ formatearMoneda(doctor.promedioDiario) }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- 👥 Tabla de Pacientes -->
+            @if (filtro.tipo === 'pacientes' && reportePacientes.length > 0) {
+            <div class="tabla-wrapper">
+                <h3><i class="fas fa-users"></i> Estadísticas de Pacientes</h3>
+                <table class="reporte-tabla">
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Nuevos Registros</th>
+                            <th>Citas Promedio</th>
+                            <th>Frecuencia Tratamientos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (paciente of reportePacientes; track $index) {
+                        <tr>
+                            <td>{{ paciente.mes }}</td>
+                            <td class="numero-total">{{ paciente.nuevosRegistros }}</td>
+                            <td class="promedio">{{ paciente.citasPromedio }}</td>
+                            <td class="frecuencia">{{ paciente.frecuenciaTratamientos }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+
+            <!-- 📄 Mensaje cuando no hay tablas disponibles -->
+            @if (filtro.tipo === 'ingresos') {
+            <div class="no-tabla-message">
+                <div class="message-content">
+                    <i class="fas fa-chart-line"></i>
+                    <h4><i class="fas fa-chart-bar"></i> Vista de Gráfico Recomendada</h4>
+                    <p>Para el análisis de ingresos, la vista de gráfico proporciona una mejor visualización de los
+                        datos.</p>
+                    <button class="btn-cambiar-vista" (click)="cambiarVista('grafico')">
+                        <i class="fas fa-chart-bar"></i>
+                        Ver Gráfico
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- 📈 VISTA GRÁFICO -->
+        @if (!cargandoReporte && vistaActual === 'grafico' && datosGrafico.length > 0) {
+        <div class="grafico-container">
+            <h3><i class="fas fa-chart-line"></i> Visualización de Datos</h3>
+            <div class="grafico-wrapper">
+                <div class="chart-visual">
+                    @for (dato of datosGrafico; track $index) {
+                    <div class="chart-bar">
+                        <div class="bar-container">
+                            <div class="bar-fill" [style.height.%]="(dato.value / datosGrafico[0].value) * 100"
+                                [style.background-color]="dato.color">
+                            </div>
+                        </div>
+                        <div class="bar-label">{{ dato.label }}</div>
+                        <div class="bar-value">
+                            @if (filtro.tipo === 'ingresos') {
+                            {{ formatearMoneda(dato.value) }}
+                            } @else {
+                            {{ dato.value }}
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- 📥 PANEL DE EXPORTACIÓN -->
+    <div class="exportacion-panel">
+        <h3><i class="fas fa-file-export"></i> Exportar Reporte</h3>
+        <div class="export-buttons">
+            <button class="export-btn pdf" (click)="exportarReporte('pdf')">
+                <i class="fas fa-file-pdf"></i>
+                Exportar PDF
+            </button>
+            <button class="export-btn excel" (click)="exportarReporte('excel')">
+                <i class="fas fa-file-excel"></i>
+                Exportar Excel
+            </button>
+        </div>
+    </div>
+
+</div>

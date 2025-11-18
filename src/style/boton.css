@@ -1,0 +1,26 @@
+.boton {
+    height: 4rem;
+    font-weight: 700;
+    font-size: 23px;
+    width: 14rem;
+    margin: 0 auto;
+    background-color: var(--azul);
+    color: var(--blanco);
+    border-radius: 15px;
+    border: none;
+
+    &:hover {
+        background-color: var(--azul-claro);
+        color: var(--blanco);
+        transition: all 0.3s ease-in-out;
+    }
+
+}
+
+@media screen and (width < 998px) {
+    .boton {
+        width: 100%;
+        font-size: 20px;
+        height: 3.5rem;
+    }
+}

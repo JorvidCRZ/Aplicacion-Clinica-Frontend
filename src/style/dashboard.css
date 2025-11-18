@@ -1,0 +1,177 @@
+/*  DASHBOARD SHARED STYLES - Para Admin, Doctor y Paciente */
+
+:host {
+    display: block;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-container {
+    padding: 20px;
+    max-width: 70vw;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: #042c52;
+    font-size: 1.5rem;
+}
+
+/*  DASHBOARD CONTAINER - Sidebar + Contenido */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+}
+
+/*  CONTENT AREA */
+.content-area {
+    background: var(--gris-claro);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.content-header {
+    margin-bottom: 2rem;
+}
+
+.content-header h2 {
+    color: var(--azul-oscuro);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(45deg, var(--azul-oscuro), var(--azul));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.content-header p {
+    color: var(--gris-oscuro);
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/*  CARDS DE ESTADÍSTICAS */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--blanco) 0%, var(--gris-claro) 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px var(--negro-sombra);
+    border: 1px solid var(--plomo);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 40px var(--negro-sombra);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--blanco);
+    margin-bottom: 1rem;
+}
+
+.stat-icon.patients {
+    background: linear-gradient(135deg, var(--verde), var(--celeste));
+}
+
+.stat-icon.doctors {
+    background: linear-gradient(135deg, var(--azul), var(--azul-medio));
+}
+
+.stat-icon.appointments {
+    background: linear-gradient(135deg, var(--celeste), var(--azul-claro));
+}
+
+.stat-icon.revenue {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul));
+}
+
+.stat-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: var(--azul-oscuro);
+}
+
+.stat-info p {
+    color: var(--gris-oscuro);
+    margin: 0;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        grid-template-columns: 1fr;
+    }
+
+    .content-area {
+        min-height: calc(100vh - 200px);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        padding: 0 0.5rem;
+    }
+
+    .content-header h2 {
+        font-size: 1.5rem;
+    }
+
+    app-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        padding: 0 1rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+}
+
+/* ✨ ANIMACIONES */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.content-area,
+.stat-card {
+    animation: slideIn 0.6s ease-out;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: 0.3s;
+}

@@ -1,0 +1,24 @@
+<nav class="menu d-none d-lg-flex position-absolute start-50 translate-middle-x">
+    <ul class="nav">
+        @for (item of menuItems; track item.route) {
+        <li class="nav-item px-3">
+            <a class="nav-link" [routerLink]="item.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.exact || false }">
+                {{ item.label }}
+            </a>
+        </li>
+        }
+    </ul>
+</nav>
+
+<nav class="menu-mobil d-lg-none mt-3">
+    <ul class="nav flex-column text-center">
+        @for (item of menuItems; track item.route) {
+        <li class="nav-item">
+            <a class="nav-link py-2" [routerLink]="item.route">
+                {{ item.label }}
+            </a>
+        </li>
+        }
+    </ul>
+</nav>

@@ -1,0 +1,44 @@
+<div class="d-none d-lg-flex align-items-center me-4">
+    @if(authService.isLoggedIn()) {
+    <div class="dropdown">
+        <button class="btn btn-link p-2 border-0 dropdown-toggle d-none d-md-flex flex-column align-items-center"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="iconos {{ userAuthService.getUserIcon() }}"
+                [style.font-size]="authService.currentUser?.rol ? '1.8rem' : '2rem'"></i>
+            <h6 class="fw-semibold mt-1" style="color:var(--blanco);">
+                {{ userAuthService.getDisplayName() }}
+            </h6>
+            @if(userAuthService.getRoleDisplayName()) {
+            <h6 class="fw-semibold mt-1" style="font-size: 0.75rem; color:var(--blanco);">
+                {{ userAuthService.getRoleDisplayName() }}
+            </h6>
+            }
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end mt-2 shadow" style="min-width:220px">
+            <li class="px-3 py-2">
+                <div class="fw-bold small mb-1">{{ userAuthService.getDisplayName() }}</div>
+                <div class="badge bg-warning text-dark fw-bold small mb-1">{{ userAuthService.getRoleDisplayName() }}</div>
+            </li>
+
+            @for(link of links; track link.route) {
+            <li class="lista">
+                <a class="dropdown-item" [routerLink]="link.route">
+                    <i class="{{ link.icon }} me-2"></i>{{ link.label }}
+                </a>
+            </li>
+            }
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li class="lista">
+                <a class="dropdown-item text-danger " style="color:var(--rojo); font-weight: bold;" (click)="authService.logout()">
+                    <i class="fa fa-sign-out me-2"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+    } @else {
+    <a routerLink="/login" title="Mi cuenta"><i class="iconos fa fa-user-circle fa-2x"></i></a>
+    }
+</div>

@@ -1,0 +1,1077 @@
+/* 📅 ESTILOS PARA CITAS DEL DOCTOR */
+
+.citas-doctor-container {
+    padding: 2rem;
+    max-width: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    /* Prevenir scroll horizontal en el contenedor principal */
+}
+
+/* 🎯 Header con estadísticas */
+.citas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-title h2 {
+    color: #2363B9;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.header-title .subtitle {
+    color: #6c757d;
+    margin: 0;
+}
+
+.stats-quick {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.stat-card.hoy .stat-icon {
+    background: #28a745;
+}
+
+.stat-card.pendientes .stat-icon {
+    background: #ffc107;
+}
+
+.stat-card.completadas .stat-icon {
+    background: #17a2b8;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-info .number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stat-info .label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 🔍 Filtros */
+.filtros-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.filtros-grupo {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.filtro-fecha,
+.filtro-estado,
+.filtro-busqueda {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filtro-fecha label,
+.filtro-estado label,
+.filtro-busqueda label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2363B9;
+    box-shadow: 0 0 0 0.2rem rgba(35, 99, 185, 0.25);
+}
+
+/* 📋 Lista de citas */
+.citas-lista {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.lista-header {
+    background: #2363B9;
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-header h3 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.total-resultados {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* � TABLA DE CITAS - ESTILO MODERNO */
+.tabla-container {
+    background: white;
+    border-radius: 12px;
+    overflow-x: auto;
+    overflow-y: visible;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 1.5rem 0;
+    max-width: 100%;
+    /* Scroll personalizado */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.tabla-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tabla-container::-webkit-scrollbar-track {
+    background: #f7fafc;
+    border-radius: 4px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 4px;
+}
+
+.tabla-container::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+.tabla-citas {
+    border-collapse: collapse;
+    font-size: 14px;
+    width: 100%;
+}
+
+/* Header de la tabla */
+.tabla-citas thead {
+    background: linear-gradient(135deg, #1A4E8D 0%, #2363B9 100%);
+    color: white;
+}
+
+.tabla-citas thead th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+}
+
+.tabla-citas thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.tabla-citas thead th.sortable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.tabla-citas thead th.sortable span {
+    margin-right: 0.5rem;
+}
+
+.tabla-citas thead th.sortable i {
+    opacity: 0.7;
+    font-size: 12px;
+}
+
+/* 📏 Anchos específicos de columnas */
+.tabla-citas th:nth-child(1),
+/* Fecha */
+.tabla-citas td:nth-child(1) {
+    width: 100px;
+    min-width: 100px;
+}
+
+.tabla-citas th:nth-child(2),
+/* Hora */
+.tabla-citas td:nth-child(2) {
+    width: 80px;
+    min-width: 80px;
+}
+
+.tabla-citas th:nth-child(3),
+/* Paciente */
+.tabla-citas td:nth-child(3) {
+    width: 200px;
+    min-width: 180px;
+}
+
+.tabla-citas th:nth-child(4),
+/* Consulta */
+.tabla-citas td:nth-child(4) {
+    width: 250px;
+    min-width: 150px;
+}
+
+.tabla-citas th:nth-child(5),
+/* Especialidad */
+.tabla-citas td:nth-child(5) {
+    width: 120px;
+    min-width: 120px;
+}
+
+.tabla-citas th:nth-child(6),
+/* Estado */
+.tabla-citas td:nth-child(6) {
+    width: 110px;
+    min-width: 110px;
+}
+
+.tabla-citas th:nth-child(7),
+/* Acciones */
+.tabla-citas td:nth-child(7) {
+    width: 140px;
+    min-width: 140px;
+}
+
+.tabla-citas thead th.acciones-header {
+    text-align: center;
+    width: 140px;
+}
+
+/* Cuerpo de la tabla */
+.tabla-citas tbody tr {
+    border-bottom: 1px solid #f1f3f5;
+    transition: background-color 0.2s ease;
+}
+
+.tabla-citas tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.tabla-citas tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tabla-citas tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    color: #495057;
+    font-size: 14px;
+}
+
+/* Estilos específicos de celdas */
+.paciente-celda {
+    font-weight: 600;
+    color: #2c3e50;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hora-badge {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.consulta-celda {
+    max-width: 250px;
+    padding: 0.75rem 0.5rem;
+}
+
+.consulta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* 🏥 Especialidad */
+.especialidad-celda {
+    text-align: center;
+    padding: 0.75rem 0.5rem;
+}
+
+.especialidad-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    color: var(--blanco);
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(26, 78, 141, 0.2);
+}
+
+.consulta-info .tipo {
+    display: block;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.consulta-info .motivo {
+    display: block;
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+/* Estados - Pills modernos */
+.estado-pill {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.estado-pill.estado-programada {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.estado-pill.estado-completada {
+    background: linear-gradient(135deg, #cce5ff 0%, #b3d9ff 100%);
+    color: #004085;
+    border: 1px solid #b3d9ff;
+}
+
+.estado-pill.estado-cancelada {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.estado-pill.estado-no-show {
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+    color: #8b6914;
+    border: 1px solid #fdcb6e;
+}
+
+/* Botones de acción */
+.acciones-celda {
+    text-align: center;
+    width: 140px;
+}
+
+.botones-accion {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.btn-accion {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.btn-accion:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-iniciar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-iniciar:hover {
+    background: linear-gradient(135deg, #218838 0%, #1c9970 100%);
+}
+
+.btn-reprogramar {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+}
+
+.btn-reprogramar:hover {
+    background: linear-gradient(135deg, #e0a800 0%, #e8590c 100%);
+}
+
+.btn-cancelar {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+}
+
+/* 🔶 Botón solicitar cancelación */
+.btn-solicitar {
+    background: linear-gradient(135deg, #fd7e14 0%, #e55a00 100%);
+    color: white;
+}
+
+.btn-solicitar:hover {
+    background: linear-gradient(135deg, #e55a00 0%, #cc4d00 100%);
+}
+
+/* ⏳ Botón pendiente */
+.btn-pendiente {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.btn-pendiente:hover {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+.btn-historial {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+}
+
+.btn-historial:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+}
+
+.btn-detalles {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+}
+
+.btn-detalles:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+}
+
+.cita-card {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.cita-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.cita-card.estado-programada::before {
+    background: #28a745;
+}
+
+.cita-card.estado-completada::before {
+    background: #17a2b8;
+}
+
+.cita-card.estado-cancelada::before {
+    background: #dc3545;
+}
+
+.cita-card.estado-no-show::before {
+    background: #6c757d;
+}
+
+.cita-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #2363B9;
+}
+
+/* 🕐 Fecha y hora */
+.cita-datetime {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.fecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 8px;
+    min-width: 60px;
+}
+
+.fecha .dia {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2363B9;
+    line-height: 1;
+}
+
+.fecha .mes {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.hora {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+/* 👤 Información del paciente */
+.paciente-info {
+    margin-bottom: 1rem;
+}
+
+.paciente-nombre {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.paciente-detalles {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* 🏥 Información de consulta */
+.consulta-info {
+    margin-bottom: 1rem;
+}
+
+.tipo-consulta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #2363B9;
+    margin-bottom: 0.5rem;
+}
+
+.motivo {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-style: italic;
+    margin-left: 1.5rem;
+}
+
+/* 🏷️ Estado */
+.estado-badge {
+    margin-bottom: 1rem;
+}
+
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-programada {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-completada {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-cancelada {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge-no-show {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* ⚡ Acciones */
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+/* 📊 Resumen del día */
+.resumen-dia {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.resumen-dia h3 {
+    color: #2363B9;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resumen-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #2363B9;
+}
+
+.resumen-item .label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.resumen-item .valor {
+    font-weight: bold;
+    color: #2363B9;
+    font-size: 1.1rem;
+}
+
+/* 🚫 Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h4 {
+    margin-bottom: 0.5rem;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+    .citas-doctor-container {
+        padding: 1rem;
+    }
+
+    .citas-header {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .stats-quick {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stat-card {
+        flex: 1;
+        padding: 1rem;
+    }
+
+    .filtros-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .filtros-grupo {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    /* Tabla responsive */
+    .tabla-container {
+        margin: 0.5rem;
+        overflow-x: auto;
+    }
+
+    .tabla-citas {
+        min-width: 800px;
+    }
+
+    .tabla-citas thead th,
+    .tabla-citas tbody td {
+        padding: 0.5rem;
+        font-size: 12px;
+    }
+
+    .paciente-celda {
+        max-width: 150px;
+    }
+
+    .consulta-celda {
+        max-width: 200px;
+    }
+
+    .botones-accion {
+        gap: 0.15rem;
+    }
+
+    .btn-accion {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+}
+
+/* 📊 PAGINACIÓN */
+.paginacion-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--blanco);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--plomo);
+}
+
+/* 🔄 CARGAR MÁS (Por lotes) */
+.cargar-mas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed var(--plomo);
+}
+
+.btn-cargar-mas {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--azul) 0%, #2363B9 100%);
+    color: var(--blanco);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(26, 78, 141, 0.3);
+}
+
+.btn-cargar-mas:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(26, 78, 141, 0.4);
+}
+
+.btn-cargar-mas:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.info-carga {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.info-carga small {
+    font-size: 0.875rem;
+}
+
+.paginacion-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.registros-select {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--plomo);
+    border-radius: 8px;
+    background: var(--blanco);
+    color: var(--azul);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.registros-select:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgba(26, 78, 141, 0.1);
+}
+
+.paginacion-controles {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-paginacion {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--blanco);
+    border: 2px solid var(--plomo);
+    color: var(--azul);
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+    background: var(--azul);
+    color: var(--blanco);
+    border-color: var(--azul);
+    transform: translateY(-1px);
+}
+
+.btn-paginacion:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--gris-claro);
+    color: #999;
+}
+
+.numeros-pagina {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 1rem;
+}
+
+.btn-numero {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--plomo);
+    background: var(--blanco);
+    color: var(--azul);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.btn-numero:hover {
+    background: var(--gris-claro);
+    border-color: var(--azul);
+    transform: translateY(-1px);
+}
+
+.btn-numero.activa {
+    background: var(--azul);
+    color: var(--blanco);
+    border-color: var(--azul);
+    box-shadow: 0 2px 8px rgba(26, 78, 141, 0.3);
+}
+
+/* 📱 Responsive para paginación */
+@media (max-width: 768px) {
+    .paginacion-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .paginacion-controles {
+        flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    .numeros-pagina {
+        order: 1;
+        justify-content: center;
+        margin: 0;
+    }
+
+    .btn-paginacion {
+        width: 100%;
+        justify-content: center;
+        padding: 0.875rem;
+    }
+
+    .btn-numero {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 📱 RESPONSIVE PARA TABLA */
+@media (min-width: 1400px) {
+    .tabla-container {
+        margin: 1.5rem auto;
+        max-width: calc(100vw - 3rem);
+    }
+}
+
+@media (max-width: 1400px) {
+    .tabla-container {
+        margin: 1rem 0;
+    }
+
+    .tabla-citas {
+        min-width: 850px;
+    }
+
+    .tabla-citas th:nth-child(4),
+    .tabla-citas td:nth-child(4) {
+        width: 200px;
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .tabla-citas {
+        min-width: 800px;
+        font-size: 13px;
+    }
+
+    .tabla-citas th:nth-child(3),
+    .tabla-citas td:nth-child(3) {
+        width: 170px;
+        min-width: 150px;
+    }
+
+    .tabla-citas th:nth-child(4),
+    .tabla-citas td:nth-child(4) {
+        width: 180px;
+        min-width: 160px;
+    }
+}
+
+@media (max-width: 992px) {
+    .tabla-container {
+        border-radius: 8px;
+        margin: 0.5rem 0;
+    }
+
+    .tabla-citas {
+        min-width: 700px;
+        font-size: 12px;
+    }
+
+    .tabla-citas thead th {
+        padding: 0.75rem 0.5rem;
+        font-size: 11px;
+    }
+
+    .tabla-citas tbody td {
+        padding: 0.5rem;
+    }
+}

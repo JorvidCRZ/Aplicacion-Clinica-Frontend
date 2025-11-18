@@ -1,0 +1,17 @@
+<section class="contenido py-5 text-center">
+    <h2 class="mb-4">Nuestra familia</h2>
+    <div class="position-relative d-flex align-items-center justify-content-center">
+        <button class="btn me-2" (click)="anterior()">‹</button>
+        <div class="overflow-hidden w-100" style="max-width:1000px;">
+            <div class="row row-cols-2 row-cols-sm-3 row-cols-lg-5 g-3 justify-content-center">
+                <div class="col text-center " *ngFor="let slide of slidesVisibles">
+                    <img [src]="slide.image" [alt]="slide.title"
+                        class="rounded-circle border border-3 border-white d-block mx-auto"
+                        style="width:150px; height:150px; object-fit:cover;" />
+                    <p class="mt-2 mb-0">{{ slide.title }}</p>
+                </div>
+            </div>
+        </div>
+        <button class="btn ms-2" (click)="siguiente()">›</button>
+    </div>
+</section>

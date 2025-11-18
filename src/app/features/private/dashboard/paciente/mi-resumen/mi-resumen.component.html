@@ -1,0 +1,85 @@
+<div class="resumen-paciente">
+    <div class="header-resumen">
+        <h1>¡Hola, {{ nombreMostrar }}!</h1>
+        <p>Aquí tienes un resumen de tu información médica</p>
+    </div>
+
+    <div class="tarjetas-resumen">
+
+        <div class="tarjeta cita">
+            <div class="icono">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="contenido">
+                <h3>Próxima Cita</h3>
+                @if (proximaCita) {
+                <p class="fecha">{{ proximaCita.fecha | date:'dd/MM/yyyy' }}</p>
+                <p class="doctor">Dr. {{ proximaCita.doctor }}</p>
+                <p class="especialidad">{{ proximaCita.especialidad }}</p>
+                } @else {
+                <p class="sin-datos">No tienes citas programadas</p>
+                <button class="btn-agendar" (click)="agendarCita()">Agendar Cita</button>
+                }
+            </div>
+        </div>
+
+        <div class="tarjeta historial">
+            <div class="icono">
+                <i class="fas fa-notes-medical"></i>
+            </div>
+            <div class="contenido">
+                <h3>Mi Historial</h3>
+                <p class="numero">{{ totalCitas }}</p>
+                <p class="etiqueta">Citas realizadas</p>
+                <button class="btn-ver" (click)="verHistorial()">Ver Historial</button>
+            </div>
+        </div>
+
+        <div class="tarjeta pagos">
+            <div class="icono">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="contenido">
+                <h3>Pagos Realizados</h3>
+                <p class="numero">{{ pagosRealizados }}</p>
+                <p class="etiqueta">Pagos registrados</p>
+                <button class="btn-ver" (click)="verPagos()">Ver Pagos</button>
+            </div>
+        </div>
+
+        <div class="tarjeta perfil">
+            <div class="icono">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="contenido">
+                <h3>Mi Perfil</h3>
+                <p>{{ nombreMostrar }}</p>
+                <p>{{ correoMostrar }}</p>
+                <button class="btn-editar" (click)="editarPerfil()">Editar Perfil</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="acciones-rapidas">
+        <h2>Acceso Rápido</h2>
+        <div class="botones-rapidos">
+            <button class="accion-btn" (click)="navegarA('/paciente/mis-citas')">
+                <i class="fas fa-calendar"></i>
+                <span>Mis Citas</span>
+            </button>
+            <button class="accion-btn" (click)="navegarA('/paciente/historial-medico')">
+                <i class="fas fa-file-medical"></i>
+                <span>Historial</span>
+            </button>
+            <button class="accion-btn" (click)="navegarA('/paciente/pagos')">
+                <i class="fas fa-receipt"></i>
+                <span>Pagos</span>
+            </button>
+            <button class="accion-btn" (click)="agendarCita()">
+                <i class="fas fa-plus"></i>
+                <span>Nueva Cita</span>
+            </button>
+        </div>
+    </div>
+</div>

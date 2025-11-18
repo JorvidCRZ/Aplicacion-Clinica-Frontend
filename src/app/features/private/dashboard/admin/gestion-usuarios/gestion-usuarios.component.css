@@ -1,0 +1,331 @@
+.usuario-form-modal .close-btn:hover {
+  color: #e53e3e;
+}
+
+.usuario-form-modal form {
+  position: relative;
+}
+
+.usuario-form-modal form {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Modal de formulario de usuario */
+.usuario-form-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.usuario-form-modal form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 2.5rem 2rem;
+  min-width: 320px;
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.usuario-form-modal form {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  padding: 2.5rem 2rem;
+  min-width: 320px;
+  max-width: 650px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.usuario-form-modal label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.usuario-form-modal input,
+.usuario-form-modal select {
+  padding: 0.7rem;
+  border: 1px solid #bdbdbd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f7f7f7;
+  transition: border 0.2s;
+}
+
+.usuario-form-modal input:focus,
+.usuario-form-modal select:focus {
+  border-color: #1976d2;
+  outline: none;
+  background: #fff;
+}
+
+.usuario-form-modal .form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.2rem;
+}
+
+.usuario-form-modal button[type="submit"] {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.13);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.usuario-form-modal button[type="submit"]:hover:not(:disabled) {
+  background: #115293;
+  transform: translateY(-2px) scale(1.04);
+}
+
+.usuario-form-modal button[type="submit"]:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+}
+
+.usuario-form-modal button[type="button"] {
+  background: #fff;
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  border-radius: 8px;
+  padding: 0.7rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.usuario-form-modal button[type="button"]:hover {
+  background: #e3f2fd;
+  color: #115293;
+}
+
+@media (max-width: 600px) {
+  .usuario-form-modal form {
+    min-width: 0;
+    max-width: 98vw;
+    padding: 1.2rem 0.5rem;
+  }
+}
+
+/* 👥 GESTIÓN DE USUARIOS STYLES - Tema Azul */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding: 25px;
+  background: #e6f3ff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.header-left h2 {
+  margin: 0 0 0.5rem 0;
+  color: #042c52;
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+.header-left p {
+  margin: 0;
+  color: #2363B9;
+  font-size: 1.2rem;
+}
+
+.header-right {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 🎯 BOTONES ESTILO ORIGINAL */
+.btn {
+  background-color: #2363B9;
+  color: #fff;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  margin: 5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-primary {
+  background-color: #2363B9;
+}
+
+.btn-success {
+  background-color: #8fddff;
+  color: #042c52;
+}
+
+.btn-danger {
+  background-color: #e53e3e;
+}
+
+.btn-warning {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.btn i {
+  font-size: 1.1rem;
+}
+
+/* 👤 BADGES DE ROLES */
+.rol-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rol-admin {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.rol-admin::before {
+  content: "🔒";
+  font-size: 0.8rem;
+}
+
+.rol-doctor {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+}
+
+.rol-doctor::before {
+  content: "👨‍⚕️";
+  font-size: 0.8rem;
+}
+
+.rol-paciente {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.rol-paciente::before {
+  content: "👤";
+  font-size: 0.8rem;
+}
+
+.rol-default {
+  background: rgba(158, 158, 158, 0.2);
+  color: #9e9e9e;
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 10px;
+    font-size: 1.2rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+    padding: 20px;
+  }
+
+  .header-left h2 {
+    font-size: 1.8rem;
+  }
+
+  .header-left p {
+    font-size: 1rem;
+  }
+
+  .header-right {
+    justify-content: flex-start;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+
+  .rol-badge {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+}
+
+.usuario-form-modal {
+  .close-btn {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    border: none;
+    font-size: 2rem !important;
+    color: var(--rojo) !important;
+    cursor: pointer;
+    z-index: 10;
+    border: none !important;
+    transition: color 0.2s;
+
+    &:hover {
+
+      background: var(--gris) !important;
+    }
+  }
+
+  h3 {
+    margin-top: 0;
+    color: #042c52;
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  label {
+    margin: 1rem;
+  }
+
+  input {
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    width: 100%;
+  }
+}

@@ -1,0 +1,21 @@
+.iconos {
+    color: var(--blanco) !important;
+    padding: 8px;
+    font-size: 1.8rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    &:hover {
+        color: var(--azul-claro)!important;
+    }
+    &:active {
+        color: var(--azul)!important;
+    }
+}
+
+a,h6 {
+    text-decoration: none !important;
+}
+
+a{
+    cursor: pointer;
+}

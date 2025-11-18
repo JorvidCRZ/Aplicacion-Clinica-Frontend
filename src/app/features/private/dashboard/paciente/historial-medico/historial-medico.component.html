@@ -1,0 +1,188 @@
+<div class="historial-container">
+  <div class="historial-header">
+    <div class="titulo-seccion">
+      <h1 class="titulo">📋 Historial Médico Confidencial</h1>
+      <p class="subtitulo">Registro completo de consultas, exámenes y tratamientos médicos</p>
+    </div>
+
+    @if (usuarioActual) {
+    <div class="paciente-resumen">
+      <div class="chip"><i class="fas fa-user"></i><span>{{ userService.getDisplayName() }}</span></div>
+      <div class="chip"><i class="fas fa-id-card"></i><span>DNI: {{ dniMostrar }}</span></div>
+      @if (datosPaciente?.altura) { <div class="chip"><i class="fas fa-ruler-vertical"></i><span>{{ datosPaciente?.altura }} cm</span></div> }
+      @if (datosPaciente?.peso) { <div class="chip"><i class="fas fa-weight"></i><span>{{ datosPaciente?.peso }} kg</span></div> }
+      @if (datosPaciente?.tipoSangre) { <div class="chip"><i class="fas fa-tint"></i><span>{{ datosPaciente?.tipoSangre }}</span></div> }
+    </div>
+    }
+
+    <div class="aviso-confidencial">
+      <div class="icono-confidencial">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <div class="texto-confidencial">
+        <h4>🔒 Información Médica Estrictamente Confidencial</h4>
+        <p>Este historial contiene información médica sensible protegida bajo la Ley N° 29733 de Protección de Datos
+          Personales del Perú.
+          El acceso está restringido únicamente al paciente titular y al personal médico autorizado.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="controles-historial">
+    <div class="filtros">
+      <div class="filtro-grupo">
+        <label for="filtroTipo">Tipo de Registro:</label>
+        <select id="filtroTipo" [(ngModel)]="filtroTipo" class="filtro-select">
+          <option value="todos">📑 Todos los registros</option>
+          <option value="consulta">🩺 Consultas médicas</option>
+          <option value="examen">🧪 Exámenes y análisis</option>
+          <option value="tratamiento">💊 Tratamientos</option>
+          <option value="cirugia">🔪 Cirugías</option>
+          <option value="vacuna">💉 Vacunación</option>
+          <option value="emergencia">🚨 Emergencias</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label class="checkbox-confidencial">
+          <input type="checkbox" [(ngModel)]="mostrarSoloConfidencial">
+          <span class="checkmark"></span>
+          🔐 Solo registros confidenciales
+        </label>
+      </div>
+    </div>
+
+    <div class="stats-historial">
+      <div class="stat-item">
+        <span class="stat-numero">{{ registrosFiltrados.length }}</span>
+        <span class="stat-label">Registros</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-numero">{{ totalRegistrosConfidenciales }}</span>
+        <span class="stat-label">Confidenciales</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="registros-lista">
+    @if (registrosFiltrados.length === 0) {
+    <div class="sin-registros">
+      <i class="fas fa-folder-open"></i>
+      <h3>No se encontraron registros</h3>
+      <p>No hay registros médicos que coincidan con los filtros seleccionados.</p>
+    </div>
+    } @else {
+    @for (registro of registrosFiltrados; track registro.id) {
+    <div class="registro-card" (click)="seleccionarRegistro(registro)" [class.confidencial]="registro.confidencial">
+      <div class="registro-header">
+        <div class="tipo-info">
+          <i [class]="obtenerIconoTipo(registro.tipo)"></i>
+          <div class="tipo-texto">
+            <h3>{{ registro.tipo | titlecase }}</h3>
+            <span class="especialidad">{{ registro.especialidad }}</span>
+          </div>
+        </div>
+
+        <div class="fecha-estado">
+          <span class="fecha">{{ registro.fecha | date:'dd/MM/yyyy' }}</span>
+          <span class="estado" [style.background-color]="obtenerColorEstado(registro.estado)">
+            {{ registro.estado | titlecase }}
+          </span>
+          @if (registro.confidencial) {
+          <span class="badge-confidencial">🔒 CONFIDENCIAL</span>
+          }
+        </div>
+      </div>
+
+      <div class="registro-contenido">
+        <div class="doctor-info">
+          <i class="fas fa-user-md"></i>
+          <span>{{ registro.doctor }}</span>
+        </div>
+
+        <div class="diagnostico">
+          <strong>Diagnóstico:</strong> {{ registro.diagnostico }}
+        </div>
+
+        <div class="tratamiento">
+          <strong>Tratamiento:</strong> {{ registro.tratamiento }}
+        </div>
+      </div>
+
+      <div class="registro-footer">
+        <span class="ver-detalle">👁️ Ver detalles completos</span>
+        <i class="fas fa-chevron-right"></i>
+      </div>
+    </div>
+    }
+    }
+  </div>
+
+  @if (vistaDetallada && registroSeleccionado) {
+  <div class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal-detalle" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="titulo-modal">
+          <i [class]="obtenerIconoTipo(registroSeleccionado.tipo)"></i>
+          <h2>{{ registroSeleccionado.tipo | titlecase }} - {{ registroSeleccionado.id }}</h2>
+          @if (registroSeleccionado.confidencial) {
+          <span class="badge-confidencial-grande">🔒 CONFIDENCIAL</span>
+          }
+        </div>
+        <button class="btn-cerrar" (click)="cerrarDetalle()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-contenido">
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <label>📅 Fecha:</label>
+            <span>{{ registroSeleccionado.fecha | date:'EEEE, dd MMMM yyyy':'es-PE' }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <label>👨‍⚕️ Doctor:</label>
+            <span>{{ registroSeleccionado.doctor }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <label>🏥 Especialidad:</label>
+            <span>{{ registroSeleccionado.especialidad }}</span>
+          </div>
+
+          <div class="detalle-item">
+            <label>📊 Estado:</label>
+            <span class="estado-detalle" [style.background-color]="obtenerColorEstado(registroSeleccionado.estado)">
+              {{ registroSeleccionado.estado | titlecase }}
+            </span>
+          </div>
+        </div>
+
+        <div class="diagnostico-completo">
+          <h4>🔍 Diagnóstico:</h4>
+          <p>{{ registroSeleccionado.diagnostico }}</p>
+        </div>
+
+        <div class="tratamiento-completo">
+          <h4>💊 Tratamiento:</h4>
+          <p>{{ registroSeleccionado.tratamiento }}</p>
+        </div>
+
+        <div class="observaciones-completas">
+          <h4>📝 Observaciones Médicas Confidenciales:</h4>
+          <div class="observaciones-contenido">
+            <pre>{{ registroSeleccionado.observaciones }}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cerrar-modal" (click)="cerrarDetalle()">
+          <i class="fas fa-times"></i> Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

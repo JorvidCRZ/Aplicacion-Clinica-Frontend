@@ -1,0 +1,10 @@
+<div class="card-estilo py-4 card h-100 text-center d-flex justify-content-center align-items-center">
+    <img [src]="image" class="card-imagen card-img-top img-fluid py-2" [alt]="title" routerLink="/especialidades" />
+    <div class="card-body">
+        <h4 class="card-title">{{ title }}</h4>
+        <p class="card-text">{{ description }}</p>
+        @if (link) {
+        <a [href]="link" class="btn">Ver más</a>
+        }
+    </div>
+</div>

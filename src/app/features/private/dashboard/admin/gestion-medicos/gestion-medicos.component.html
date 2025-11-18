@@ -1,0 +1,129 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Doctores</h2>
+      <p>Administra la información de todos los doctores</p>
+    </div>
+    <div class="header-left">
+      <button class="btn btn-primary">
+        <i class="fas fa-file-alt"></i>
+        Reporte de Medicos
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarDoctor()">
+        <i class="fas fa-plus"></i>
+        Agregar Doctor
+      </button>
+    </div>
+  </div>
+
+  <app-data-table [data]="doctores" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+    emptyMessage="No hay doctores registrados" (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+
+  @if (mostrarModalVer && doctorActual) {
+  <div class="usuario-form-modal">
+    <form>
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>Detalles del Doctor</h3>
+      <div class="form-group">
+        <label>Nombre:</label>
+        <input [value]="doctorActual.nombre" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [value]="doctorActual.apellidoPaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [value]="doctorActual.apellidoMaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [value]="doctorActual.email" disabled>
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [value]="doctorActual.telefono" disabled>
+      </div>
+      <div class="form-group">
+        <label>Especialidad:</label>
+        <input [value]="doctorActual.especialidad" disabled>
+      </div>
+      <div class="form-group">
+        <label>Nro. Colegiado:</label>
+        <input [value]="doctorActual.nroColegiado" disabled>
+      </div>
+      <div class="form-group">
+        <label>Horario:</label>
+        <input [value]="doctorActual.horario" disabled>
+      </div>
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [value]="doctorActual.tipoDocumento" disabled>
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [value]="doctorActual.numeroDocumento" disabled>
+      </div>
+    </form>
+  </div>
+  }
+
+  @if (doctorActual && !mostrarModalVer) {
+  <div class="usuario-form-modal">
+    <form (ngSubmit)="guardarDoctor()" #formDoctor="ngForm">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>{{ modoEdicion ? 'Editar Doctor' : 'Nuevo Doctor' }}</h3>
+      <div class="form-group">
+        <label>Nombre:</label>
+        <input [(ngModel)]="doctorActual.nombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [(ngModel)]="doctorActual.apellidoPaterno" name="apellidoPaterno" required>
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [(ngModel)]="doctorActual.apellidoMaterno" name="apellidoMaterno" required>
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [(ngModel)]="doctorActual.email" name="email" required type="email">
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [(ngModel)]="doctorActual.telefono" name="telefono">
+      </div>
+      <div class="form-group">
+        <label>Especialidad:</label>
+        <select [(ngModel)]="doctorActual.especialidad" name="especialidad">
+          <option *ngFor="let esp of especialidades" [value]="esp.nombre">{{ esp.nombre }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nro. Colegiado:</label>
+        <input [(ngModel)]="doctorActual.nroColegiado" name="nroColegiado">
+      </div>
+      <div class="form-group">
+        <label>Horario:</label>
+        <input [(ngModel)]="doctorActual.horario" name="horario">
+      </div>
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [(ngModel)]="doctorActual.tipoDocumento" name="tipoDocumento">
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [(ngModel)]="doctorActual.numeroDocumento" name="numeroDocumento">
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="formDoctor.invalid">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  }
+</div>

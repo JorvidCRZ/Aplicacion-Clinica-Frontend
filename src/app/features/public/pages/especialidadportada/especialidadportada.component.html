@@ -1,0 +1,59 @@
+<div class="container py-5">
+
+	@if(especialidad) {
+	<div class="mb-5">
+		<div class="row align-items-center justify-content-center portada-profesional">
+			<div class="col-md-7 col-12 mb-3 mb-md-0">
+				<h2 class="mb-4 nombre-profesional">{{ especialidad.nombre }}
+					<span class="subrayado"></span>
+				</h2>
+				<p class="lead mt-4 descripcion-profesional">{{ especialidad.descripcionPortada }}</p>
+			</div>
+			<div class="col-md-5 col-12 text-center">
+				<div class="img-portada-wrapper">
+					@if (especialidad.urlImgPort) {
+					<img [src]="especialidad.urlImgPort" [alt]="especialidad.nombre" class="img-portada-profesional">
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	}
+
+
+	<div class="row mt-4">
+		<div class="col-12">
+			<h3 class="mb-4 text-primary">Subespecialidades</h3>
+		</div>
+
+		@for (sub of subespecialidades; track $index) {
+		<div class="col-lg-4 col-md-6 col-12 mb-4">
+			<div class="card card-especialidad h-100 border-0 shadow-lg position-relative overflow-hidden">
+				<div class="card-img-top d-flex justify-content-center align-items-center bg-white"
+					style="min-height: 140px;">
+					<img *ngIf="sub.urlImg" [src]="sub.urlImg" [alt]="sub.nombre" class="img-especialidad" />
+				</div>
+				<div class="card-body d-flex flex-column">
+					<h5 class="card-title fw-bold text-primary mb-2">{{ sub.nombre }}</h5>
+					<p class="card-text flex-grow-1 text-secondary">{{ sub.descripcion }}</p>
+					<div class="mt-2">
+						<span class="fw-bold">Precio:</span>
+						<span class="text-success">S/ {{ sub.precioSubespecial | number:'1.0-2' }}</span>
+					</div>
+					<div class="mt-3 d-flex flex-column align-items-center gap-2">
+						<button class="boton w-100" style="font-weight:600; letter-spacing:0.5px;"
+							(click)="irACitas(sub)">Obtener cita</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		}
+
+		@if (subespecialidades.length === 0) {
+		<div class="col-12 text-center text-muted">
+			<p>No hay subespecialidades registradas para esta especialidad.</p>
+		</div>
+		}
+
+	</div>
+</div>

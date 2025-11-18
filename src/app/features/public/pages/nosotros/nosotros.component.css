@@ -1,0 +1,70 @@
+.contenido {
+    background-color: var(--azul-medio);
+    color: var(--blanco);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    span {
+        color: var(--azul-oscuro);
+        font-weight: 800;
+    }
+}
+
+img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 20px !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        filter: brightness(1.1);
+    }
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 1rem;
+}
+
+.titulo {
+    font-weight: 800;
+    color: var(--azul);
+    font-size: 2.5rem;
+}
+
+p,
+ul {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    padding: 1rem;
+
+    @media screen and (max-width: 768px) {
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+}
+
+.contenedor-sede {
+    border: 5px solid var(--azul);
+}
+
+.contenedor-sede h3 {
+    color: var(--azul-oscuro);
+}
+
+.contenedor-sede div:first-child,
+.contenedor-sede div:last-child {
+    background-color: var(--gris);
+    color: var(--azul);
+}
+
+@media screen and (width < 500px) {
+    .contenedor-nosotros {
+        padding: 1rem 0 !important;
+    }
+}

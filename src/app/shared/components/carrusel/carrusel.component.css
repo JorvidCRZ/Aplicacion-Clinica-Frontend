@@ -1,0 +1,25 @@
+.contenido {
+    background-color: var(--azul);
+    color: var(--blanco);
+
+    p {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .transition {
+        transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    button {
+        background-color: var(--blanco) !important;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: var(--gris);
+    }
+}

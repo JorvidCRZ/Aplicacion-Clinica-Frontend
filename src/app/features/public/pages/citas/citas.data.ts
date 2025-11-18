@@ -1,0 +1,386 @@
+// Datos mockeados para la página de Citas
+// Separamos estos datos del componente para mantener el TS más limpio
+
+export interface Cita {
+  doctor: string;
+  especialidad: string;
+  paciente: string;
+  disponibilidad: string[];
+}
+
+export interface DiaDisponible {
+  codigo: 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo' | string;
+  nombre: string;
+  fecha: string; // Ej: '04 Sep'
+}
+
+export const CITAS: Cita[] = [
+  { doctor: 'Dr. Carlos Ramírez', especialidad: 'Medicina General', paciente: 'Ana Torres', disponibilidad: ['8:00 AM', '11:30 AM', '4:00 PM'] },
+{ doctor: 'Dra. Luisa Fernández', especialidad: 'Medicina General', paciente: 'Jorge Salinas', disponibilidad: ['9:00 AM', '2:00 PM', '6:00 PM'] },
+{ doctor: 'Dr. Pedro Gonzales', especialidad: 'Medicina General', paciente: 'María Calderón', disponibilidad: ['7:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Carla Mendoza', especialidad: 'Medicina General', paciente: 'Ricardo Peña', disponibilidad: ['8:30 AM', '1:00 PM', '5:30 PM'] },
+{ doctor: 'Dr. Óscar Huerta', especialidad: 'Medicina General', paciente: 'Verónica Silva', disponibilidad: ['9:15 AM', '3:45 PM'] },
+{ doctor: 'Dra. Patricia Salcedo', especialidad: 'Medicina General', paciente: 'Héctor León', disponibilidad: ['10:00 AM', '4:30 PM'] },
+
+{ doctor: 'Dr. Andrés Navarro', especialidad: 'Pediatría', paciente: 'Valeria Flores', disponibilidad: ['8:30 AM', '11:00 AM', '3:30 PM'] },
+{ doctor: 'Dra. Andrea Rojas', especialidad: 'Pediatría', paciente: 'Camila Chávez', disponibilidad: ['9:00 AM', '12:00 PM', '5:00 PM'] },
+{ doctor: 'Dr. Juan Villanueva', especialidad: 'Pediatría', paciente: 'Mateo Salas', disponibilidad: ['8:00 AM', '2:30 PM'] },
+{ doctor: 'Dra. Natalia Guzmán', especialidad: 'Pediatría', paciente: 'Sofía Herrera', disponibilidad: ['10:00 AM', '1:30 PM', '4:00 PM'] },
+{ doctor: 'Dr. Felipe Lozano', especialidad: 'Pediatría', paciente: 'Esteban Bravo', disponibilidad: ['9:45 AM', '3:00 PM'] },
+{ doctor: 'Dra. Andrea Torres', especialidad: 'Pediatría', paciente: 'Camila Serrano', disponibilidad: ['11:30 AM', '4:00 PM'] },
+
+{ doctor: 'Dra. Rosa Pacheco', especialidad: 'Ginecología', paciente: 'Patricia Rivas', disponibilidad: ['8:00 AM', '11:30 AM', '5:30 PM'] },
+{ doctor: 'Dra. Verónica Cáceres', especialidad: 'Ginecología', paciente: 'Claudia Núñez', disponibilidad: ['9:00 AM', '2:30 PM'] },
+{ doctor: 'Dr. Javier Campos', especialidad: 'Ginecología', paciente: 'Verónica Salazar', disponibilidad: ['10:00 AM', '3:15 PM', '6:00 PM'] },
+{ doctor: 'Dra. Sofía Medina', especialidad: 'Ginecología', paciente: 'Carmen Ruiz', disponibilidad: ['8:30 AM', '12:15 PM', '5:00 PM'] },
+{ doctor: 'Dr. Andrés Pajuelo', especialidad: 'Ginecología', paciente: 'Lucía Morales', disponibilidad: ['9:45 AM', '2:30 PM'] },
+{ doctor: 'Dra. Teresa Chávez', especialidad: 'Ginecología', paciente: 'Milagros Castillo', disponibilidad: ['10:30 AM', '4:45 PM'] },
+
+{ doctor: 'Dr. Miguel Herrera', especialidad: 'Cardiología', paciente: 'José Díaz', disponibilidad: ['9:00 AM', '11:00 AM', '4:30 PM'] },
+{ doctor: 'Dra. Carmen Aguilar', especialidad: 'Cardiología', paciente: 'Rosa Fernández', disponibilidad: ['8:30 AM', '1:00 PM'] },
+{ doctor: 'Dr. Juan Pérez', especialidad: 'Cardiología', paciente: 'Luis Torres', disponibilidad: ['10:00 AM', '2:00 PM', '5:00 PM'] },
+{ doctor: 'Dra. Elena Flores', especialidad: 'Cardiología', paciente: 'Marcos Ruiz', disponibilidad: ['11:15 AM', '3:45 PM'] },
+{ doctor: 'Dr. Ricardo Solís', especialidad: 'Cardiología', paciente: 'Ana Beltrán', disponibilidad: ['8:45 AM', '12:30 PM'] },
+{ doctor: 'Dra. Lorena Paredes', especialidad: 'Cardiología', paciente: 'Marcelo Peña', disponibilidad: ['9:30 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Fernando Reyes', especialidad: 'Cirugía General', paciente: 'Nancy Flores', disponibilidad: ['7:30 AM', '12:30 PM', '5:30 PM'] },
+{ doctor: 'Dra. Mónica Torres', especialidad: 'Cirugía General', paciente: 'Alberto Sosa', disponibilidad: ['8:00 AM', '2:00 PM'] },
+{ doctor: 'Dr. Hugo García', especialidad: 'Cirugía General', paciente: 'Sergio Huamán', disponibilidad: ['9:00 AM', '1:00 PM', '4:00 PM'] },
+{ doctor: 'Dra. Beatriz Molina', especialidad: 'Cirugía General', paciente: 'Daniela Vega', disponibilidad: ['8:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Eduardo Luna', especialidad: 'Cirugía General', paciente: 'Rocío Marín', disponibilidad: ['7:45 AM', '11:30 AM'] },
+{ doctor: 'Dra. Claudia Romero', especialidad: 'Cirugía General', paciente: 'Hugo Castillo', disponibilidad: ['10:00 AM', '2:30 PM'] },
+
+{ doctor: 'Dra. Mónica Cárdenas', especialidad: 'Endocrinología', paciente: 'Rosa Gamarra', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Samuel Vela', especialidad: 'Endocrinología', paciente: 'Mariana Peña', disponibilidad: ['9:00 AM', '1:30 PM', '5:00 PM'] },
+{ doctor: 'Dra. Mirtha Valdez', especialidad: 'Endocrinología', paciente: 'Roberto Lozano', disponibilidad: ['10:30 AM', '3:45 PM'] },
+{ doctor: 'Dr. Álvaro Quispe', especialidad: 'Endocrinología', paciente: 'Silvia Morales', disponibilidad: ['8:30 AM', '12:00 PM'] },
+{ doctor: 'Dra. Karina Huerta', especialidad: 'Endocrinología', paciente: 'Marcos Valdez', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Luis Paredes', especialidad: 'Endocrinología', paciente: 'Cecilia Rojas', disponibilidad: ['9:15 AM', '2:15 PM'] },
+
+{ doctor: 'Dr. Walter Bravo', especialidad: 'Hematología', paciente: 'Alberto Castañeda', disponibilidad: ['8:30 AM', '1:30 PM'] },
+{ doctor: 'Dra. Elena Ortiz', especialidad: 'Hematología', paciente: 'Marta Espinoza', disponibilidad: ['9:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Rogelio Peña', especialidad: 'Hematología', paciente: 'Claudia Ramírez', disponibilidad: ['10:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Silvia Núñez', especialidad: 'Hematología', paciente: 'Patricia Mendoza', disponibilidad: ['11:00 AM', '4:30 PM'] },
+{ doctor: 'Dr. Mauricio Gil', especialidad: 'Hematología', paciente: 'Diego Moreno', disponibilidad: ['9:45 AM', '1:15 PM'] },
+{ doctor: 'Dra. Jessica Salazar', especialidad: 'Hematología', paciente: 'Luz Benítez', disponibilidad: ['8:00 AM', '12:00 PM'] },
+
+{ doctor: 'Dr. Martín Salas', especialidad: 'Medicina Física', paciente: 'Juliana Poma', disponibilidad: ['9:00 AM', '12:00 PM', '4:00 PM'] },
+{ doctor: 'Dra. Claudia Vega', especialidad: 'Medicina Física', paciente: 'Isabela Torres', disponibilidad: ['8:30 AM', '2:30 PM'] },
+{ doctor: 'Dr. Alex Pizarro', especialidad: 'Medicina Física', paciente: 'Javier Cortés', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Karen Chávez', especialidad: 'Medicina Física', paciente: 'Mariana Ruiz', disponibilidad: ['9:15 AM', '1:45 PM'] },
+{ doctor: 'Dr. Renato Salas', especialidad: 'Medicina Física', paciente: 'Noelia Castro', disponibilidad: ['8:00 AM', '11:30 AM'] },
+{ doctor: 'Dra. Fiorella Díaz', especialidad: 'Medicina Física', paciente: 'Gabriela Marín', disponibilidad: ['2:00 PM', '5:00 PM'] },
+
+{ doctor: 'Dr. Manuel Cabrera', especialidad: 'Neumología', paciente: 'Carmen Morales', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Gabriela Herrera', especialidad: 'Neumología', paciente: 'Pablo Rivas', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Hugo Flores', especialidad: 'Neumología', paciente: 'Clara Soto', disponibilidad: ['8:30 AM', '12:00 PM', '4:30 PM'] },
+{ doctor: 'Dra. Vanessa León', especialidad: 'Neumología', paciente: 'Mario Peña', disponibilidad: ['9:45 AM', '1:15 PM'] },
+{ doctor: 'Dr. Esteban Muñoz', especialidad: 'Neumología', paciente: 'Rosa Cabrera', disponibilidad: ['11:00 AM', '5:00 PM'] },
+{ doctor: 'Dra. Evelyn Poma', especialidad: 'Neumología', paciente: 'Humberto Rojas', disponibilidad: ['8:00 AM', '2:30 PM'] },
+
+{ doctor: 'Dra. Milagros Soto', especialidad: 'Nutrición', paciente: 'Laura Medina', disponibilidad: ['10:00 AM', '1:30 PM'] },
+{ doctor: 'Dr. Gonzalo Peña', especialidad: 'Nutrición', paciente: 'María Paredes', disponibilidad: ['9:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Ximena Rodríguez', especialidad: 'Nutrición', paciente: 'Sofía Castro', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Ricardo Valdez', especialidad: 'Nutrición', paciente: 'Paola Ruiz', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Lorena Quispe', especialidad: 'Nutrición', paciente: 'Daniela Ríos', disponibilidad: ['9:30 AM', '2:00 PM'] },
+{ doctor: 'Dr. Javier Poma', especialidad: 'Nutrición', paciente: 'Cecilia Vargas', disponibilidad: ['10:15 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Alberto Gómez', especialidad: 'Oftalmología', paciente: 'Diego Fernández', disponibilidad: ['11:15 AM', '4:00 PM'] },
+{ doctor: 'Dra. Carolina Vega', especialidad: 'Oftalmología', paciente: 'Sofía Delgado', disponibilidad: ['9:30 AM', '1:00 PM'] },
+{ doctor: 'Dr. Martín Cárdenas', especialidad: 'Oftalmología', paciente: 'Paola Ruiz', disponibilidad: ['8:00 AM', '12:15 PM', '5:30 PM'] },
+{ doctor: 'Dra. Elena Quispe', especialidad: 'Oftalmología', paciente: 'Rodrigo Mendoza', disponibilidad: ['2:45 PM', '6:00 PM'] },
+{ doctor: 'Dr. Pablo Salinas', especialidad: 'Oftalmología', paciente: 'Natalia Cruz', disponibilidad: ['10:00 AM', '3:30 PM'] },
+{ doctor: 'Dra. Brenda Rojas', especialidad: 'Oftalmología', paciente: 'Luis Alvarado', disponibilidad: ['9:00 AM', '1:30 PM'] },
+
+{ doctor: 'Dr. Ricardo Alarcón', especialidad: 'Urología', paciente: 'Héctor Guzmán', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Elena Bustamante', especialidad: 'Urología', paciente: 'Oscar Medina', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Félix Paredes', especialidad: 'Urología', paciente: 'Guillermo Ríos', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Mariela Torres', especialidad: 'Urología', paciente: 'Andrés Rubio', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Santiago Villacorta', especialidad: 'Urología', paciente: 'Raúl Peña', disponibilidad: ['9:45 AM', '5:00 PM'] },
+{ doctor: 'Dra. Claudia Benites', especialidad: 'Urología', paciente: 'Óscar Maldonado', disponibilidad: ['11:30 AM', '4:30 PM'] },
+
+{ doctor: 'Dr. Ricardo Morales', especialidad: 'Traumatología', paciente: 'Raúl Peña', disponibilidad: ['9:00 AM', '11:30 AM', '2:00 PM'] },
+{ doctor: 'Dra. Patricia Sánchez', especialidad: 'Traumatología', paciente: 'Andrea Salas', disponibilidad: ['8:15 AM', '3:15 PM'] },
+{ doctor: 'Dr. Esteban Cruz', especialidad: 'Traumatología', paciente: 'Héctor Ramos', disponibilidad: ['10:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Fabiola Herrera', especialidad: 'Traumatología', paciente: 'Marcelo Paredes', disponibilidad: ['12:30 PM', '6:15 PM'] },
+{ doctor: 'Dr. Alfonso Navarro', especialidad: 'Traumatología', paciente: 'Luis Cárdenas', disponibilidad: ['9:00 AM', '1:00 PM', '6:00 PM'] },
+{ doctor: 'Dra. Patricia Mejía', especialidad: 'Traumatología', paciente: 'José Rivas', disponibilidad: ['8:00 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Carlos Ramos', especialidad: 'Psicología', paciente: 'Miguel Díaz', disponibilidad: ['9:30 AM', '1:00 PM'] },
+{ doctor: 'Dra. Gabriela Lozano', especialidad: 'Psicología', paciente: 'Sofía Herrera', disponibilidad: ['10:00 AM', '1:00 PM', '5:00 PM'] },
+{ doctor: 'Dr. Ramón Ortega', especialidad: 'Psicología', paciente: 'María Fernanda', disponibilidad: ['9:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Vanessa Cruz', especialidad: 'Psicología', paciente: 'Isabel Moreno', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Héctor Salinas', especialidad: 'Psicología', paciente: 'Fernando Salinas', disponibilidad: ['8:15 AM', '2:45 PM'] },
+{ doctor: 'Dra. Mónica Ramos', especialidad: 'Psicología', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] },
+
+{ doctor: 'Dr. Javier Ruiz', especialidad: 'Psiquiatría', paciente: 'Ricardo Fernández', disponibilidad: ['9:30 AM', '3:30 PM'] },
+{ doctor: 'Dra. Mónica Fuentes', especialidad: 'Psiquiatría', paciente: 'Santiago León', disponibilidad: ['9:00 AM', '11:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Alberto Castillo', especialidad: 'Psiquiatría', paciente: 'Isabel Moreno', disponibilidad: ['10:30 AM', '1:30 PM'] },
+{ doctor: 'Dra. Claudia Rivas', especialidad: 'Psiquiatría', paciente: 'Fernando Salinas', disponibilidad: ['8:15 AM', '2:45 PM'] },
+{ doctor: 'Dr. Gustavo Ponce', especialidad: 'Psiquiatría', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] },
+{ doctor: 'Dra. Adriana Solano', especialidad: 'Psiquiatría', paciente: 'Natalia Paredes', disponibilidad: ['11:15 AM', '5:15 PM'] },
+
+{ doctor: 'Dr. Julio Ledesma', especialidad: 'Ortodoncia', paciente: 'Marina Paredes', disponibilidad: ['9:30 AM', '3:30 PM'] },
+{ doctor: 'Dra. Valentina Rojas', especialidad: 'Ortodoncia', paciente: 'Mariana Peña', disponibilidad: ['10:15 AM', '4:00 PM'] },
+{ doctor: 'Dr. Enrique Cárdenas', especialidad: 'Ortodoncia', paciente: 'Claudia Ortega', disponibilidad: ['9:00 AM', '1:30 PM'] },
+{ doctor: 'Dra. Alejandra Bustos', especialidad: 'Ortodoncia', paciente: 'Felipe Guerrero', disponibilidad: ['8:30 AM', '12:00 PM', '3:45 PM'] },
+{ doctor: 'Dr. Raúl Mendieta', especialidad: 'Ortodoncia', paciente: 'Paula Vega', disponibilidad: ['11:00 AM', '5:00 PM'] },
+{ doctor: 'Dra. Miriam Tapia', especialidad: 'Ortodoncia', paciente: 'Natalio Poma', disponibilidad: ['10:00 AM', '2:00 PM'] },
+
+{ doctor: 'Dr. Francisco Rojas', especialidad: 'Reumatología', paciente: 'Cecilia Vargas', disponibilidad: ['8:15 AM', '12:30 PM'] },
+{ doctor: 'Dra. Rocío Aguilar', especialidad: 'Reumatología', paciente: 'Elena Cornejo', disponibilidad: ['10:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Hernán Quiroz', especialidad: 'Reumatología', paciente: 'Marta Gutiérrez', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Susana Poma', especialidad: 'Reumatología', paciente: 'Carla Ruiz', disponibilidad: ['11:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Omar Valverde', especialidad: 'Reumatología', paciente: 'Patricio Luna', disponibilidad: ['8:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Carmen Delgado', especialidad: 'Reumatología', paciente: 'Gabriela Soto', disponibilidad: ['9:30 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Hugo Salazar', especialidad: 'Gastroenterología', paciente: 'Daniel Vera', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. María Álvarez', especialidad: 'Gastroenterología', paciente: 'Lorena Paredes', disponibilidad: ['10:30 AM', '4:00 PM'] },
+{ doctor: 'Dr. Nelson Ramos', especialidad: 'Gastroenterología', paciente: 'Mario Córdova', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Patricia Calderón', especialidad: 'Gastroenterología', paciente: 'Ana María Torres', disponibilidad: ['11:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. César Poma', especialidad: 'Gastroenterología', paciente: 'Ruth Peña', disponibilidad: ['9:45 AM', '2:00 PM'] },
+{ doctor: 'Dra. Karina Rojas', especialidad: 'Gastroenterología', paciente: 'Esteban Rivas', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Fiorella León', especialidad: 'Neurología', paciente: 'Julio Pérez', disponibilidad: ['10:30 AM', '4:00 PM'] },
+{ doctor: 'Dra. Karen Bravo', especialidad: 'Neurología', paciente: 'Lucía Torres', disponibilidad: ['9:00 AM', '1:30 PM'] },
+{ doctor: 'Dr. Ernesto Gálvez', especialidad: 'Neurología', paciente: 'Paula Sánchez', disponibilidad: ['8:45 AM', '12:15 PM'] },
+{ doctor: 'Dra. Miriam Vásquez', especialidad: 'Neurología', paciente: 'Gonzalo Ruiz', disponibilidad: ['11:00 AM', '3:30 PM'] },
+{ doctor: 'Dr. Raúl Ponce', especialidad: 'Neurología', paciente: 'Patricia Gómez', disponibilidad: ['9:30 AM', '2:00 PM'] },
+{ doctor: 'Dra. Gloria Salcedo', especialidad: 'Neurología', paciente: 'Javier Luna', disponibilidad: ['10:00 AM', '5:15 PM'] },
+
+{ doctor: 'Dr. Alberto Castillo', especialidad: 'Infectología', paciente: 'Isabel Moreno', disponibilidad: ['9:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Natalia Vega', especialidad: 'Infectología', paciente: 'Gloria Ruiz', disponibilidad: ['10:00 AM', '1:00 PM'] },
+{ doctor: 'Dr. Jorge Molina', especialidad: 'Infectología', paciente: 'Carlos Vásquez', disponibilidad: ['8:30 AM', '2:30 PM'] },
+{ doctor: 'Dra. Sandra Peña', especialidad: 'Infectología', paciente: 'Marisol Poma', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Mauricio Rojas', especialidad: 'Infectología', paciente: 'Felipe Castillo', disponibilidad: ['9:45 AM', '1:45 PM'] },
+{ doctor: 'Dra. Irma Figueroa', especialidad: 'Infectología', paciente: 'Olga Herrera', disponibilidad: ['10:30 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Nelson Ortega', especialidad: 'Medicina Interna', paciente: 'Lucía Campos', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Claudia Peña', especialidad: 'Medicina Interna', paciente: 'Rafael Soto', disponibilidad: ['10:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Ricardo Mendoza', especialidad: 'Medicina Interna', paciente: 'Mónica Salas', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Sonia Poma', especialidad: 'Medicina Interna', paciente: 'Carolina Ruiz', disponibilidad: ['11:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Hugo Cárdenas', especialidad: 'Medicina Interna', paciente: 'Edgar Lozano', disponibilidad: ['9:45 AM', '1:15 PM'] },
+{ doctor: 'Dra. Patricia Villanueva', especialidad: 'Medicina Interna', paciente: 'Rosa Morales', disponibilidad: ['10:30 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Roberto Salcedo', especialidad: 'Neonatología', paciente: 'Luciano Pérez', disponibilidad: ['8:00 AM', '11:00 AM'] },
+{ doctor: 'Dra. Susana Medina', especialidad: 'Neonatología', paciente: 'Martina López', disponibilidad: ['9:30 AM', '2:00 PM'] },
+{ doctor: 'Dr. César Quiroz', especialidad: 'Neonatología', paciente: 'Benjamín Castro', disponibilidad: ['7:45 AM', '12:15 PM'] },
+{ doctor: 'Dra. Roxana Fuentes', especialidad: 'Neonatología', paciente: 'Camilo Vargas', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Edwin Rojas', especialidad: 'Neonatología', paciente: 'Renata Salazar', disponibilidad: ['8:30 AM', '1:30 PM'] },
+{ doctor: 'Dra. Patricia Ordoñez', especialidad: 'Neonatología', paciente: 'Bruno Mendoza', disponibilidad: ['9:00 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Andrés Paredes', especialidad: 'Dermatología', paciente: 'Marta Espinoza', disponibilidad: ['10:30 AM', '3:00 PM'] },
+{ doctor: 'Dra. Cecilia Torres', especialidad: 'Dermatología', paciente: 'Ana Castillo', disponibilidad: ['2:00 PM', '4:30 PM'] },
+{ doctor: 'Dr. Luis Romero', especialidad: 'Dermatología', paciente: 'Carlos Vargas', disponibilidad: ['9:45 AM', '3:00 PM'] },
+{ doctor: 'Dra. Silvia Torres', especialidad: 'Dermatología', paciente: 'Julia Herrera', disponibilidad: ['10:15 AM', '1:30 PM', '6:00 PM'] },
+{ doctor: 'Dr. Daniel Flores', especialidad: 'Dermatología', paciente: 'Gabriela Rojas', disponibilidad: ['11:00 AM', '5:00 PM'] },
+{ doctor: 'Dra. Vanessa Ruiz', especialidad: 'Dermatología', paciente: 'Mariana Poma', disponibilidad: ['9:00 AM', '2:00 PM'] },
+
+{ doctor: 'Dr. Diego Córdova', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Hugo Soto', disponibilidad: ['8:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Lorena Gutiérrez', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Marcos Bustamante', disponibilidad: ['9:15 AM', '1:15 PM'] },
+{ doctor: 'Dr. Francisco Alva', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Patricio Ramos', disponibilidad: ['7:30 AM', '11:30 AM'] },
+{ doctor: 'Dra. Mariana Calderón', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Daniela Poma', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Omar Salinas', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Rocío Peña', disponibilidad: ['8:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Adriana Mena', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Hernán García', disponibilidad: ['9:30 AM', '2:30 PM'] },
+
+{ doctor: 'Dr. Jorge Molina', especialidad: 'Nefrología', paciente: 'Alfredo Peña', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Patricia Córdova', especialidad: 'Nefrología', paciente: 'Rodolfo Soto', disponibilidad: ['10:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Martín Vela', especialidad: 'Nefrología', paciente: 'Cristina Ramos', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Isabel Andrade', especialidad: 'Nefrología', paciente: 'Javier Poma', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Carlos Peña', especialidad: 'Nefrología', paciente: 'Mónica Ruiz', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Leticia Marín', especialidad: 'Nefrología', paciente: 'Raúl Castro', disponibilidad: ['8:00 AM', '1:30 PM'] },
+
+{ doctor: 'Dr. Esteban Salcedo', especialidad: 'Odontología', paciente: 'Nicolás Herrera', disponibilidad: ['12:00 PM', '5:30 PM'] },
+{ doctor: 'Dra. Liliana Vargas', especialidad: 'Odontología', paciente: 'Liliana Vargas', disponibilidad: ['9:00 AM', '11:30 AM', '2:45 PM'] },
+{ doctor: 'Dr. Ernesto Salazar', especialidad: 'Odontología', paciente: 'Hugo Castro', disponibilidad: ['8:30 AM', '1:15 PM'] },
+{ doctor: 'Dra. Valentina Rojas', especialidad: 'Odontología', paciente: 'Mariana Peña', disponibilidad: ['10:15 AM', '4:00 PM'] },
+{ doctor: 'Dr. Ricardo Gálvez', especialidad: 'Odontología', paciente: 'Nicolás Herrera', disponibilidad: ['9:30 AM', '2:30 PM'] },
+{ doctor: 'Dra. Paula Benítez', especialidad: 'Odontología', paciente: 'Liliana Vargas', disponibilidad: ['11:00 AM', '3:30 PM'] },
+
+{ doctor: 'Dr. Raúl Mendieta', especialidad: 'Otorrinolaringología', paciente: 'Felipe Guerrero', disponibilidad: ['9:00 AM', '1:30 PM'] },
+{ doctor: 'Dra. Sonia Quispe', especialidad: 'Otorrinolaringología', paciente: 'Alicia Torres', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Miguel Cortés', especialidad: 'Otorrinolaringología', paciente: 'César Rojas', disponibilidad: ['8:30 AM', '12:00 PM'] },
+{ doctor: 'Dra. Natalia Rivas', especialidad: 'Otorrinolaringología', paciente: 'Yolanda Poma', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Sergio Luna', especialidad: 'Otorrinolaringología', paciente: 'Pablo Álvarez', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Graciela Peña', especialidad: 'Otorrinolaringología', paciente: 'Rocío Vargas', disponibilidad: ['10:30 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Andrés Castro', especialidad: 'Geriatría', paciente: 'Ernesto Poma', disponibilidad: ['8:30 AM', '2:30 PM'] },
+{ doctor: 'Dra. Teresa Huamán', especialidad: 'Geriatría', paciente: 'Margarita Flores', disponibilidad: ['9:30 AM', '12:30 PM'] },
+{ doctor: 'Dr. Jorge Alvarado', especialidad: 'Geriatría', paciente: 'Hugo Salas', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Olga Quintana', especialidad: 'Geriatría', paciente: 'Ramiro Torres', disponibilidad: ['8:00 AM', '11:00 AM'] },
+{ doctor: 'Dr. Ricardo Flores', especialidad: 'Geriatría', paciente: 'Inés Ramos', disponibilidad: ['9:15 AM', '1:45 PM'] },
+{ doctor: 'Dra. Amalia Paredes', especialidad: 'Geriatría', paciente: 'Evelyn Cortés', disponibilidad: ['10:30 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Gonzalo Peña', especialidad: 'Nutrición', paciente: 'María Paredes', disponibilidad: ['9:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Vanessa Ortega', especialidad: 'Nutrición', paciente: 'Diana Villanueva', disponibilidad: ['10:00 AM', '1:30 PM'] },
+{ doctor: 'Dr. Jaime Poma', especialidad: 'Nutrición', paciente: 'Lorena Núñez', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Milagros Castro', especialidad: 'Nutrición', paciente: 'Sebastián Flores', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Marco Rojas', especialidad: 'Nutrición', paciente: 'Eva Delgado', disponibilidad: ['9:45 AM', '2:00 PM'] },
+{ doctor: 'Dra. Sonia Vega', especialidad: 'Nutrición', paciente: 'Pablo Sosa', disponibilidad: ['10:15 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Daniel Flores', especialidad: 'Traumatología', paciente: 'Luis Cárdenas', disponibilidad: ['8:00 AM', '10:30 AM', '2:00 PM'] },
+{ doctor: 'Dra. Teresa Castillo', especialidad: 'Traumatología', paciente: 'Andrés Rivera', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dr. Leonardo Guzmán', especialidad: 'Traumatología', paciente: 'Héctor Ramos', disponibilidad: ['10:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Fabiola Herrera', especialidad: 'Traumatología', paciente: 'Marcelo Paredes', disponibilidad: ['12:30 PM', '6:15 PM'] },
+{ doctor: 'Dr. Rafael Cruz', especialidad: 'Traumatología', paciente: 'Sergio Peña', disponibilidad: ['9:30 AM', '3:30 PM'] },
+{ doctor: 'Dra. Marisol Luna', especialidad: 'Traumatología', paciente: 'Iván Soto', disponibilidad: ['8:15 AM', '2:15 PM'] },
+
+{ doctor: 'Dr. Javier Poma', especialidad: 'Medicina Física', paciente: 'Noelia Castro', disponibilidad: ['9:00 AM', '12:00 PM', '4:00 PM'] },
+{ doctor: 'Dra. Karen Herrera', especialidad: 'Medicina Física', paciente: 'Esteban Bravo', disponibilidad: ['8:15 AM', '2:30 PM'] },
+{ doctor: 'Dr. Renzo Aguilar', especialidad: 'Medicina Física', paciente: 'Julia Peña', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Cecilia Marín', especialidad: 'Medicina Física', paciente: 'María Luisa', disponibilidad: ['9:30 AM', '1:30 PM'] },
+{ doctor: 'Dr. Óscar Paredes', especialidad: 'Medicina Física', paciente: 'Cintia Morales', disponibilidad: ['8:45 AM', '11:15 AM'] },
+{ doctor: 'Dra. Yesenia Torres', especialidad: 'Medicina Física', paciente: 'Lourdes Rojas', disponibilidad: ['2:00 PM', '5:00 PM'] },
+
+{ doctor: 'Dr. Nelson Ramos', especialidad: 'Gastroenterología', paciente: 'Mario Córdova', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Patricia Calderón', especialidad: 'Gastroenterología', paciente: 'Ana María Torres', disponibilidad: ['11:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. César Poma', especialidad: 'Gastroenterología', paciente: 'Ruth Peña', disponibilidad: ['9:45 AM', '2:00 PM'] },
+{ doctor: 'Dra. Karina Rojas', especialidad: 'Gastroenterología', paciente: 'Esteban Rivas', disponibilidad: ['10:00 AM', '5:00 PM'] },
+{ doctor: 'Dr. Hugo Bustamante', especialidad: 'Gastroenterología', paciente: 'Paola Delgado', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Sonia Castro', especialidad: 'Gastroenterología', paciente: 'Javier Cornejo', disponibilidad: ['8:00 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Martín Cárdenas', especialidad: 'Oftalmología', paciente: 'Paola Ruiz', disponibilidad: ['8:00 AM', '12:15 PM', '5:30 PM'] },
+{ doctor: 'Dra. Brenda Rojas', especialidad: 'Oftalmología', paciente: 'Luis Alvarado', disponibilidad: ['9:30 AM', '1:30 PM'] },
+{ doctor: 'Dr. Pablo Salinas', especialidad: 'Oftalmología', paciente: 'Natalia Cruz', disponibilidad: ['10:00 AM', '3:30 PM'] },
+{ doctor: 'Dra. Teresa Solís', especialidad: 'Oftalmología', paciente: 'Felipe Morales', disponibilidad: ['11:15 AM', '4:45 PM'] },
+{ doctor: 'Dr. Javier Santa Cruz', especialidad: 'Oftalmología', paciente: 'Lorena Poma', disponibilidad: ['9:15 AM', '2:45 PM'] },
+{ doctor: 'Dra. Miriam Luján', especialidad: 'Oftalmología', paciente: 'Claudio Ruiz', disponibilidad: ['8:45 AM', '12:00 PM'] },
+
+{ doctor: 'Dr. Enrique Palacios', especialidad: 'Neurología', paciente: 'Patricia Gómez', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Fiorella Castillo', especialidad: 'Neurología', paciente: 'Pedro Salinas', disponibilidad: ['10:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Orlando Ramírez', especialidad: 'Neurología', paciente: 'María Paz', disponibilidad: ['8:00 AM', '11:00 AM'] },
+{ doctor: 'Dra. Violeta Contreras', especialidad: 'Neurología', paciente: 'Daniel Cortés', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dr. Hugo Benítez', especialidad: 'Neurología', paciente: 'Mauro Sánchez', disponibilidad: ['10:00 AM', '4:30 PM'] },
+{ doctor: 'Dra. Liliana Gamarra', especialidad: 'Neurología', paciente: 'Julieta Ríos', disponibilidad: ['11:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Diego Valverde', especialidad: 'Dermatología', paciente: 'Carmen Ortega', disponibilidad: ['9:00 AM', '12:00 PM'] },
+{ doctor: 'Dra. Maritza Solano', especialidad: 'Dermatología', paciente: 'Pilar Mendoza', disponibilidad: ['10:15 AM', '3:00 PM'] },
+{ doctor: 'Dr. Alexis Quiroz', especialidad: 'Dermatología', paciente: 'Natalia Poma', disponibilidad: ['8:30 AM', '1:30 PM'] },
+{ doctor: 'Dra. Gabriela Rojas', especialidad: 'Dermatología', paciente: 'Lorena Sifuentes', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. César Álvarez', especialidad: 'Dermatología', paciente: 'Yadira Castillo', disponibilidad: ['9:45 AM', '2:30 PM'] },
+{ doctor: 'Dra. Daniela Mejía', especialidad: 'Dermatología', paciente: 'Patricia Ugarte', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Omar Salinas', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Rocío Peña', disponibilidad: ['8:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Adriana Mena', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Hernán García', disponibilidad: ['9:30 AM', '2:30 PM'] },
+{ doctor: 'Dr. Francisco Alva', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Patricio Ramos', disponibilidad: ['7:30 AM', '11:30 AM'] },
+{ doctor: 'Dra. Lorena Gutiérrez', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Marcos Bustamante', disponibilidad: ['9:15 AM', '1:15 PM'] },
+{ doctor: 'Dr. Raúl Estévez', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Claudia Peña', disponibilidad: ['8:00 AM', '12:00 PM'] },
+{ doctor: 'Dra. Vanesa Zúñiga', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Diego Flores', disponibilidad: ['10:00 AM', '3:00 PM'] },
+
+{ doctor: 'Dr. Jorge Molina', especialidad: 'Nefrología', paciente: 'Alfredo Peña', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Patricia Córdova', especialidad: 'Nefrología', paciente: 'Rodolfo Soto', disponibilidad: ['10:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Martín Vela', especialidad: 'Nefrología', paciente: 'Cristina Ramos', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Leticia Marín', especialidad: 'Nefrología', paciente: 'Raúl Castro', disponibilidad: ['8:00 AM', '1:30 PM'] },
+{ doctor: 'Dr. Carlos Peña', especialidad: 'Nefrología', paciente: 'Mónica Ruiz', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Elena Poma', especialidad: 'Nefrología', paciente: 'Isidro Gálvez', disponibilidad: ['11:00 AM', '4:00 PM'] },
+
+{ doctor: 'Dr. Raúl Mendieta', especialidad: 'Otorrinolaringología', paciente: 'Felipe Guerrero', disponibilidad: ['9:00 AM', '1:30 PM'] },
+{ doctor: 'Dra. Sonia Quispe', especialidad: 'Otorrinolaringología', paciente: 'Alicia Torres', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Miguel Cortés', especialidad: 'Otorrinolaringología', paciente: 'César Rojas', disponibilidad: ['8:30 AM', '12:00 PM'] },
+{ doctor: 'Dra. Natalia Rivas', especialidad: 'Otorrinolaringología', paciente: 'Yolanda Poma', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Sergio Luna', especialidad: 'Otorrinolaringología', paciente: 'Pablo Álvarez', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Graciela Peña', especialidad: 'Otorrinolaringología', paciente: 'Rocío Vargas', disponibilidad: ['10:30 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Oscar Huamán', especialidad: 'Medicina Interna', paciente: 'Raúl Mena', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Mariela Paredes', especialidad: 'Medicina Interna', paciente: 'Sandra López', disponibilidad: ['10:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Iván Salinas', especialidad: 'Medicina Interna', paciente: 'Ricardo Campos', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Olga Peña', especialidad: 'Medicina Interna', paciente: 'María Elena', disponibilidad: ['11:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Julio Castañeda', especialidad: 'Medicina Interna', paciente: 'Ignacio Torres', disponibilidad: ['11:00 AM', '5:30 PM'] },
+{ doctor: 'Dra. Patricia Valdez', especialidad: 'Medicina Interna', paciente: 'Rocío Sifuentes', disponibilidad: ['9:45 AM', '1:15 PM'] },
+
+{ doctor: 'Dr. Ricardo Alvarado', especialidad: 'Endocrinología', paciente: 'Carmen Roca', disponibilidad: ['9:30 AM', '2:30 PM'] },
+{ doctor: 'Dra. Mirtha Valdez', especialidad: 'Endocrinología', paciente: 'Roberto Lozano', disponibilidad: ['10:30 AM', '3:45 PM'] },
+{ doctor: 'Dr. Manuel Torres', especialidad: 'Endocrinología', paciente: 'Patricia Quispe', disponibilidad: ['8:15 AM', '12:45 PM'] },
+{ doctor: 'Dra. Juliana Poma', especialidad: 'Endocrinología', paciente: 'Alberto Vega', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Hugo Rojas', especialidad: 'Endocrinología', paciente: 'Marcela Peña', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Ingrid Guzmán', especialidad: 'Endocrinología', paciente: 'Felipe Serrano', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Enrique Palacios', especialidad: 'Neurología', paciente: 'Patricia Gómez', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Fiorella Castillo', especialidad: 'Neurología', paciente: 'Pedro Salinas', disponibilidad: ['10:30 AM', '3:30 PM'] },
+{ doctor: 'Dr. Orlando Ramírez', especialidad: 'Neurología', paciente: 'María Paz', disponibilidad: ['8:00 AM', '11:00 AM'] },
+{ doctor: 'Dra. Violeta Contreras', especialidad: 'Neurología', paciente: 'Daniel Cortés', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dr. Hugo Benítez', especialidad: 'Neurología', paciente: 'Mauro Sánchez', disponibilidad: ['10:00 AM', '4:30 PM'] },
+{ doctor: 'Dra. Liliana Gamarra', especialidad: 'Neurología', paciente: 'Julieta Ríos', disponibilidad: ['11:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Alberto Quintana', especialidad: 'Gastroenterología', paciente: 'Héctor Medina', disponibilidad: ['9:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Sonia Varela', especialidad: 'Gastroenterología', paciente: 'Adriana López', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Fernando Prado', especialidad: 'Gastroenterología', paciente: 'Natalia Gutiérrez', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Isabel Soria', especialidad: 'Gastroenterología', paciente: 'Cesar Poma', disponibilidad: ['11:15 AM', '4:00 PM'] },
+{ doctor: 'Dr. Marco Benítez', especialidad: 'Gastroenterología', paciente: 'Rosa Valdivia', disponibilidad: ['9:30 AM', '2:30 PM'] },
+{ doctor: 'Dra. Elsa Carpio', especialidad: 'Gastroenterología', paciente: 'Juan Manuel', disponibilidad: ['10:45 AM', '5:15 PM'] },
+
+{ doctor: 'Dr. Ricardo Solís', especialidad: 'Cardiología', paciente: 'Ana Beltrán', disponibilidad: ['8:45 AM', '12:30 PM'] },
+{ doctor: 'Dra. Lorena Paredes', especialidad: 'Cardiología', paciente: 'Marcelo Peña', disponibilidad: ['9:30 AM', '4:00 PM'] },
+{ doctor: 'Dr. Alfredo Córdova', especialidad: 'Cardiología', paciente: 'Daniela Herrera', disponibilidad: ['10:15 AM', '2:45 PM'] },
+{ doctor: 'Dra. Miriam Poma', especialidad: 'Cardiología', paciente: 'Gonzalo Pérez', disponibilidad: ['11:00 AM', '3:30 PM'] },
+{ doctor: 'Dr. Esteban Ruiz', especialidad: 'Cardiología', paciente: 'Cecilia Navarro', disponibilidad: ['8:00 AM', '1:00 PM'] },
+{ doctor: 'Dra. Vanessa Prado', especialidad: 'Cardiología', paciente: 'Hugo Mendez', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Diego Córdova', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Hugo Soto', disponibilidad: ['8:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Lorena Gutiérrez', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Marcos Bustamante', disponibilidad: ['9:15 AM', '1:15 PM'] },
+{ doctor: 'Dr. Francisco Alva', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Patricio Ramos', disponibilidad: ['7:30 AM', '11:30 AM'] },
+{ doctor: 'Dra. Mariana Calderón', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Daniela Poma', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dr. Omar Salinas', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Rocío Peña', disponibilidad: ['8:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Adriana Mena', especialidad: 'Cirugía de Cabeza, Cuello y Maxilofacial', paciente: 'Hernán García', disponibilidad: ['9:30 AM', '2:30 PM'] },
+
+{ doctor: 'Dr. Walter Bravo', especialidad: 'Hematología', paciente: 'Diego Moreno', disponibilidad: ['9:45 AM', '1:15 PM'] },
+{ doctor: 'Dra. Jessica Salazar', especialidad: 'Hematología', paciente: 'Luz Benítez', disponibilidad: ['8:00 AM', '12:00 PM'] },
+{ doctor: 'Dr. Rogelio Peña', especialidad: 'Hematología', paciente: 'Claudia Ramírez', disponibilidad: ['10:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Silvia Núñez', especialidad: 'Hematología', paciente: 'Patricia Mendoza', disponibilidad: ['11:00 AM', '4:30 PM'] },
+{ doctor: 'Dr. Mauricio Gil', especialidad: 'Hematología', paciente: 'Diego Moreno', disponibilidad: ['9:30 AM', '3:00 PM'] },
+{ doctor: 'Dra. Elena Ortiz', especialidad: 'Hematología', paciente: 'Marta Espinoza', disponibilidad: ['9:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Martín Vela', especialidad: 'Nefrología', paciente: 'Cristina Ramos', disponibilidad: ['8:30 AM', '12:30 PM'] },
+{ doctor: 'Dra. Isabel Andrade', especialidad: 'Nefrología', paciente: 'Javier Poma', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Carlos Peña', especialidad: 'Nefrología', paciente: 'Mónica Ruiz', disponibilidad: ['9:45 AM', '2:15 PM'] },
+{ doctor: 'Dra. Leticia Marín', especialidad: 'Nefrología', paciente: 'Raúl Castro', disponibilidad: ['8:00 AM', '1:30 PM'] },
+{ doctor: 'Dr. Jorge Silva', especialidad: 'Nefrología', paciente: 'Patricia Bilbao', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Viviana Soto', especialidad: 'Nefrología', paciente: 'César Luna', disponibilidad: ['9:15 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Esteban Cruz', especialidad: 'Traumatología', paciente: 'Héctor Ramos', disponibilidad: ['10:45 AM', '4:00 PM'] },
+{ doctor: 'Dra. Fabiola Herrera', especialidad: 'Traumatología', paciente: 'Marcelo Paredes', disponibilidad: ['12:30 PM', '6:15 PM'] },
+{ doctor: 'Dr. Alfonso Navarro', especialidad: 'Traumatología', paciente: 'Luis Cárdenas', disponibilidad: ['9:00 AM', '1:00 PM', '6:00 PM'] },
+{ doctor: 'Dra. Patricia Mejía', especialidad: 'Traumatología', paciente: 'José Rivas', disponibilidad: ['8:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Raúl Torres', especialidad: 'Traumatología', paciente: 'Ernesto Poma', disponibilidad: ['8:30 AM', '11:30 AM'] },
+{ doctor: 'Dra. Claudia Vela', especialidad: 'Traumatología', paciente: 'Adriana Flores', disponibilidad: ['10:15 AM', '3:15 PM'] },
+
+{ doctor: 'Dr. Alejandro Rey', especialidad: 'Psiquiatría', paciente: 'Marco Antonio', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dra. Lucía Méndez', especialidad: 'Psiquiatría', paciente: 'Irene Poma', disponibilidad: ['10:30 AM', '4:30 PM'] },
+{ doctor: 'Dr. Fernando Ávila', especialidad: 'Psiquiatría', paciente: 'Sergio Calderón', disponibilidad: ['11:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Paola Quintana', especialidad: 'Psiquiatría', paciente: 'Marta Solís', disponibilidad: ['9:30 AM', '1:30 PM'] },
+{ doctor: 'Dr. Gustavo Ponce', especialidad: 'Psiquiatría', paciente: 'Lorena Vega', disponibilidad: ['12:00 PM', '4:30 PM'] },
+{ doctor: 'Dra. Natalia Bravo', especialidad: 'Psiquiatría', paciente: 'Carlos Esteban', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Rolando Vega', especialidad: 'Reumatología', paciente: 'Hilda Carrasco', disponibilidad: ['8:30 AM', '12:00 PM'] },
+{ doctor: 'Dra. Silvia Poma', especialidad: 'Reumatología', paciente: 'Francisco Luna', disponibilidad: ['9:00 AM', '2:00 PM'] },
+{ doctor: 'Dr. Federico Soto', especialidad: 'Reumatología', paciente: 'Carina Ruiz', disponibilidad: ['10:15 AM', '3:15 PM'] },
+{ doctor: 'Dra. Gabriela Urbina', especialidad: 'Reumatología', paciente: 'Mauro Prado', disponibilidad: ['11:00 AM', '4:00 PM'] },
+{ doctor: 'Dr. Nelson Paredes', especialidad: 'Reumatología', paciente: 'Cecilia Ríos', disponibilidad: ['9:45 AM', '1:15 PM'] },
+{ doctor: 'Dra. Marcela Torres', especialidad: 'Reumatología', paciente: 'Pedro Sosa', disponibilidad: ['10:00 AM', '5:00 PM'] },
+
+{ doctor: 'Dr. Diego Cárdenas', especialidad: 'Oftalmología', paciente: 'Roxana Silva', disponibilidad: ['8:00 AM', '10:30 AM'] },
+{ doctor: 'Dra. Teresa Solís', especialidad: 'Oftalmología', paciente: 'Felipe Morales', disponibilidad: ['11:15 AM', '4:45 PM'] },
+{ doctor: 'Dr. Javier Santa Cruz', especialidad: 'Oftalmología', paciente: 'Lorena Poma', disponibilidad: ['9:15 AM', '2:45 PM'] },
+{ doctor: 'Dra. Miriam Luján', especialidad: 'Oftalmología', paciente: 'Claudio Ruiz', disponibilidad: ['8:45 AM', '12:00 PM'] },
+{ doctor: 'Dr. Óscar Rivera', especialidad: 'Oftalmología', paciente: 'María Elena', disponibilidad: ['10:00 AM', '3:00 PM'] },
+{ doctor: 'Dra. Sandra Paredes', especialidad: 'Oftalmología', paciente: 'Rosa Benítez', disponibilidad: ['9:45 AM', '1:00 PM'] },
+
+{ doctor: 'Dr. Juan Rojas', especialidad: 'Medicina General', paciente: 'Mariano Peña', disponibilidad: ['7:30 AM', '11:00 AM'] },
+{ doctor: 'Dra. Ángela Ruiz', especialidad: 'Medicina General', paciente: 'Lorena Chávez', disponibilidad: ['8:15 AM', '2:15 PM'] },
+];
+
+export const HORARIOS_POR_DIA: Record<string, string[]> = {
+  'jueves': ['10:20', '10:40', '11:00', '11:20', '11:40', '12:00'],
+  'viernes': ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'],
+  'sabado': ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'],
+  'lunes': ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00'],
+  'martes': ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00']
+};
+
+export const DIAS_DISPONIBLES: DiaDisponible[] = [
+  { codigo: 'jueves', nombre: 'Jue', fecha: '20 Nov' },
+  { codigo: 'viernes', nombre: 'Vie', fecha: '21 Nov' },
+  { codigo: 'sabado', nombre: 'Sáb', fecha: '22 Nov' },
+  { codigo: 'lunes', nombre: 'Lun', fecha: '23 Nov' },
+  { codigo: 'martes', nombre: 'Mar', fecha: '24 Nov' }
+];

@@ -1,0 +1,11 @@
+<div class="dashboard-container" style="display: flex; align-items: stretch; min-height: 100vh;">
+    <app-sidebar
+        [menuItems]="sidebarItems" 
+        [title]="'Navegación ' + userAuthService.getRoleDisplayName()"
+        [currentUser]="authService.currentUser"
+        style="height: max-content; min-height: 100vh; flex: 0 0 260px; position: sticky; top: 0;">
+    </app-sidebar>
+    <div class="content-area" style="flex: 1 1 auto; min-height: 100vh; overflow-x: auto;">
+        <router-outlet></router-outlet>
+    </div>
+</div>

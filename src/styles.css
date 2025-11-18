@@ -1,0 +1,32 @@
+@import url('style/boton.css');
+@import url('style/icono.css');
+@import url('style/tarjeta.css');
+@import url('style/scroll.css');
+@import url('style/variables.css');
+@import url('style/registro-material.css');
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    background-color: var(--blanco);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.contenido-seccion,
+.contenido-contacto,
+.contenido-formulario,
+.contenido-general {
+    background: var(--gris);
+    border-radius: 30px;
+    padding: 20px;
+}
+
+.contenido-especialidades {
+    width: 100%;
+    background-color: var(--azul);
+}

@@ -1,0 +1,76 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Citas</h2>
+      <p>Administra todas las citas médicas</p>
+    </div>
+    <div class="header-left">
+      <button class="btn btn-primary">
+        <i class="fas fa-file-alt"></i>
+        Reporte de Citas
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarCita()">
+        <i class="fas fa-plus"></i>
+        Nueva Cita
+      </button>
+    </div>
+  </div>
+
+  <app-data-table [data]="citas" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+    emptyMessage="No hay citas registradas" [paginated]="true" [pageSize]="5" [pageSizeOptions]="[5,10,20,50]"
+    (actionClicked)="onTableAction($event)" (sortChanged)="onSortChange($event)">
+  </app-data-table>
+
+  @if (mostrarModalVer && citaActual) {
+  <div class="usuario-form-modal">
+    <form>
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>Detalles de la Cita</h3>
+      <div class="form-group"><label>Paciente:</label><input [value]="citaActual.pacienteNombre" disabled></div>
+      <div class="form-group"><label>Doctor:</label><input [value]="citaActual.doctorNombre" disabled></div>
+      <div class="form-group"><label>Especialidad:</label><input [value]="citaActual.especialidad" disabled></div>
+      <div class="form-group"><label>Fecha:</label><input [value]="citaActual.fecha" disabled></div>
+      <div class="form-group"><label>Hora:</label><input [value]="citaActual.hora" disabled></div>
+      <div class="form-group"><label>Estado:</label><input [value]="citaActual.estado" disabled></div>
+      <div class="form-group"><label>Tipo Consulta:</label><input [value]="citaActual.tipoConsulta" disabled></div>
+      <div class="form-group"><label>Motivo Consulta:</label><input [value]="citaActual.motivoConsulta" disabled></div>
+      <div class="form-group"><label>Notas Adicionales:</label><input [value]="citaActual.notasAdicionales" disabled>
+      </div>
+    </form>
+  </div>
+  }
+
+  @if (citaActual && !mostrarModalVer) {
+  <div class="usuario-form-modal">
+    <form (ngSubmit)="guardarCita()" #formCita="ngForm">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>{{ modoEdicion ? 'Editar Cita' : 'Nueva Cita' }}</h3>
+      <div class="form-group"><label>Paciente:</label><input [(ngModel)]="citaActual.pacienteNombre"
+          name="pacienteNombre" required></div>
+      <div class="form-group"><label>Doctor:</label><input [(ngModel)]="citaActual.doctorNombre" name="doctorNombre"
+          required></div>
+      <div class="form-group"><label>Especialidad:</label><input [(ngModel)]="citaActual.especialidad"
+          name="especialidad" required></div>
+      <div class="form-group"><label>Fecha:</label><input [(ngModel)]="citaActual.fecha" name="fecha" required
+          type="date"></div>
+      <div class="form-group"><label>Hora:</label><input [(ngModel)]="citaActual.hora" name="hora" required type="time">
+      </div>
+      <div class="form-group"><label>Estado:</label><select [(ngModel)]="citaActual.estado" name="estado" required>
+          <option *ngFor="let est of estadosCitas" [value]="est.id">{{ est.label }}</option>
+        </select></div>
+      <div class="form-group"><label>Tipo Consulta:</label><input [(ngModel)]="citaActual.tipoConsulta"
+          name="tipoConsulta" required></div>
+      <div class="form-group"><label>Motivo Consulta:</label><input [(ngModel)]="citaActual.motivoConsulta"
+          name="motivoConsulta"></div>
+      <div class="form-group"><label>Notas Adicionales:</label><input [(ngModel)]="citaActual.notasAdicionales"
+          name="notasAdicionales"></div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="formCita.invalid">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  }
+</div>

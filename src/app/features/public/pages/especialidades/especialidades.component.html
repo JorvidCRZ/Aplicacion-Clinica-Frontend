@@ -1,0 +1,33 @@
+<div class="especialidades-container container py-5 my-5">
+    <h2 class="titulo-seccion text-center mb-5">Nuestras Especialidades</h2>
+
+    <!-- Buscador reutilizable -->
+    <app-buscador [placeholder]="'Buscar especialidad...'" [data]="especialidades" key="nombre"
+        (resultado)="onBuscarResultados($event)">
+    </app-buscador>
+
+    <!-- Grid de especialidades -->
+    <div class="row mt-5">
+
+        @for (esp of especialidadesFiltradas; track $index) {
+        <div class="col-lg-4 col-md-6 col-12 mb-4">
+            <div class="card-especialidad h-100 shadow-sm">
+                <div class="card-header text-center text-white">
+                    <div class="img-card-wrapper mx-auto mb-2">
+                        @if (esp.urlImgIcono) {
+                        <img [src]="esp.urlImgIcono" alt="{{esp.nombre}}">
+                        }
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ esp.nombre }}</h5>
+                    <p class="card-text flex-grow-1">{{ esp.descripcion }}</p>
+                    <button class="boton btn-detalle" (click)="verDetalle(esp)">
+                        Ver detalle
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

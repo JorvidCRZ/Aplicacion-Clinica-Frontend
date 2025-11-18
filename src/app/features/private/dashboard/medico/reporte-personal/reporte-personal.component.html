@@ -1,0 +1,167 @@
+<div class="reporte-container">
+    <div class="reporte-header">
+        <div class="doctor-info-card">
+            <div class="doctor-avatar">
+                <div class="avatar-circle">
+                    {{ obtenerIniciales() }}
+                </div>
+            </div>
+            <div class="doctor-details">
+                <h1>{{ obtenerNombreCompleto() }}</h1>
+                <div class="especialidad-badge">
+                    <i class="fas fa-stethoscope"></i>
+                    {{ doctorActual?.especialidad || 'Medicina General' }}
+                </div>
+                <div class="registro-badge">
+                    <i class="fas fa-id-card"></i>
+                    CMP: {{ doctorActual?.nroColegiado || 'N/A' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="filtros-container">
+            <div class="filtro-grupo">
+                <label>Período:</label>
+                <select [(ngModel)]="periodoSeleccionado" (change)="actualizarReporte()" class="select-moderno">
+                    <option value="semana">Última Semana</option>
+                    <option value="mes">Último Mes</option>
+                    <option value="trimestre">Último Trimestre</option>
+                    <option value="año">Último Año</option>
+                </select>
+            </div>
+
+            <div class="acciones-reporte">
+                <button class="btn-exportar" (click)="exportarReporte('pdf')">
+                    <i class="fas fa-file-pdf"></i> Exportar PDF
+                </button>
+                <button class="btn-exportar secondary" (click)="exportarReporte('excel')">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="metricas-grid">
+        <div *ngFor="let metrica of metricas" class="metrica-card" [style.border-left-color]="metrica.color">
+            <div class="metrica-header">
+                <div class="metrica-icono" [style.background]="metrica.color">
+                    <i [class]="metrica.icono"></i>
+                </div>
+                <div class="metrica-info">
+                    <h3>{{ metrica.titulo }}</h3>
+                    <div class="metrica-valor">{{ metrica.valor }}</div>
+                </div>
+            </div>
+            <div class="metrica-footer">
+                <span class="cambio" [class]="metrica.tendencia">
+                    <i class="fas" [class.fa-arrow-up]="metrica.tendencia === 'up'"
+                        [class.fa-arrow-down]="metrica.tendencia === 'down'"
+                        [class.fa-minus]="metrica.tendencia === 'neutral'"></i>
+                    {{ metrica.cambio }}
+                </span>
+                <span class="descripcion">vs período anterior</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="navegacion-tabs">
+        <button *ngFor="let tab of tabs" class="tab-button" [class.active]="tabActivo === tab.id"
+            (click)="cambiarTab(tab.id)">
+            <i [class]="tab.icono"></i>
+            {{ tab.nombre }}
+        </button>
+    </div>
+
+    <div class="contenido-tabs">
+        <div *ngIf="tabActivo === 'resumen'" class="seccion-contenido">
+            <div class="cards-resumen">
+                <div class="card-seccion">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-day"></i> Citas de Hoy</h3>
+                        <span class="badge">{{ citasHoy.length }} citas</span>
+                    </div>
+                    <div class="citas-lista">
+                        <div *ngFor="let cita of citasHoy" class="cita-item" [class]="cita.estado">
+                            <div class="cita-hora">{{ cita.hora }}</div>
+                            <div class="cita-info">
+                                <div class="paciente">{{ cita.paciente }}</div>
+                                <div class="tipo">{{ cita.tipo }}</div>
+                            </div>
+                            <div class="cita-estado">
+                                <span class="estado-badge" [class]="cita.estado">
+                                    {{ cita.estado | titlecase }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-seccion">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Actividad Semanal</h3>
+                    </div>
+                    <div class="actividad-grafico">
+                        <div *ngFor="let dia of actividadSemanal" class="dia-actividad">
+                            <div class="dia-nombre">{{ dia.nombre }}</div>
+                            <div class="dia-barra">
+                                <div class="barra-progreso" [style.height.%]="dia.porcentaje"></div>
+                            </div>
+                            <div class="dia-valor">{{ dia.citas }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="tabActivo === 'diagnosticos'" class="seccion-contenido">
+            <div class="card-seccion">
+                <div class="card-header">
+                    <h3><i class="fas fa-diagnoses"></i> Diagnósticos Frecuentes - {{ doctorActual?.especialidad }}</h3>
+                    <span class="badge">Top 5</span>
+                </div>
+                <div class="diagnosticos-lista">
+                    <div *ngFor="let diagnostico of diagnosticosEspecialidad; let i = index" class="diagnostico-item">
+                        <div class="diagnostico-ranking">{{ i + 1 }}</div>
+                        <div class="diagnostico-info">
+                            <div class="diagnostico-nombre">{{ diagnostico.nombre }}</div>
+                            <div class="diagnostico-progreso">
+                                <div class="progreso-barra">
+                                    <div class="progreso-fill" [style.width.%]="diagnostico.porcentaje"></div>
+                                </div>
+                                <span class="progreso-texto">{{ diagnostico.porcentaje }}%</span>
+                            </div>
+                        </div>
+                        <div class="diagnostico-cantidad">{{ diagnostico.cantidad }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="tabActivo === 'productividad'" class="seccion-contenido">
+            <div class="productividad-stats">
+                <div class="stat-card">
+                    <h4>Tiempo Promedio por Cita</h4>
+                    <div class="stat-valor">32 min</div>
+                    <div class="stat-descripcion">Optimización: +15%</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Eficiencia Diaria</h4>
+                    <div class="stat-valor">94%</div>
+                    <div class="stat-descripcion">Citas completadas</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Seguimientos</h4>
+                    <div class="stat-valor">127</div>
+                    <div class="stat-descripcion">Pacientes en seguimiento</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="cargandoReporte" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Generando reporte...</p>
+        </div>
+    </div>
+</div>

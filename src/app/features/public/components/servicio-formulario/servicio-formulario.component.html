@@ -1,0 +1,102 @@
+<div class="bg-light min-vh-100 my-5">
+    <div class="container py-5 contenido-formulario">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">Agendar Cita Médica</h1>
+            <p class="text-muted">Programa tu cita con nuestros especialistas médicos</p>
+        </div>
+        <div class="card shadow-sm mx-auto col-lg-8 col-md-10">
+            <div class="card-body">
+                <h5 class="mb-3">
+                    <i class="bi bi-calendar-event"></i> Información de la Cita
+                </h5>
+                <p class="text-muted">Completa todos los campos para agendar tu cita médica</p>
+                <hr>
+                <form id="formCitaMedica" name="formCitaMedica" (ngSubmit)="onSubmit()">
+                    <h6><i class="bi bi-person"></i> Información Personal</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="nombreCompleto" class="form-label">Nombre completo</label>
+                            <input type="text" id="nombreCompleto" class="form-control" placeholder="Ingrese su nombre completo"
+                                [(ngModel)]="cita.nombreCompleto" name="nombreCompleto" autocomplete="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cedula" class="form-label">Cédula de identidad</label>
+                            <input type="text" id="cedula" class="form-control" placeholder="Ingrese su cédula"
+                                [(ngModel)]="cita.cedula" name="cedula" autocomplete="off" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" id="telefono" class="form-control" placeholder="Ingrese su teléfono"
+                                [(ngModel)]="cita.telefono" name="telefono" autocomplete="tel" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Ingrese su correo electrónico"
+                                [(ngModel)]="cita.email" name="email" autocomplete="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                            <input type="date" id="fechaNacimiento" class="form-control"
+                                [(ngModel)]="cita.fechaNacimiento" name="fechaNacimiento" autocomplete="bday" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="genero" class="form-label">Género</label>
+                            <select id="genero" class="form-select" [(ngModel)]="cita.genero" name="genero" autocomplete="sex" required>
+                                <option value="" disabled selected>Seleccione su género</option>
+                                <option *ngFor="let genero of generos; let i = index" [value]="genero" [id]="'genero-' + i">{{ genero }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" id="direccion" class="form-control" placeholder="Ingrese su dirección completa"
+                                [(ngModel)]="cita.direccion" name="direccion" autocomplete="address-line1" required>
+                        </div>
+                    </div>
+
+                    <h6><i class="bi bi-clipboard-pulse"></i> Información Médica</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="especialidadRequerida" class="form-label">Especialidad requerida</label>
+                            <select id="especialidadRequerida" class="form-select" [(ngModel)]="cita.especialidadRequerida" name="especialidadRequerida" required>
+                                <option value="" disabled selected>Seleccione la especialidad</option>
+                                <option *ngFor="let especialidad of especialidades; let i = index" [value]="especialidad" [id]="'especialidad-' + i">{{ especialidad }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="motivoConsulta" class="form-label">Motivo de la consulta</label>
+                            <textarea id="motivoConsulta" class="form-control" rows="3" placeholder="Describa brevemente el motivo de su consulta"
+                                [(ngModel)]="cita.motivoConsulta" name="motivoConsulta" required></textarea>
+                        </div>
+                    </div>
+
+                    <h6><i class="bi bi-clock"></i> Detalles de la Cita</h6>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="fechaPreferida" class="form-label">Fecha preferida</label>
+                            <input type="date" id="fechaPreferida" class="form-control" [(ngModel)]="cita.fechaPreferida"
+                                name="fechaPreferida" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="horaPreferida" class="form-label">Hora preferida</label>
+                            <select id="horaPreferida" class="form-select" [(ngModel)]="cita.horaPreferida" name="horaPreferida" required>
+                                <option value="" disabled selected>Seleccione la hora</option>
+                                <option *ngFor="let hora of horas; let i = index" [value]="hora" [id]="'hora-' + i">{{ hora }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="notasAdicionales" class="form-label">Notas adicionales</label>
+                            <textarea id="notasAdicionales" class="form-control" rows="3" placeholder="Información adicional que considere relevante"
+                                [(ngModel)]="cita.notasAdicionales" name="notasAdicionales"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" id="btnAgendar" name="btnAgendar" class="btn btn-lg btn-warning w-100">
+                            <i class="bi bi-calendar-check"></i> Agendar Cita Médica
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,224 @@
+<div class="perfil-container">
+  <div class="perfil-header">
+    <h1 class="titulo">Mi Perfil Médico</h1>
+    <p class="subtitulo">Mantén actualizada tu información personal y médica</p>
+  </div>
+
+  <div class="perfil-content">
+
+    <!-- Información Personal -->
+    <div class="seccion-card">
+      <div class="card-header">
+        <h2><i class="fas fa-user"></i> Información Personal</h2>
+        <button class="btn-editar" (click)="editarInformacionPersonal()" [disabled]="editandoPersonal">
+          <i class="fas fa-edit"></i>
+          {{ editandoPersonal ? 'Editando...' : 'Editar' }}
+        </button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Primer Nombre</label>
+          <input type="text" [(ngModel)]="perfilPaciente.persona.nombre1" [readonly]="!editandoPersonal"
+            class="form-input" [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>Segundo Nombre</label>
+          <input type="text" [(ngModel)]="perfilPaciente.persona.nombre2" [readonly]="!editandoPersonal"
+            class="form-input" [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>Apellido Paterno</label>
+          <input type="text" [(ngModel)]="perfilPaciente.persona.apellidoPaterno" [readonly]="!editandoPersonal"
+            class="form-input" [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>Apellido Materno</label>
+          <input type="text" [(ngModel)]="perfilPaciente.persona.apellidoMaterno" [readonly]="!editandoPersonal"
+            class="form-input" [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>DNI</label>
+          <input type="text" [(ngModel)]="perfilPaciente.persona.dni" [readonly]="!editandoPersonal" class="form-input"
+            [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>Fecha de Nacimiento</label>
+          <input type="date" [(ngModel)]="perfilPaciente.persona.fechaNacimiento" [readonly]="!editandoPersonal"
+            class="form-input" [class.editable]="editandoPersonal">
+        </div>
+
+        <div class="info-item">
+          <label>Género</label>
+          <select [(ngModel)]="perfilPaciente.persona.genero" [disabled]="!editandoPersonal" class="form-input"
+            [class.editable]="editandoPersonal">
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      @if (editandoPersonal) {
+      <div class="acciones">
+        <button class="btn-guardar" (click)="guardarInformacionPersonal()">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+        <button class="btn-cancelar" (click)="cancelarEdicionPersonal()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+      }
+    </div>
+
+    <!-- Información de Contacto -->
+    <div class="seccion-card">
+      <div class="card-header">
+        <h2><i class="fas fa-phone"></i> Información de Contacto</h2>
+        <button class="btn-editar" (click)="editarContacto()" [disabled]="editandoContacto">
+          <i class="fas fa-edit"></i>
+          {{ editandoContacto ? 'Editando...' : 'Editar' }}
+        </button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="perfilPaciente.persona.telefono" [readonly]="!editandoContacto"
+            class="form-input" [class.editable]="editandoContacto">
+        </div>
+
+        <div class="info-item">
+          <label>Correo Electrónico</label>
+     <input type="email"
+       [ngModel]="perfilPaciente.usuario?.correo || ''"
+       (ngModelChange)="onCorreoChange($event)"
+       [readonly]="!editandoContacto"
+       class="form-input" [class.editable]="editandoContacto"
+       [placeholder]="correoActual">
+        </div>
+
+        <div class="info-item full-width">
+          <label>Dirección</label>
+          <textarea [(ngModel)]="perfilPaciente.persona.direccion" [readonly]="!editandoContacto"
+            class="form-input textarea" [class.editable]="editandoContacto" rows="3"></textarea>
+        </div>
+      </div>
+
+      @if (editandoContacto) {
+      <div class="acciones">
+        <button class="btn-guardar" (click)="guardarContacto()">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+        <button class="btn-cancelar" (click)="cancelarEdicionContacto()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+      }
+    </div>
+
+    <!-- Información Médica -->
+    <div class="seccion-card">
+      <div class="card-header">
+        <h2><i class="fas fa-heartbeat"></i> Información Médica</h2>
+        <button class="btn-editar" (click)="editarInformacionMedica()" [disabled]="editandoMedica">
+          <i class="fas fa-edit"></i>
+          {{ editandoMedica ? 'Editando...' : 'Editar' }}
+        </button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Tipo de Sangre</label>
+          <select [(ngModel)]="perfilPaciente.tipoSangre" [disabled]="!editandoMedica" class="form-input"
+            [class.editable]="editandoMedica">
+            @for (tipo of ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="info-item">
+          <label>Peso (kg)</label>
+          <input type="number" [(ngModel)]="perfilPaciente.peso" [readonly]="!editandoMedica" class="form-input"
+            [class.editable]="editandoMedica">
+        </div>
+
+        <div class="info-item">
+          <label>Altura (cm)</label>
+          <input type="number" [(ngModel)]="perfilPaciente.altura" [readonly]="!editandoMedica" class="form-input"
+            [class.editable]="editandoMedica">
+        </div>
+
+        <div class="info-item">
+          <label>IMC Calculado</label>
+          <input type="text" [value]="calcularIMC()" readonly class="form-input imc-result">
+        </div>
+      </div>
+
+      @if (editandoMedica) {
+      <div class="acciones">
+        <button class="btn-guardar" (click)="guardarInformacionMedica()">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+        <button class="btn-cancelar" (click)="cancelarEdicionMedica()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+      }
+    </div>
+
+    <!-- Contacto de Emergencia -->
+    <div class="seccion-card">
+      <div class="card-header">
+        <h2><i class="fas fa-ambulance"></i> Contacto de Emergencia</h2>
+        <button class="btn-editar" (click)="editarEmergencia()" [disabled]="editandoEmergencia">
+          <i class="fas fa-edit"></i>
+          {{ editandoEmergencia ? 'Editando...' : 'Editar' }}
+        </button>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="perfilPaciente.contactoEmergenciaNombre" [readonly]="!editandoEmergencia"
+            class="form-input" [class.editable]="editandoEmergencia">
+        </div>
+
+        <div class="info-item">
+          <label>Relación</label>
+          <input type="text" [(ngModel)]="perfilPaciente.contactoEmergenciaRelacion" [readonly]="!editandoEmergencia"
+            class="form-input" [class.editable]="editandoEmergencia">
+        </div>
+
+        <div class="info-item">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="perfilPaciente.contactoEmergenciaTelefono" [readonly]="!editandoEmergencia"
+            class="form-input" [class.editable]="editandoEmergencia">
+        </div>
+      </div>
+
+      @if (editandoEmergencia) {
+      <div class="acciones">
+        <button class="btn-guardar" (click)="guardarEmergencia()">
+          <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+        <button class="btn-cancelar" (click)="cancelarEdicionEmergencia()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+
+  @if (mensajeGuardado) {
+  <div class="mensaje-exito">
+    <i class="fas fa-check-circle"></i> {{ mensajeGuardado }}
+  </div>
+  }
+</div>

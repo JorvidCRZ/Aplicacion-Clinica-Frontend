@@ -1,0 +1,132 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Pacientes</h2>
+      <p>Administra la información de todos los pacientes</p>
+    </div>
+    <div class="header-left">
+      <button class="btn btn-primary">
+        <i class="fas fa-file-alt"></i>
+        Reporte de Pacientes
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarPaciente()">
+        <i class="fas fa-plus"></i>
+        Agregar Paciente
+      </button>
+    </div>
+  </div>
+
+  <app-data-table [data]="pacientes" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+    emptyMessage="No hay pacientes registrados" [paginated]="true" [pageSize]="5" [pageSizeOptions]="[10,20,50]"
+    (actionClicked)="onTableAction($event)" (sortChanged)="onSortChange($event)">
+  </app-data-table>
+
+  @if (mostrarModalVer && pacienteActual) {
+  <div class="usuario-form-modal">
+    <form>
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>Detalles del Paciente</h3>
+      <div class="form-group">
+        <label>Nombre Completo:</label>
+        <input [value]="pacienteActual.nombre" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [value]="pacienteActual.apellidoPaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [value]="pacienteActual.apellidoMaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [value]="pacienteActual.email" disabled>
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [value]="pacienteActual.telefono" disabled>
+      </div>
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [value]="pacienteActual.tipoDocumento" disabled>
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [value]="pacienteActual.numeroDocumento" disabled>
+      </div>
+      <div class="form-group">
+        <label>Género:</label>
+        <input [value]="pacienteActual.genero" disabled>
+      </div>
+      <div class="form-group">
+        <label>Fecha Nacimiento:</label>
+        <input [value]="pacienteActual.fechaNacimiento ? (pacienteActual.fechaNacimiento | date:'dd/MM/yyyy') : ''"
+          disabled>
+      </div>
+      <div class="form-group">
+        <label>Dirección:</label>
+        <input [value]="pacienteActual.domicilio" disabled>
+      </div>
+    </form>
+  </div>
+  }
+
+  @if (pacienteActual && !mostrarModalVer) {
+  <div class="usuario-form-modal">
+    <form (ngSubmit)="guardarPaciente()" #formPaciente="ngForm">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>{{ modoEdicion ? 'Editar Paciente' : 'Nuevo Paciente' }}</h3>
+      <div class="form-group">
+        <label>Nombre Completo:</label>
+        <input [(ngModel)]="pacienteActual.nombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [(ngModel)]="pacienteActual.apellidoPaterno" name="apellidoPaterno">
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [(ngModel)]="pacienteActual.apellidoMaterno" name="apellidoMaterno">
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [(ngModel)]="pacienteActual.email" name="email" required type="email" placeholder="ej. nombre@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [(ngModel)]="pacienteActual.telefono" name="telefono">
+      </div>
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [(ngModel)]="pacienteActual.tipoDocumento" name="tipoDocumento">
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [(ngModel)]="pacienteActual.numeroDocumento" name="numeroDocumento">
+      </div>
+      <div class="form-group">
+        <label>Género:</label>
+        <select [(ngModel)]="pacienteActual.genero" name="genero">
+          <option value="masculino">Masculino</option>
+          <option value="femenino">Femenino</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fecha Nacimiento:</label>
+        <input [(ngModel)]="pacienteActual.fechaNacimiento" name="fechaNacimiento" type="date">
+      </div>
+      <div class="form-group">
+        <label>Dirección:</label>
+        <input [(ngModel)]="pacienteActual.domicilio" name="domicilio">
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="formPaciente.invalid">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  }
+</div>

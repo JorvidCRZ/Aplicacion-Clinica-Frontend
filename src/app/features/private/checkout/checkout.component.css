@@ -1,0 +1,229 @@
+.checkout-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--gris);
+  border-radius: 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.seccion-cita {
+  .cita-datos span {
+    color: var(--blanco);
+    margin-top: 1rem;
+  }
+
+  i {
+    margin-right: 0.5rem;
+    color: var(--blanco);
+  }
+}
+.campos-pago {
+  h3 {
+    color: var(--blanco);
+    margin: 1rem 0;
+  }
+}
+
+.checkout-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--plomo);
+  padding-bottom: 1rem;
+}
+
+.checkout-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--azul);
+}
+
+.checkout-form input,
+.checkout-form textarea {
+  width: 100%;
+  display: block;
+}
+
+.checkout-content span {
+  margin-top: 1rem;
+}
+
+.btn-volver {
+  background: var(--blanco);
+  border: 1px solid var(--plomo);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: var(--azul-medio);
+}
+
+.btn-volver:hover {
+  background: var(--plomo);
+}
+
+/* Secciones */
+.seccion-cita,
+.seccion-formulario,
+.seccion-pago,
+.seccion-resumen {
+  background: linear-gradient(135deg, var(--azul-claro) 0%, var(--azul) 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px var(--negro-sombra);
+}
+
+.seccion-cita h2,
+.seccion-formulario h2,
+.seccion-pago h2,
+.seccion-resumen h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  color: var(--gris);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+form label {
+  color: var(--blanco);
+}
+
+/* Datos de la cita */
+.cita-detalle {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.doctor-info h3 {
+  margin: 0;
+  color: var(--blanco);
+  font-size: 1.2rem;
+  padding: 0.5rem 0;
+}
+
+.especialidad {
+  color: var(--gris);
+  font-weight: 600;
+}
+
+.descripcion {
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+
+/* Formulario */
+.form-group label {
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 1rem;
+  color: var(--blanco);
+}
+
+input,
+textarea {
+  padding: 0.6rem;
+  border: 1px solid var(--plomo);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--gris-claro);
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--azul-claro);
+  background: var(--blanco);
+  outline: none;
+}
+
+.error-message {
+  color: var(--rojo);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Métodos de pago */
+.metodos-pago {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.metodo-pago {
+  flex: 1 1 45%;
+  border: 1px solid var(--plomo);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+  background: var(--blanco);
+}
+
+.metodo-pago:hover {
+  border-color: var(--azul-medio);
+}
+
+.metodo-pago.seleccionado {
+  border-color: var(--verde);
+  background: #f1fff4;
+}
+
+/* Resumen */
+.item-resumen {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  color: var(--gris-claro);
+}
+
+.item-resumen.total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--blanco);
+}
+
+/* Botón confirmar */
+.btn-confirmar {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--verde);
+  color: var(--blanco);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-confirmar:hover:not(:disabled) {
+  background: #3d9442;
+}
+
+.btn-confirmar:disabled {
+  background: var(--rojo);
+  cursor: not-allowed;
+  filter: blur(0.5px);
+}
+
+
+.mensaje-estado{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px var(--negro-sombra);
+  background: linear-gradient(135deg, var(--azul-claro) 0%, var(--azul) 100%);
+  color: var(--blanco);
+}

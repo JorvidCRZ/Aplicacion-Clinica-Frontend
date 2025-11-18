@@ -1,0 +1,78 @@
+h2,
+p,
+h5 {
+    color: var(--azul);
+    margin-bottom: 1rem;
+}
+
+h1.titulo {
+    padding: 2rem 0;
+    font-size: 5rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--azul-claro);
+}
+
+h5.subtitulo {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--negro);
+}
+
+h2 {
+    padding-top: 1.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+p.descripcion {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: var(--negro);
+}
+
+#conocer p {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 2.5;
+}
+
+.imagen-conocer img {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+.imagen-conocer img.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.img-fluid {
+    max-width: 95%;
+    border-radius: 1rem;
+
+    &:hover {
+        cursor: pointer;
+        filter: drop-shadow(20px 20px 4px var(--negro-sombra)) brightness(0.8);
+    }
+}
+
+@media (max-width: 768px) {
+
+    #conocer p,
+    #bienvenidos p {
+        font-size: 1rem;
+    }
+
+    #comentario h1 {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (width< 769px) {
+    h1.titulo {
+        font-size: 3rem;
+    }
+}

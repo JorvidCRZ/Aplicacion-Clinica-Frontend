@@ -1,0 +1,178 @@
+/* Default state - Bordes en blanco para todos los campos */
+app-registro .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-registro .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-registro .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__trailing,
+app-registro .mat-stepper-horizontal-line {
+    border-color: var(--blanco) !important;
+}
+
+/* Focus state - Borde blanco cuando está enfocado */
+app-registro .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-registro .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-registro .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--blanco) !important;
+    border-width: 2px !important;
+}
+
+/* Invalid state - Borde rojo cuando es inválido y ya fue tocado */
+app-registro .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-registro .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-registro .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--rojo) !important;
+    border-width: 2px !important;
+}
+
+/* Valid state - Borde verde cuando es válido y ya fue tocado */
+app-registro .mat-mdc-form-field.ng-valid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-registro .mat-mdc-form-field.ng-valid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-registro .mat-mdc-form-field.ng-valid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--verde) !important;
+    border-width: 2px !important;
+}
+
+/* Labels y texto en blanco */
+app-registro .mat-mdc-form-field .mat-mdc-floating-label,
+app-registro .mat-mdc-form-field .mdc-floating-label {
+    color: var(--blanco) !important;
+}
+
+/* Input text en blanco */
+app-registro .mat-mdc-form-field .mat-mdc-input-element {
+    color: var(--blanco) !important;
+    caret-color: var(--blanco) !important;
+}
+
+/* Placeholder en blanco con opacidad */
+app-registro .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+app-registro {
+    place-items: anchor-center;
+
+    .container {
+        margin: 0 !important;
+
+        .mat-horizontal-stepper-content {
+            margin-top: 1rem;
+        }
+
+    }
+}
+
+app-registro {
+    .mat-horizontal-content-container {
+        border-radius: 0 0 16px 16px;
+        padding: 1.5rem;
+    }
+}
+
+mat-error {
+    color: var(--rojo) !important;
+    font-size: 1rem !important;
+    /* Tamaño de fuente más pequeño */
+    margin-top: 4px !important;
+    /* Espacio entre el input y el error */
+}
+
+.mat-mdc-select-panel {
+    background-color: var(--gris) !important;
+    border-radius: 8px !important;
+}
+
+.mat-mdc-option {
+    color: var(--negro) !important;
+    background-color: var(--blanco) !important;
+}
+
+.mat-mdc-option:hover,
+.mat-mdc-option.mat-mdc-option-active {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    color: var(--azul) !important;
+}
+
+.mat-mdc-option.mat-mdc-option-selected {
+    background-color: var(--azul) !important;
+    color: var(--blanco) !important;
+}
+
+app-registro .mat-mdc-select-value,
+app-registro .mat-mdc-select-arrow {
+    color: var(--blanco) !important;
+}
+
+mat-horizontal-stepper {
+    border-radius: 20px;
+}
+
+app-registro {
+    .text-muted,
+    h2,
+    h4,
+    .text-label,
+    mat-label,
+    .mat-step-text-label,
+    .mat-mdc-text-field-wrapper,
+    .mat-mdc-input-element,
+    .mdc-label,
+    .mat-label[placeholder],
+    mat-icon,
+    .mat-stepper-horizontal-line,
+    mat-form-field {
+        color: var(--blanco) !important;
+    }
+}
+
+/* 🔄 ESTILOS COMPARTIDOS PARA LOGIN */
+app-login .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-login .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-login .mat-mdc-form-field .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--blanco) !important;
+}
+
+/* Focus state para login */
+app-login .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-login .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-login .mat-mdc-form-field.mat-focused .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--blanco) !important;
+    border-width: 2px !important;
+}
+
+/* Invalid state para login */
+app-login .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__leading,
+app-login .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__notch,
+app-login .mat-mdc-form-field.ng-invalid.ng-touched .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--rojo) !important;
+    border-width: 2px !important;
+}
+
+/* Estilos de texto para login */
+app-login .mat-mdc-form-field .mat-mdc-floating-label,
+app-login .mat-mdc-form-field .mdc-floating-label {
+    color: var(--blanco) !important;
+}
+
+app-login .mat-mdc-form-field .mat-mdc-input-element {
+    color: var(--blanco) !important;
+    caret-color: var(--blanco) !important;
+}
+
+app-login .mat-mdc-form-field .mat-mdc-input-element::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+app-login {
+    .text-muted,
+    h2,
+    h4,
+    .text-label,
+    mat-label,
+    .mat-mdc-text-field-wrapper,
+    .mat-mdc-input-element,
+    .mdc-label,
+    .mat-label[placeholder],
+    mat-icon,
+    mat-form-field {
+        color: var(--blanco) !important;
+    }
+}

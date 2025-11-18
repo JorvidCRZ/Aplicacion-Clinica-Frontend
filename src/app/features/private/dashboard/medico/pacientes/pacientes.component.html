@@ -1,0 +1,287 @@
+<!-- 👥 PACIENTES DEL DOCTOR -->
+<div class="pacientes-doctor-container">
+
+    <!-- 🎯 Header con estadísticas -->
+    <div class="pacientes-header">
+        <div class="header-info">
+            <h2><i class="fas fa-users"></i> Mis Pacientes</h2>
+            <p class="subtitle">Gestiona tu lista de pacientes y sus historiales médicos</p>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-box">
+                <div class="stat-number">{{ totalPacientes }}</div>
+                <div class="stat-label">Total Pacientes</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ totalCitas }}</div>
+                <div class="stat-label">Citas Registradas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">{{ citasEsteMes }}</div>
+                <div class="stat-label">Citas este mes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔍 Filtros y búsqueda -->
+    <div class="filtros-busqueda">
+        <div class="busqueda-principal">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" [(ngModel)]="busquedaTexto" (input)="filtrarPacientes()"
+                    placeholder="Buscar por nombre, documento o teléfono..." class="form-control">
+            </div>
+        </div>
+
+        <div class="filtros-adicionales">
+            <div class="filtro-grupo">
+                <label>Edad:</label>
+                <select [(ngModel)]="filtroEdad" (change)="filtrarPacientes()" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="0-17">Niños (0-17)</option>
+                    <option value="18-39">Adultos jóvenes (18-39)</option>
+                    <option value="40-64">Adultos (40-64)</option>
+                    <option value="65+">Adultos mayores (65+)</option>
+                </select>
+            </div>
+
+            <div class="filtro-grupo">
+                <label>Ordenar:</label>
+                <select [(ngModel)]="ordenamiento" (change)="aplicarOrdenamiento()" class="form-select">
+                    <option value="nombre">Nombre A-Z</option>
+                    <option value="nombre-desc">Nombre Z-A</option>
+                    <option value="fecha-desc">Más reciente</option>
+                    <option value="fecha-asc">Más antiguo</option>
+                    <option value="edad-asc">Edad (menor)</option>
+                    <option value="edad-desc">Edad (mayor)</option>
+                </select>
+            </div>
+
+            <button (click)="limpiarFiltros()" class="btn btn-outline-secondary">
+                <i class="fas fa-filter"></i> Limpiar
+            </button>
+        </div>
+    </div>
+
+    <!-- 📋 Lista de pacientes -->
+    <div class="pacientes-lista">
+        <div class="lista-header">
+            <h3>Lista de Pacientes</h3>
+            <div class="vista-controles">
+                <span class="resultados">{{ pacientesFiltrados.length }} de {{ totalPacientes }} pacientes</span>
+                <div class="vista-botones">
+                    <button (click)="cambiarVista('tarjetas')" [class.active]="vistaActual === 'tarjetas'"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button (click)="cambiarVista('tabla')" [class.active]="vistaActual === 'tabla'"
+                        class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @if (pacientesFiltrados.length === 0) {
+        <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <h4>No se encontraron pacientes</h4>
+            <p>No hay pacientes que coincidan con los filtros seleccionados</p>
+        </div>
+        } @else {
+
+        <!-- 🃏 Vista de tarjetas -->
+        @if (vistaActual === 'tarjetas') {
+        <div class="pacientes-grid">
+            @for (paciente of pacientesFiltrados; track paciente.id) {
+            <div class="paciente-card">
+
+                <!-- 👤 Avatar y nombre -->
+                <div class="paciente-header">
+                    <div class="avatar">
+                        <div class="avatar-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                    <div class="info-basica">
+                        <h4>{{ paciente.nombre }}</h4>
+                        <p class="documento">CC: {{ paciente.documento }}</p>
+                        <span class="edad-genero">{{ paciente.edad }} años • {{ paciente.genero }}</span>
+                    </div>
+                </div>
+
+                <!-- 📞 Contacto -->
+                <div class="contacto-info">
+                    <div class="contacto-item">
+                        <i class="fas fa-phone" aria-hidden="true"></i>
+                        <span class="contacto-text">{{ paciente.telefono || 'Sin teléfono' }}</span>
+                    </div>
+                    <div class="contacto-item">
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span class="contacto-text">{{ paciente.email || 'Sin email' }}</span>
+                    </div>
+                </div>
+
+                <!-- 🏥 Información médica rápida -->
+                <div class="info-medica">
+                    <div class="info-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div>
+                            <span class="label">Última cita:</span>
+                            <span class="valor">{{ paciente.ultimaCita | date:'dd/MM/yyyy' }}</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-heartbeat"></i>
+                        <div>
+                            <span class="label">Diagnóstico:</span>
+                            <span class="valor">{{ paciente.ultimoDiagnostico }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ⚡ Acciones rápidas -->
+                <div class="acciones">
+                    <button (click)="verHistorial(paciente)" class="btn btn-primary btn-sm">
+                        <i class="fas fa-file-medical"></i> Historial
+                    </button>
+                    <button (click)="nuevaCita(paciente)" class="btn btn-success btn-sm">
+                        <i class="fas fa-calendar-plus"></i> Nueva Cita
+                    </button>
+                    <button (click)="contactarPaciente(paciente)" class="btn btn-info btn-sm">
+                        <i class="fas fa-phone"></i> Contactar
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- 📋 Vista de tabla (Por defecto - más eficiente) -->
+        @if (vistaActual === 'tabla') {
+        <div class="tabla-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Edad/Género</th>
+                        <th>Contacto</th>
+                        <th>Última Cita</th>
+                        <th>Diagnóstico</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (paciente of pacientesFiltrados; track paciente.id) {
+                    <tr>
+                        <td>
+                            <div class="paciente-tabla">
+                                <div class="avatar-mini-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <strong>{{ paciente.nombre }}</strong>
+                                    <br><small class="text-muted">CC: {{ paciente.documento }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>{{ paciente.edad }} años</div>
+                            <small class="text-muted">{{ paciente.genero | titlecase }}</small>
+                        </td>
+                        <td>
+                            <div>{{ paciente.telefono }}</div>
+                            <small class="text-muted">{{ paciente.email }}</small>
+                        </td>
+                        <td>{{ paciente.ultimaCita | date:'dd/MM/yyyy' }}</td>
+                        <td>
+                            <span class="diagnostico">{{ paciente.ultimoDiagnostico }}</span>
+                        </td>
+                        <td>
+                            <div class="acciones-tabla">
+                                <button (click)="verHistorial(paciente)" class="btn btn-sm btn-outline-primary"
+                                    title="Ver historial">
+                                    <i class="fas fa-file-medical"></i>
+                                </button>
+                                <button (click)="nuevaCita(paciente)" class="btn btn-sm btn-outline-success"
+                                    title="Nueva cita">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </button>
+                                <button (click)="contactarPaciente(paciente)" class="btn btn-sm btn-outline-info"
+                                    title="Contactar">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+        }
+    </div>
+
+    <!-- 📊 Estadísticas de citas -->
+    <div class="estadisticas-detalladas">
+        <div class="seccion-titulo">
+            <h3><i class="fas fa-chart-bar"></i> Estadísticas de Citas</h3>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card edad">
+                <h4>Distribución por Edad</h4>
+                <div class="stat-items">
+                    <div class="stat-item">
+                        <span class="categoria">0-17 años:</span>
+                        <span class="numero">{{ estadisticas.porEdad['0-17'] || 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="categoria">18-39 años:</span>
+                        <span class="numero">{{ estadisticas.porEdad['18-39'] || 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="categoria">40-64 años:</span>
+                        <span class="numero">{{ estadisticas.porEdad['40-64'] || 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="categoria">65+ años:</span>
+                        <span class="numero">{{ estadisticas.porEdad['65+'] || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card genero">
+                <h4>Distribución por Género</h4>
+                <div class="stat-items">
+                    <div class="stat-item">
+                        <span class="categoria">Femenino:</span>
+                        <span class="numero">{{ estadisticas.porGenero.femenino || 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="categoria">Masculino:</span>
+                        <span class="numero">{{ estadisticas.porGenero.masculino || 0 }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="categoria">Otros:</span>
+                        <span class="numero">{{ estadisticas.porGenero.otro || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card diagnosticos">
+                <h4>Diagnósticos Frecuentes</h4>
+                <div class="stat-items">
+                    @for (diagnostico of estadisticas.diagnosticosFrecuentes; track diagnostico.nombre) {
+                    <div class="stat-item">
+                        <span class="categoria">{{ diagnostico.nombre }}:</span>
+                        <span class="numero">{{ diagnostico.cantidad }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

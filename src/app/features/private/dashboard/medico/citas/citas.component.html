@@ -1,0 +1,252 @@
+<div class="citas-doctor-container container">
+    <div class="citas-header">
+        <div class="header-title">
+            <h2><i class="fas fa-calendar-check"></i> Citas</h2>
+            <p class="subtitle">
+                @if (doctorActual?.especialidad) {
+                Especialidad: {{ doctorActual?.especialidad }} • Administra tus citas y horarios
+                } @else {
+                Administra tus citas y horarios de atención
+                }
+            </p>
+        </div>
+
+        <div class="stats-quick">
+            <div class="stat-card hoy">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="number">{{ citasHoy }}</span>
+                    <span class="label">Hoy</span>
+                </div>
+            </div>
+            <div class="stat-card pendientes">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="number">{{ citasPendientes }}</span>
+                    <span class="label">Pendientes</span>
+                </div>
+            </div>
+            <div class="stat-card completadas">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="number">{{ citasCompletadas }}</span>
+                    <span class="label">Completadas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="filtros-container">
+        <div class="filtros-grupo">
+            <div class="filtro-fecha">
+                <label>Fecha:</label>
+                <input type="date" [(ngModel)]="filtroFecha" (change)="filtrarCitas()" class="form-control">
+            </div>
+            <div class="filtro-estado">
+                <label>Estado:</label>
+                <select [(ngModel)]="filtroEstado" (change)="filtrarCitas()" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="programada">Programadas</option>
+                    <option value="completada">Completadas</option>
+                    <option value="cancelada">Canceladas</option>
+                    <option value="no-show">No Show</option>
+                </select>
+            </div>
+            <div class="filtro-busqueda">
+                <label>Buscar paciente:</label>
+                <input type="text" [(ngModel)]="busquedaPaciente" (input)="filtrarCitas()"
+                    placeholder="Nombre o documento" class="form-control">
+            </div>
+        </div>
+        <button (click)="limpiarFiltros()" class="btn btn-outline-secondary">
+            <i class="fas fa-filter"></i> Limpiar
+        </button>
+    </div>
+
+    <div class="citas-lista">
+        <div class="lista-header">
+            <h3>Citas {{ obtenerTextoFiltro() }}</h3>
+            <span class="total-resultados">
+                @if (totalRegistros > 0) {
+                Mostrando {{ registrosIniciales }} - {{ registrosFinales }} de {{ totalRegistros }} resultados
+                } @else {
+                0 resultados
+                }
+            </span>
+        </div>
+
+        @if (totalRegistros === 0) {
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h4>No hay citas</h4>
+            <p>No se encontraron citas para los filtros seleccionados</p>
+        </div>
+        } @else {
+        <div class="tabla-container">
+            <table class="tabla-citas">
+                <thead>
+                    <tr>
+                        <th class="sortable">
+                            <span>Fecha</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Hora</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Paciente</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Documento</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Teléfono</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Tipo Consulta</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable">
+                            <span>Estado</span>
+                            <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="acciones-header">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (cita of citasPaginadas; track cita.id) {
+                    <tr class="fila-cita">
+                        <td>{{ formatearFecha(cita.fecha) }}</td>
+
+                        <td>
+                            <span class="hora-badge">{{ cita.hora }}</span>
+                        </td>
+
+                        <td class="paciente-celda">{{ cita.paciente.nombre }}</td>
+
+                        <td>{{ cita.paciente.documento }}</td>
+
+                        <td>{{ cita.paciente.telefono }}</td>
+
+                        <td class="consulta-celda">
+                            <div class="consulta-info">
+                                <span class="tipo">{{ cita.tipoConsulta }}</span>
+                                @if (cita.motivo) {
+                                <small class="motivo">{{ cita.motivo }}</small>
+                                }
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="estado-pill" [class]="'estado-' + cita.estado">
+                                @switch (cita.estado) {
+                                @case ('programada') { Programada }
+                                @case ('completada') { Completada }
+                                @case ('cancelada') { Cancelada }
+                                @case ('no-show') { No Show }
+                                @default { {{ cita.estado }} }
+                                }
+                            </span>
+                        </td>
+
+                        <td class="acciones-celda">
+                            <div class="botones-accion">
+                                @if (cita.estado === 'programada') {
+                                <button (click)="iniciarConsulta(cita)" class="btn-accion btn-iniciar"
+                                    title="Iniciar consulta">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button (click)="reprogramarCita(cita)" class="btn-accion btn-reprogramar"
+                                    title="Reprogramar">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </button>
+                                @if (tieneSolicitudCancelacion(cita.id)) {
+                                <button disabled class="btn-accion btn-pendiente"
+                                    title="Solicitud de cancelación pendiente">
+                                    <i class="fas fa-clock"></i>
+                                </button>
+                                } @else {
+                                <button (click)="solicitarCancelacion(cita)" class="btn-accion btn-solicitar"
+                                    title="Solicitar cancelación">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </button>
+                                }
+                                } @else if (cita.estado === 'completada') {
+                                <button (click)="verHistorial(cita)" class="btn-accion btn-historial"
+                                    title="Ver historial">
+                                    <i class="fas fa-file-medical"></i>
+                                </button>
+                                } @else {
+                                <button (click)="verDetalles(cita)" class="btn-accion btn-detalles"
+                                    title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (hayMasRegistros) {
+        <div class="cargar-mas-container">
+            <button (click)="cargarMasRegistros()" [disabled]="cargandoMas" class="btn-cargar-mas">
+                @if (cargandoMas) {
+                <i class="fas fa-spinner fa-spin"></i> Cargando...
+                } @else {
+                <i class="fas fa-plus-circle"></i> Cargar más registros ({{ registrosPorPagina }} más)
+                }
+            </button>
+            <div class="info-carga">
+                <small>Mostrando {{ citasVisibles.length }} de {{ totalRegistros }} registros en esta página</small>
+            </div>
+        </div>
+        }
+
+        @if (totalRegistros > 5) {
+        <div class="paginacion-container">
+            <div class="paginacion-info">
+                <select [(ngModel)]="registrosPorPagina" (change)="cambiarRegistrosPorPagina(registrosPorPagina)"
+                    class="registros-select">
+                    <option value="5">5 por página</option>
+                    <option value="10">10 por página</option>
+                    <option value="25">25 por página</option>
+                    <option value="50">50 por página</option>
+                </select>
+            </div>
+
+            <div class="paginacion-controles">
+                <button (click)="paginaAnterior()" [disabled]="paginaActual === 1" class="btn-paginacion">
+                    <i class="fas fa-chevron-left"></i> Anterior
+                </button>
+
+                <div class="numeros-pagina">
+                    @for (pagina of obtenerNumerosPagina(); track pagina) {
+                    <button (click)="irAPagina(pagina)"
+                        [class]="'btn-numero ' + (pagina === paginaActual ? 'activa' : '')">
+                        {{ pagina }}
+                    </button>
+                    }
+                </div>
+
+                <button (click)="paginaSiguiente()" [disabled]="paginaActual === totalPaginas" class="btn-paginacion">
+                    Siguiente <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        }
+        }
+    </div>
+</div>

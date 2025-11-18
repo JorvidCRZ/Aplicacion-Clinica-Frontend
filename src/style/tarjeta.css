@@ -1,0 +1,108 @@
+.card-estilo {
+    background: var(--azul);
+    color: var(--blanco);
+    border-radius: 25px;
+
+    .card-title {
+        font-weight: 700;
+    }
+
+    .card-imagen {
+        width: 80%;
+        height: 16rem;
+        border-radius: 15px;
+    }
+
+    .card-text {
+        line-height: 34px;
+        font-size: 1.2rem;
+    }
+
+    &:hover {
+        filter: brightness(0.95);
+    }
+
+}
+
+.servicios .card-estilo {
+    .card-imagen {
+        border-radius: 50%;
+        border: 5px solid var(--blanco);
+        padding: 0 !important;
+        object-fit: fill;
+        width: 250px;
+        height: 250px;
+    }
+
+    @media screen and (max-width: 1024px) {
+        .card-imagen {
+            width: 150px;
+            height: 150px;
+        }
+    }
+}
+
+.nosotros .card-estilo {
+    background-color: var(--blanco) !important;
+    color: var(--azul) !important;
+}
+
+
+#especialidades {
+    .titulo {
+        color: var(--blanco);
+    }
+
+    .card-container {
+        background-color: var(--azul-medio);
+        width: 100vw;
+        margin: 0;
+
+    }
+
+    div {
+        background-color: var(--azul-medio);
+        margin: 0 auto;
+
+        .card-estilo {
+            padding: 0 !important;
+            margin: 0;
+            border-radius: 15px;
+
+            img {
+                width: 50%;
+                height: 15rem;
+                object-fit: contain;
+                filter: invert(1);
+
+                &:hover {
+                    filter: invert(0);
+                }
+            }
+
+            &:hover {
+                text-align: center;
+                background-color: var(--azul-oscuro);
+                color: var(--negro);
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    #especialidades {
+        justify-items: center;
+
+        .titulo {
+            color: var(--blanco);
+        }
+
+        .card-container {
+            background-color: var(--azul-medio);
+            width: 80%;
+            margin: 0;
+        }
+    }
+}

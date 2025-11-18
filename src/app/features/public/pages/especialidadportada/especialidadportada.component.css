@@ -1,0 +1,106 @@
+/* Card de subespecialidad igual a especialidad */
+.card-especialidad {
+	border-radius: 22px;
+	box-shadow: 0 6px 32px rgba(80,80,160,0.10);
+	transition: box-shadow 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s cubic-bezier(.4,0,.2,1);
+	background: var(--blanco);
+	border: none;
+	padding: 1.2rem 1.1rem 1.3rem 1.1rem;
+	margin-bottom: 28px;
+}
+.card-especialidad:hover {
+	box-shadow: 0 16px 48px rgba(80,80,160,0.18);
+	transform: translateY(-4px) scale(1.03);
+}
+.card-img-top.d-flex.justify-content-center.align-items-center.bg-white {
+	min-height: 140px;
+	height: 160px;
+	padding: 0;
+	background: var(--blanco);
+	border-top-left-radius: 22px;
+	border-top-right-radius: 22px;
+	overflow: hidden;
+}
+.img-especialidad {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 0;
+	background: var(--blanco);
+	box-shadow: none;
+	margin: 0;
+	display: block;
+	transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+/* Fondo gradiente elegante para la portada */
+.portada-profesional {
+	background: linear-gradient(90deg, #f8fafc 60%, #e0e7ff 100%);
+	border-radius: 32px;
+	box-shadow: 0 8px 40px rgba(80,80,160,0.10);
+	padding: 2.8rem 1.5rem 2.2rem 2.2rem;
+	margin-bottom: 2.5rem;
+	animation: fadeInPortada 0.7s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes fadeInPortada {
+	from { opacity: 0; transform: translateY(40px); }
+	to { opacity: 1; transform: none; }
+}
+
+.nombre-profesional {
+	font-size: 2.7rem;
+	font-weight: 800;
+	color: #22304a;
+	letter-spacing: 0.5px;
+	position: relative;
+	margin-bottom: 2.2rem;
+	display: inline-block;
+}
+.nombre-profesional .subrayado {
+	display: block;
+	width: 60px;
+	height: 5px;
+	background: linear-gradient(90deg, #6366f1 0%, #38bdf8 100%);
+	border-radius: 3px;
+	margin-top: 0.5rem;
+	animation: subrayadoAnim 1.1s cubic-bezier(.4,0,.2,1);
+}
+@keyframes subrayadoAnim {
+	from { width: 0; }
+	to { width: 60px; }
+}
+
+.descripcion-profesional {
+	font-size: 1.18rem;
+	color: #4b5563;
+	line-height: 1.8;
+	font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+	margin-bottom: 0;
+}
+
+.img-portada-wrapper {
+	display: inline-block;
+	background: #fff;
+	border-radius: 32px;
+	box-shadow: 0 12px 48px rgba(80,80,160,0.16);
+	padding: 1.5rem;
+	transition: box-shadow 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.img-portada-wrapper:hover {
+	box-shadow: 0 20px 64px rgba(80,80,160,0.22);
+	transform: translateY(-4px) scale(1.03);
+}
+.img-portada-profesional {
+	width: 100%;
+	max-width: 650px;
+	max-height: 480px;
+	min-height: 260px;
+	object-fit: cover;
+	border-radius: 32px;
+	box-shadow: 0 12px 48px rgba(80,80,160,0.22);
+	transition: box-shadow 0.3s cubic-bezier(.4,0,.2,1), transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.img-portada-profesional:hover {
+	box-shadow: 0 24px 96px rgba(80,80,160,0.28);
+	transform: scale(1.05);
+}

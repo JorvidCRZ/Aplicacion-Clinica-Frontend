@@ -1,0 +1,136 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Usuarios</h2>
+      <p>Administra todos los usuarios del sistema</p>
+    </div>
+    <div class="header-left">
+      <button class="btn btn-primary">
+        <i class="fas fa-file-alt"></i>
+        Reporte de Usuarios
+      </button>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarUsuario()">
+        <i class="fas fa-plus"></i>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
+  @if (usuarioActual) {
+  <div class="usuario-form-modal">
+    <form (ngSubmit)="guardarUsuario()" #formUsuario="ngForm">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">
+        &times;
+      </button>
+      <h3>{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
+      <div class="form-group">
+        <label>Nombre Completo:</label>
+        <input [(ngModel)]="usuarioActual.nombre" name="nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [(ngModel)]="usuarioActual.apellidoPaterno" name="apellidoPaterno">
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [(ngModel)]="usuarioActual.apellidoMaterno" name="apellidoMaterno">
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [(ngModel)]="usuarioActual.email" name="email" required type="email">
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [(ngModel)]="usuarioActual.telefono" name="telefono">
+      </div>
+      <div class="form-group">
+        <label>Rol:</label>
+        <select [(ngModel)]="usuarioActual.rol" name="rol">
+          <option value="admin">Admin</option>
+          <option value="doctor">Doctor</option>
+          <option value="paciente">Paciente</option>
+        </select>
+      </div>
+      @if (usuarioActual.rol === 'doctor') {
+      <div class="form-group">
+        <label>Especialidad:</label>
+        <input [(ngModel)]="usuarioActual.especialidad" name="especialidad">
+      </div>
+      }
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [(ngModel)]="usuarioActual.tipoDocumento" name="tipoDocumento">
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [(ngModel)]="usuarioActual.numeroDocumento" name="numeroDocumento">
+      </div>
+      <div class="form-group">
+        <label>Contraseña:</label>
+        <input [(ngModel)]="usuarioActual.password" name="password" type="password">
+      </div>
+      <div class="form-actions">
+        <button type="submit" [disabled]="formUsuario.invalid">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  }
+
+  @if (mostrarModalVer && usuarioActual) {
+  <div class="usuario-form-modal">
+    <form>
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      <h3>Detalles del Usuario</h3>
+      <div class="form-group">
+        <label>Nombre Completo:</label>
+        <input [value]="usuarioActual.nombre" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno:</label>
+        <input [value]="usuarioActual.apellidoPaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno:</label>
+        <input [value]="usuarioActual.apellidoMaterno" disabled>
+      </div>
+      <div class="form-group">
+        <label>Email:</label>
+        <input [value]="usuarioActual.email" disabled>
+      </div>
+      <div class="form-group">
+        <label>Teléfono:</label>
+        <input [value]="usuarioActual.telefono" disabled>
+      </div>
+      <div class="form-group">
+        <label>Rol:</label>
+        <input [value]="usuarioActual.rol" disabled>
+      </div>
+      @if (usuarioActual.rol === 'doctor') {
+      <div class="form-group">
+        <label>Especialidad:</label>
+        <input [value]="usuarioActual.especialidad" disabled>
+      </div>
+      }
+      <div class="form-group">
+        <label>Tipo Documento:</label>
+        <input [value]="usuarioActual.tipoDocumento" disabled>
+      </div>
+      <div class="form-group">
+        <label>Número Documento:</label>
+        <input [value]="usuarioActual.numeroDocumento" disabled>
+      </div>
+      <div class="form-group">
+        <label>Contraseña:</label>
+        <input [value]="usuarioActual.password" type="password" disabled>
+      </div>
+    </form>
+  </div>
+  }
+
+  <app-data-table [data]="usuarios" [columns]="columns" [actions]="actions" [searchable]="true" [loading]="isLoading"
+    [paginated]="true" [pageSize]="10" [pageSizeOptions]="[10,20,50]" emptyMessage="No hay usuarios registrados"
+    (actionClicked)="onTableAction($event)" (sortChanged)="onSortChange($event)">
+  </app-data-table>
+</div>
