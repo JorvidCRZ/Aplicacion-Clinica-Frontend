@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
 import { PagosService, Factura as FacturaLocal } from '../../../../../core/services/logic/pagos.service';
+import { environment } from '../../../../../../environments/environment';
+import { ReportesService } from '../../../../../core/services/reportes.service';
 import { CitaCompleta } from '../../../../../core/models/common/cita';
 
 // 📊 Interfaces para Reportes
@@ -55,7 +57,11 @@ interface DatoGrafico {
   styleUrl: './reportes.component.css'
 })
 export class ReportesComponent implements OnInit {
-  constructor(private citaService: CitaService, private pagosService: PagosService) {}
+  constructor(
+    private citaService: CitaService,
+    private pagosService: PagosService,
+    private reportesService: ReportesService
+  ) {}
   
   // 📋 Configuración de filtros
   filtro: FiltroReporte = {
@@ -271,15 +277,60 @@ export class ReportesComponent implements OnInit {
     this.datosGrafico = claves.map((k, i) => ({ label: this.formatearMes(k), value: porMes[k], color: paleta[i % paleta.length] }));
   }
 
-  // 📥 Exportar reporte
+  // 📥 Exportar reporte (llama al backend y descarga el archivo)
   exportarReporte(formato: 'pdf' | 'excel' | 'csv'): void {
-    const mensaje = `Exportando reporte en formato ${formato.toUpperCase()}...`;
-    console.log(mensaje);
-    
-    // Simular descarga
-    setTimeout(() => {
-      alert(`✅ Reporte exportado exitosamente en formato ${formato.toUpperCase()}`);
-    }, 1500);
+    const tipoFiltro = this.filtro.tipo; // 'pacientes' | 'doctores' expected
+
+    let basePath = '';
+    if (tipoFiltro === 'pacientes') basePath = '/reportes/pacientes';
+    else if (tipoFiltro === 'doctores') basePath = '/reportes/medicos';
+    else {
+      alert('Seleccione el filtro de tipo "pacientes" o "doctores" antes de exportar.');
+      return;
+    }
+
+    // Determinar extensión y headers según formato
+    const ext = formato === 'pdf' ? 'pdf' : (formato === 'excel' ? 'xlsx' : 'csv');
+    const acceptHeader = formato === 'pdf'
+      ? 'application/pdf'
+      : (formato === 'excel'
+        ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        : 'text/csv');
+
+    // Construir URL con filtros de fechas (si el backend los soporta se usarán)
+    const url = `${environment.apiUrl}${basePath}/${formato}`;
+    const params = new URLSearchParams();
+    if (this.filtro.fechaInicio) params.set('desde', this.filtro.fechaInicio);
+    if (this.filtro.fechaFin) params.set('hasta', this.filtro.fechaFin);
+    const fetchUrl = params.toString() ? `${url}?${params.toString()}` : url;
+
+    const desde = this.filtro.fechaInicio || undefined;
+    const hasta = this.filtro.fechaFin || undefined;
+
+    let obs;
+    if (tipoFiltro === 'pacientes') {
+      obs = this.reportesService.descargarPacientes(formato, desde, hasta);
+    } else {
+      obs = this.reportesService.descargarMedicos(formato, desde, hasta);
+    }
+
+    obs.subscribe({
+      next: (blob: Blob) => {
+        const filename = `reporte-${tipoFiltro}.${ext}`;
+        const urlBlob = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = urlBlob;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(urlBlob);
+      },
+      error: (err: any) => {
+        console.error('Error al descargar el reporte:', err);
+        alert('No se pudo descargar el reporte. Revise la consola para más detalles.');
+      }
+    });
   }
 
   // 🔄 Actualizar datos
