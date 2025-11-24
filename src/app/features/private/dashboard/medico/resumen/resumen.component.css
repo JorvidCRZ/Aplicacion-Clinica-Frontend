@@ -348,6 +348,28 @@
     color: var(--azul);
 }
 
+/* Nuevos estilos para estados añadidos: seguir diseño de completada/programada */
+.badge.no-show {
+    background: rgba(220, 53, 69, 0.08);
+    color: #dc3545;
+}
+
+.badge.cancelada {
+    background: rgba(108, 117, 125, 0.08);
+    color: #6c757d;
+}
+
+/* Opcional: estilos para la fila completa cuando el estado es no-show o cancelada */
+.cita-item.estado-no-show {
+    background: linear-gradient(135deg, rgba(220,53,69,0.04) 0%, rgba(220,53,69,0.02) 100%);
+    border-color: rgba(220,53,69,0.15);
+}
+
+.cita-item.estado-cancelada {
+    background: linear-gradient(135deg, rgba(108,117,125,0.03) 0%, rgba(108,117,125,0.01) 100%);
+    border-color: rgba(108,117,125,0.12);
+}
+
 /* 👥 Pacientes recientes */
 .pacientes-lista {
     padding: 0 1.5rem 1.5rem;
@@ -639,3 +661,48 @@
         align-self: center;
     }
 }
+
+/* ===== Modal de 'Ver todas' ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 1rem;
+}
+.modal-window {
+    background: var(--blanco);
+    width: 800px;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(11, 34, 70, 0.35);
+    overflow: hidden;
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e9ecef;
+}
+.modal-header h4 {
+    margin: 0;
+    color: var(--azul);
+    font-weight: 700;
+}
+.modal-close {
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #495057;
+}
+.modal-body { padding: 1rem; max-height: 60vh; overflow: auto; }
+.citas-todas-lista .modal-item { margin-bottom: 0.75rem; }
+.texto-vacio { color: #6c757d; padding: 1rem; text-align: center; }

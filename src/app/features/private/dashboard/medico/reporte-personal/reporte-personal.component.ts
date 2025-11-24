@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../../core/services/auth/auth.service';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
+import { MedicosService } from '../../../../../core/services/logic/medico.service';
+import { PacienteService } from '../../../../../core/services/rol/paciente.service';
 import { CitaCompleta } from '../../../../../core/models/common/cita';
 
 // 📊 Interfaces para el Reporte
@@ -40,6 +42,8 @@ export class ReportePersonalComponent implements OnInit {
   // 🔧 Servicios
   private authService = inject(AuthService);
   private citasSrv = inject(CitaService);
+  private medicosSrv = inject(MedicosService);
+  private pacienteSrv = inject(PacienteService);
 
   // 👨‍⚕️ Doctor actual
   doctorActual: DoctorVM | null = null;
@@ -67,6 +71,25 @@ export class ReportePersonalComponent implements OnInit {
 
   // 🎛️ Vista actual
   vistaActiva = 'resumen';
+
+  // Total calculado desde el endpoint dashboard/medico/:id
+  totalCitasAtendidasApi: number | null = null;
+  // Total de citas (conteo absoluto) obtenido desde endpoint dashboard (para calcular %)
+  totalCitasApiCount: number | null = null;
+  // Total de pacientes activos obtenido desde `tablapacientes/medico/:idMedico`
+  totalPacientesApi: number | null = null;
+  // Lista de pacientes obtenida desde el endpoint (si disponible)
+  pacientesListaApi: any[] | null = null;
+  // Tiempo promedio (minutos) obtenido desde `citas/dashboard/medico/:idMedico/horas-promedio`
+  totalTiempoPromedioApi: number | null = null;
+  // Citas de hoy cargadas desde API (si están disponibles)
+  citasHoyApi: any[] | null = null;
+
+  // Propiedades expuestas para la pestaña Productividad
+  tiempoPromedio: number | null = null;
+  eficienciaReport: number | null = null; // porcentaje
+  pacientesSeguimiento: number | null = null; // usar totalPacientesApi cuando esté disponible
+  optimizacionPercent: string | null = null;
 
   // ⏳ Estado de carga
   cargando = false;
@@ -109,12 +132,198 @@ export class ReportePersonalComponent implements OnInit {
     this.citasDoctor = this.filtrarCitasPorDoctor(this.citas);
 
     // Secciones del reporte
-    this.cargarMetricas();
-    this.cargarCitasHoy();
-    this.cargarDiagnosticosComunes();
-    this.cargarActividadSemanal();
+    // Obtener en paralelo el total de citas completadas y el total de pacientes
+    // desde los endpoints del backend. Si fallan, se usan los cálculos locales.
+    Promise.all([
+      this.fetchTotalCitasAtendidasDesdeApi(),
+      this.fetchTotalPacientesDesdeApi(),
+      this.fetchTotalTiempoPromedioDesdeApi(),
+      this.fetchCitasHoyDesdeApi()
+    ]).finally(() => {
+      this.cargarMetricas();
+      this.cargarCitasHoy();
+      this.cargarDiagnosticosComunes();
+      this.cargarActividadSemanal();
 
-    this.cargando = false;
+      this.cargando = false;
+    });
+  }
+
+  // Cargar 'Citas de Hoy' desde el endpoint dashboard por médico
+  private async fetchCitasHoyDesdeApi(): Promise<void> {
+    try {
+      const usuario: any = this.authService.currentUser;
+      if (!usuario || !usuario.idUsuario) return;
+      const prom = new Promise<void>((resolve) => {
+        this.medicosSrv.obtenerMedicoPorUsuario(usuario.idUsuario).subscribe({
+          next: (medResp: any) => {
+            const idMedico = medResp?.id_medico || medResp?.idMedico || medResp?.id || medResp?.medicoId || 0;
+            if (!idMedico) return resolve();
+            this.citasSrv.obtenerCitasDashboardPorMedico(idMedico).subscribe({
+              next: (lista: any[]) => {
+                try {
+                  const arr = Array.isArray(lista) ? lista : [];
+                  const hoy = this.fechaISO(new Date());
+                  const hoyArr = arr.filter((c: any) => (c.fecha || '').toString().startsWith(hoy));
+                  this.citasHoyApi = hoyArr;
+                  // Mapear inmediatamente a la forma usada en la UI
+                  this.citasHoy = hoyArr.map(c => ({
+                    hora: (c.hora || '').toString().slice(0,5),
+                    paciente: this.nombreCorto(c.paciente || c.pacienteNombre || c.nombreCompleto || ''),
+                    tipo: c.tipoConsulta || c.subespecialidad || c.tipo || '',
+                    estado: (c.estado || '').toString().toLowerCase() === 'completada' || (c.estado || '').toString().toLowerCase().includes('complet') ? 'completada' : ((c.estado || '').toString().toLowerCase().includes('cancel') ? 'cancelada' : 'pendiente')
+                  } as CitaDelDia));
+                  console.log('DEBUG: citasHoyApi cargadas:', this.citasHoy.length);
+                } catch (e) {
+                  console.warn('Error procesando citasHoy desde API:', e);
+                  this.citasHoyApi = null;
+                }
+                resolve();
+              },
+              error: (err: any) => {
+                console.warn('No se pudo obtener citas dashboard por medico (hoy):', err);
+                this.citasHoyApi = null;
+                resolve();
+              }
+            });
+          },
+          error: (err: any) => {
+            console.warn('No se pudo resolver medico por usuario (citas hoy):', err);
+            this.citasHoyApi = null;
+            resolve();
+          }
+        });
+      });
+      await prom;
+    } catch (err) {
+      console.warn('fetchCitasHoyDesdeApi error:', err);
+      this.citasHoyApi = null;
+    }
+  }
+
+  // Obtener total de pacientes (formato tabla) para el médico y guardarlo
+  private async fetchTotalPacientesDesdeApi(): Promise<void> {
+    try {
+      const usuario: any = this.authService.currentUser;
+      if (!usuario || !usuario.idUsuario) return;
+      const prom = new Promise<void>((resolve) => {
+        this.medicosSrv.obtenerMedicoPorUsuario(usuario.idUsuario).subscribe({
+          next: (medResp: any) => {
+            const idMedico = medResp?.id_medico || medResp?.idMedico || medResp?.id || medResp?.medicoId || 0;
+            if (!idMedico) return resolve();
+            this.pacienteSrv.obtenerPacientesPorMedico(idMedico).subscribe({
+              next: (lista: any[]) => {
+                try {
+                  const arr = Array.isArray(lista) ? lista : [];
+                  this.totalPacientesApi = arr.length;
+                  this.pacientesListaApi = arr;
+                  console.log('DEBUG: totalPacientesApi obtenido:', this.totalPacientesApi, 'pacientesListaApi:', (this.pacientesListaApi || []).length);
+                } catch (e) {
+                  console.warn('Error procesando totalPacientesApi:', e);
+                }
+                resolve();
+              },
+              error: (err: any) => {
+                console.warn('No se pudo obtener pacientes por medico:', err);
+                resolve();
+              }
+            });
+          },
+          error: (err: any) => {
+            console.warn('No se pudo resolver medico por usuario (pacientes):', err);
+            resolve();
+          }
+        });
+      });
+      await prom;
+    } catch (err) {
+      console.warn('fetchTotalPacientesDesdeApi error:', err);
+    }
+  }
+
+  // Intenta resolver `idMedico` para el usuario actual y llamar al endpoint
+  // `obtenerCitasDashboardPorMedico` para calcular el total de citas completadas.
+  private async fetchTotalCitasAtendidasDesdeApi(): Promise<void> {
+    try {
+      const usuario: any = this.authService.currentUser;
+      if (!usuario || !usuario.idUsuario) return;
+      // Obtener idMedico desde el servicio de médicos
+      const prom = new Promise<void>((resolve) => {
+        this.medicosSrv.obtenerMedicoPorUsuario(usuario.idUsuario).subscribe({
+          next: (medResp: any) => {
+            const idMedico = medResp?.id_medico || medResp?.idMedico || medResp?.id || medResp?.medicoId || 0;
+            if (!idMedico) return resolve();
+            // Llamar al endpoint de citas para dashboard
+            this.citasSrv.obtenerCitasDashboardPorMedico(idMedico).subscribe({
+              next: (lista: any[]) => {
+                try {
+                  const arr = Array.isArray(lista) ? lista : [];
+                  const completadas = arr.filter((c: any) => (c && (c.estado || '').toString().toLowerCase().includes('complet'))).length;
+                  this.totalCitasAtendidasApi = completadas;
+                  this.totalCitasApiCount = arr.length;
+                  console.log('DEBUG: totalCitasAtendidasApi obtenido:', this.totalCitasAtendidasApi, ' totalCitasApiCount:', this.totalCitasApiCount);
+                } catch (e) {
+                  console.warn('Error calculando totalCitasAtendidasApi:', e);
+                }
+                resolve();
+              },
+              error: (err: any) => {
+                console.warn('No se pudo obtener citas dashboard por medico:', err);
+                resolve();
+              }
+            });
+          },
+          error: (err: any) => {
+            console.warn('No se pudo resolver medico por usuario:', err);
+            resolve();
+          }
+        });
+      });
+      await prom;
+    } catch (err) {
+      console.warn('fetchTotalCitasAtendidasDesdeApi error:', err);
+    }
+  }
+
+  // Obtener tiempo promedio (minutos) desde el endpoint de estadísticas de citas
+  private async fetchTotalTiempoPromedioDesdeApi(): Promise<void> {
+    try {
+      const usuario: any = this.authService.currentUser;
+      if (!usuario || !usuario.idUsuario) return;
+      const prom = new Promise<void>((resolve) => {
+        this.medicosSrv.obtenerMedicoPorUsuario(usuario.idUsuario).subscribe({
+          next: (medResp: any) => {
+            const idMedico = medResp?.id_medico || medResp?.idMedico || medResp?.id || medResp?.medicoId || 0;
+            if (!idMedico) return resolve();
+            this.citasSrv.obtenerHorasPromedioPorMedico(idMedico).subscribe({
+              next: (res: any) => {
+                try {
+                  const pm = res && res.promedioMinutos !== undefined ? res.promedioMinutos : (res && typeof res === 'number' ? res : null);
+                  if (pm !== null && pm !== undefined) {
+                    this.totalTiempoPromedioApi = Math.round(pm);
+                    console.log('DEBUG: totalTiempoPromedioApi obtenido:', this.totalTiempoPromedioApi);
+                  }
+                } catch (e) {
+                  console.warn('Error procesando totalTiempoPromedioApi:', e);
+                }
+                resolve();
+              },
+              error: (err: any) => {
+                console.warn('No se pudo obtener horas/promedio por medico:', err);
+                resolve();
+              }
+            });
+          },
+          error: (err: any) => {
+            console.warn('No se pudo resolver medico por usuario (tiempo promedio):', err);
+            resolve();
+          }
+        });
+      });
+      await prom;
+    } catch (err) {
+      console.warn('fetchTotalTiempoPromedioDesdeApi error:', err);
+    }
   }
 
   private filtrarCitasPorDoctor(citas: CitaCompleta[]): CitaCompleta[] {
@@ -132,19 +341,60 @@ export class ReportePersonalComponent implements OnInit {
   private cargarMetricas(): void {
     const rango = this.obtenerRangoPeriodo(this.periodoSeleccionado);
     const enRango = this.citasDoctor.filter(c => this.enRangoFecha(c.fecha, rango.inicio, rango.fin));
-    const completadas = enRango.filter(c => c.estado === 'completada');
+    const completadasArr = enRango.filter(c => c.estado === 'completada');
     const pendientes = enRango.filter(c => c.estado === 'pendiente' || c.estado === 'confirmada');
+    // Si obtuvimos el total desde el endpoint, lo usamos para la métrica principal;
+    // en caso contrario usamos el conteo local dentro del periodo
+    const totalCompletadasParaMetrica = (this.totalCitasAtendidasApi !== null) ? this.totalCitasAtendidasApi : completadasArr.length;
 
     const pacientesUnicos = new Set(enRango.map(c => c.pacienteEmail).filter(Boolean));
+    const totalPacientesParaMetrica = (this.totalPacientesApi !== null) ? this.totalPacientesApi : pacientesUnicos.size;
 
-    const promMin = completadas.length
-      ? Math.round(completadas.reduce((acc, c) => acc + (c.duracionEstimada || 30), 0) / completadas.length)
+    const promMin = completadasArr.length
+      ? Math.round(completadasArr.reduce((acc, c) => acc + (c.duracionEstimada || 30), 0) / completadasArr.length)
       : 30;
+    const tiempoPromedioParaMetrica = (this.totalTiempoPromedioApi !== null) ? this.totalTiempoPromedioApi : promMin;
+
+    // Priorizar valores desde API para la pestaña Productividad
+    this.tiempoPromedio = (this.totalTiempoPromedioApi !== null) ? this.totalTiempoPromedioApi : promMin;
+
+    // Eficiencia: si el API provee totales, usar completadas / total; si no, fallback local
+    if (this.totalCitasApiCount !== null && this.totalCitasApiCount > 0 && this.totalCitasAtendidasApi !== null) {
+      this.eficienciaReport = Math.round((this.totalCitasAtendidasApi / this.totalCitasApiCount) * 100);
+    } else {
+      const totalLocal = completadasArr.length + pendientes.length;
+      this.eficienciaReport = totalLocal > 0 ? Math.round((completadasArr.length / totalLocal) * 100) : 0;
+    }
+
+    // Seguimientos: preferir totalPacientesApi cuando esté disponible
+    if (this.totalPacientesApi !== null) {
+      this.pacientesSeguimiento = this.totalPacientesApi;
+    } else {
+      // Calcular pacientes con >=3 visitas en el periodo
+      const visitasPorPaciente = new Map<string, number>();
+      for (const c of enRango) {
+        const anyC: any = c as any;
+        const key = (anyC.pacienteEmail || anyC.pacienteNombre || anyC.pacienteTelefono || '').toString();
+        if (!key) continue;
+        visitasPorPaciente.set(key, (visitasPorPaciente.get(key) || 0) + 1);
+      }
+      this.pacientesSeguimiento = Array.from(visitasPorPaciente.values()).filter(v => v >= 3).length;
+    }
+
+    // Calcular optimización relativa a baseline (30 min)
+    if (this.tiempoPromedio !== null) {
+      const baseline = 30;
+      const pct = Math.round(((baseline - this.tiempoPromedio) / (this.tiempoPromedio || 1)) * 100);
+      const sign = pct > 0 ? '+' : '';
+      this.optimizacionPercent = `${sign}${pct}%`;
+    } else {
+      this.optimizacionPercent = null;
+    }
 
     this.metricas = [
-      {
+        {
         titulo: 'Citas Atendidas',
-        valor: completadas.length,
+        valor: totalCompletadasParaMetrica,
         icono: 'fas fa-calendar-check',
         color: '#28a745',
         cambio: '-',
@@ -152,7 +402,7 @@ export class ReportePersonalComponent implements OnInit {
       },
       {
         titulo: 'Pacientes Activos',
-        valor: pacientesUnicos.size,
+        valor: totalPacientesParaMetrica,
         icono: 'fas fa-users',
         color: '#007bff',
         cambio: '-',
@@ -160,7 +410,7 @@ export class ReportePersonalComponent implements OnInit {
       },
       {
         titulo: 'Tiempo Promedio',
-        valor: `${promMin} min`,
+        valor: `${tiempoPromedioParaMetrica} min`,
         icono: 'fas fa-clock',
         color: '#17a2b8',
         cambio: '-',
@@ -171,6 +421,8 @@ export class ReportePersonalComponent implements OnInit {
 
   // 📅 Cargar citas de hoy
   private cargarCitasHoy(): void {
+    // Si ya cargamos las citas de hoy desde el API, no sobrescribimos
+    if (this.citasHoyApi !== null) return;
     const hoy = this.fechaISO(new Date());
     const hoyCitas = this.citasDoctor
       .filter(c => c.fecha === hoy)
@@ -187,11 +439,22 @@ export class ReportePersonalComponent implements OnInit {
   private cargarDiagnosticosComunes(): void {
     // Top tipos de consulta por frecuencia en el período seleccionado
     const rango = this.obtenerRangoPeriodo(this.periodoSeleccionado);
-    const enRango = this.citasDoctor.filter(c => this.enRangoFecha(c.fecha, rango.inicio, rango.fin));
+    // Preferir el endpoint de pacientes si devolvió la lista (usaremos el campo diagnóstico)
     const conteo = new Map<string, number>();
-    for (const c of enRango) {
-      const k = c.tipoConsulta || 'Consulta';
-      conteo.set(k, (conteo.get(k) || 0) + 1);
+    if (this.pacientesListaApi && this.pacientesListaApi.length > 0) {
+      // Priorizar el campo `diagnostico` que devuelve el endpoint `tablapacientes`
+      // Si es null/ vacío, agrupar como 'Sin diagnóstico'
+      for (const p of this.pacientesListaApi) {
+        const diagRaw = p.diagnostico;
+        const k = (diagRaw && diagRaw.toString().trim()) ? diagRaw.toString().trim() : 'Sin diagnóstico';
+        conteo.set(k, (conteo.get(k) || 0) + 1);
+      }
+    } else {
+      const enRango = this.citasDoctor.filter(c => this.enRangoFecha(c.fecha, rango.inicio, rango.fin));
+      for (const c of enRango) {
+        const k = c.tipoConsulta || 'Consulta';
+        conteo.set(k, (conteo.get(k) || 0) + 1);
+      }
     }
     const total = Array.from(conteo.values()).reduce((a, b) => a + b, 0) || 1;
     const items = Array.from(conteo.entries())

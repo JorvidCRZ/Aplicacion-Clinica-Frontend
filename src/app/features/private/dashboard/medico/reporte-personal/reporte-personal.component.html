@@ -53,13 +53,12 @@
                 </div>
             </div>
             <div class="metrica-footer">
-                <span class="cambio" [class]="metrica.tendencia">
+                <span *ngIf="metrica.cambio && metrica.cambio !== '-'" class="cambio" [class]="metrica.tendencia">
                     <i class="fas" [class.fa-arrow-up]="metrica.tendencia === 'up'"
                         [class.fa-arrow-down]="metrica.tendencia === 'down'"
                         [class.fa-minus]="metrica.tendencia === 'neutral'"></i>
                     {{ metrica.cambio }}
                 </span>
-                <span class="descripcion">vs período anterior</span>
             </div>
         </div>
     </div>
@@ -141,17 +140,17 @@
             <div class="productividad-stats">
                 <div class="stat-card">
                     <h4>Tiempo Promedio por Cita</h4>
-                    <div class="stat-valor">32 min</div>
-                    <div class="stat-descripcion">Optimización: +15%</div>
+                    <div class="stat-valor">{{ tiempoPromedio !== null ? (tiempoPromedio + ' min') : '-' }}</div>
+                    <div class="stat-descripcion">Optimización: <span *ngIf="optimizacionPercent !== null">{{ optimizacionPercent }}</span><span *ngIf="optimizacionPercent === null">-</span></div>
                 </div>
                 <div class="stat-card">
                     <h4>Eficiencia Diaria</h4>
-                    <div class="stat-valor">94%</div>
+                    <div class="stat-valor">{{ eficienciaReport !== null ? (eficienciaReport + '%') : '-' }}</div>
                     <div class="stat-descripcion">Citas completadas</div>
                 </div>
                 <div class="stat-card">
                     <h4>Seguimientos</h4>
-                    <div class="stat-valor">127</div>
+                    <div class="stat-valor">{{ pacientesSeguimiento !== null ? pacientesSeguimiento : '-' }}</div>
                     <div class="stat-descripcion">Pacientes en seguimiento</div>
                 </div>
             </div>

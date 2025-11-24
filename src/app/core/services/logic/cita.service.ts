@@ -135,4 +135,15 @@ export class CitaService {
     obtenerCitasDashboardPorMedico(idMedico: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiBase}/dashboard/medico/${idMedico}`);
     }
+     // Obtener horas totales y promedio de minutos por médico (stats)
+    obtenerHorasPromedioPorMedico(idMedico: number): Observable<{ horasTotales: number; promedioMinutos: number }> {
+        return this.http.get<{ horasTotales: number; promedioMinutos: number }>(`${this.apiBase}/dashboard/medico/${idMedico}/horas-promedio`);
+    }
+
+     // ======== HISTORIAL CITAS POR MEDICO =========
+    // Endpoint: GET /api/historial/citas/medico/{id_medico}
+    obtenerHistorialCitasPorMedico(idMedico: number): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/api/historial/citas/medico/${idMedico}`);
+    }
+
 }

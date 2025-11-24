@@ -11,24 +11,7 @@
             }
         </div>
         
-        @if (proximaCita) {
-        <div class="proxima-cita-card">
-            <div class="proxima-cita-header">
-                <i class="fas fa-clock"></i>
-                <span>Próxima Cita</span>
-            </div>
-            <div class="proxima-cita-info">
-                <div class="hora-paciente">
-                    <span class="hora">{{ proximaCita.hora }}</span>
-                    <span class="paciente">{{ proximaCita.paciente }}</span>
-                </div>
-                <div class="tipo-consulta">{{ proximaCita.tipo }}</div>
-                <button (click)="iniciarSiguienteCita()" class="btn-iniciar-cita">
-                    <i class="fas fa-play"></i> Iniciar
-                </button>
-            </div>
-        </div>
-        }
+                
     </div>
 
     <div class="estadisticas-grid">
@@ -50,10 +33,9 @@
             <div class="stat-content">
                 <span class="numero">{{ estadisticas.totalPacientes }}</span>
                 <span class="label">Total Pacientes</span>
-                <span class="sublabel">+{{ estadisticas.pacientesNuevos }} este mes</span>
+                <span class="sublabel">Registrados actualmente</span>
             </div>
         </div>
-
         <div class="stat-card tiempo">
             <div class="stat-icon">
                 <i class="fas fa-clock"></i>
@@ -77,8 +59,8 @@
                 </div>
                 
                 <div class="citas-lista">
-                    @for (cita of citasHoy; track cita.id) {
-                    <div class="cita-item" [class]="'estado-' + cita.estado">
+                    <div *ngIf="citasHoy && citasHoy.length > 0; else sinSiguiente">
+                      <div *ngFor="let cita of citasHoy" class="cita-item" [class]="'estado-' + cita.estado">
                         <div class="cita-hora">
                             <span class="hora">{{ cita.hora }}</span>
                             <span class="duracion">{{ cita.duracion }}min</span>
@@ -87,27 +69,58 @@
                             <div class="paciente-nombre">{{ cita.paciente }}</div>
                             <div class="consulta-tipo">{{ cita.tipo }}</div>
                         </div>
-                        <div class="cita-estado">
-                            @switch (cita.estado) {
-                                @case ('completada') {
-                                    <span class="badge completada">
-                                        <i class="fas fa-check"></i> Completada
-                                    </span>
-                                }
-                                @case ('siguiente') {
-                                    <span class="badge siguiente">
-                                        <i class="fas fa-play"></i> Siguiente
-                                    </span>
-                                }
-                                @case ('programada') {
-                                    <span class="badge programada">
-                                        <i class="fas fa-clock"></i> Programada
-                                    </span>
-                                }
-                            }
+                                                <div class="cita-estado">
+                                                    <span *ngIf="cita.estado === 'completada'" class="badge completada"><i class="fas fa-check"></i> Completada</span>
+                                                    <span *ngIf="cita.estado === 'siguiente'" class="badge siguiente"><i class="fas fa-play"></i> Siguiente</span>
+                                                    <span *ngIf="cita.estado === 'programada'" class="badge programada"><i class="fas fa-clock"></i> Programada</span>
+                                                    <span *ngIf="cita.estado === 'no-show'" class="badge no-show"><i class="fas fa-user-times"></i> No Show</span>
+                                                    <span *ngIf="cita.estado === 'cancelada'" class="badge cancelada"><i class="fas fa-ban"></i> Cancelada</span>
+                                                </div>
+                      </div>
+                    </div>
+                    <ng-template #sinSiguiente>
+                      <div class="cita-item" style="border-style: dashed; justify-content: center;">
+                        <div class="cita-info">
+                          <div class="paciente-nombre">Ya no hay siguiente cita</div>
+                          <div class="consulta-tipo">Pulsa "Ver todas" para ver historial de hoy</div>
+                        </div>
+                      </div>
+                    </ng-template>
+                </div>
+            </div>
+
+            <div *ngIf="showCitasModal" class="modal-overlay">
+                <div class="modal-window">
+                    <div class="modal-header">
+                        <h4>Citas de Hoy</h4>
+                        <button class="modal-close" (click)="cerrarModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="citas-todas-lista">
+                            <div *ngIf="citasHoyTodas && citasHoyTodas.length > 0; else vacio">
+                                <div *ngFor="let c of citasHoyTodas; let i = index" class="cita-item modal-item" [class]="'estado-' + c.estado">
+                                    <div class="cita-hora">
+                                        <span class="hora">{{ c.hora }}</span>
+                                        <span class="duracion">{{ c.duracion }}min</span>
+                                    </div>
+                                    <div class="cita-info">
+                                        <div class="paciente-nombre">{{ c.paciente }}</div>
+                                        <div class="consulta-tipo">{{ c.tipo }}</div>
+                                    </div>
+                                    <div class="cita-estado">
+                                        <span *ngIf="c.estado === 'completada'" class="badge completada"><i class="fas fa-check"></i> Completada</span>
+                                        <span *ngIf="c.estado === 'siguiente'" class="badge siguiente"><i class="fas fa-play"></i> Siguiente</span>
+                                        <span *ngIf="c.estado === 'programada'" class="badge programada"><i class="fas fa-clock"></i> Programada</span>
+                                        <span *ngIf="c.estado === 'no-show'" class="badge no-show"><i class="fas fa-user-times"></i> No Show</span>
+                                        <span *ngIf="c.estado === 'cancelada'" class="badge cancelada"><i class="fas fa-ban"></i> Cancelada</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-template #vacio>
+                                <p class="texto-vacio">No hay citas para hoy.</p>
+                            </ng-template>
                         </div>
                     </div>
-                    }
                 </div>
             </div>
 

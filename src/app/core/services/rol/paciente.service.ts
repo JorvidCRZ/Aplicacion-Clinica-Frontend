@@ -91,4 +91,13 @@ export class PacienteService {
   obtenerPacientesPorMedico(idMedico: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/tablapacientes/medico/${idMedico}`);
   }
+    // Obtener puntualidad del médico (porcentaje o métrica) — endpoint añadido
+  obtenerPuntualidadPorMedico(idMedico: number): Observable<{ puntualidad: number }> {
+    return this.http.get<{ puntualidad: number }>(`${this.apiUrl}/puntualidad/medico/${idMedico}`);
+  }
+
+  // Obtener satisfacción del médico (porcentaje o métrica)
+  obtenerSatisfaccionPorMedico(idMedico: number): Observable<{ satisfaccion: number }> {
+    return this.http.get<{ satisfaccion: number }>(`${this.apiUrl}/satisfaccion/medico/${idMedico}`);
+  }
 }
