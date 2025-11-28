@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { CITAS, HORARIOS_POR_DIA, DIAS_DISPONIBLES, Cita, DiaDisponible } from './citas.data';
+import { HORARIOS_POR_DIA, DIAS_DISPONIBLES, DiaDisponible } from './citas.data';
+import { MedicoService } from '../../../../core/services/rol/medico.service';
 import { SubespecialidadService, Subespecialidad } from '../../../../core/services/pages/subespecialidad.service';
 import { EspecialidadService, Especialidad } from '../../../../core/services/pages/especialidad.service';
 
@@ -22,6 +23,7 @@ export class CitasComponent implements OnInit {
   private authService = inject(AuthService);
   private subespService = inject(SubespecialidadService);
   private espService = inject(EspecialidadService);
+  private medicoService = inject(MedicoService);
 
   mostrarModal = false;
   citaParaReservar: any = null;
@@ -57,9 +59,13 @@ export class CitasComponent implements OnInit {
         }
       }
     });
+    this.cargarMedicosDesdeApi();
   }
 
-  citas: Cita[] = CITAS;
+  citas: any[] = [];
+
+  cargandoMedicos = false;
+  errorMedicos: string | null = null;
 
   selectedEspecialidad: string | null = null;
   busqueda: any[] = [];
@@ -73,8 +79,40 @@ export class CitasComponent implements OnInit {
 
   diasDisponibles: DiaDisponible[] = DIAS_DISPONIBLES;
 
+  // Perfil modal
+  mostrarPerfilModal = false;
+  perfilMedicoSeleccionado: any = null;
+
   onBuscarDoctor(resultados: any[]) {
     this.resultadosBuscadorDoctor = resultados;
+  }
+
+  private cargarMedicosDesdeApi() {
+    this.cargandoMedicos = true;
+    this.errorMedicos = null;
+    this.medicoService.getMedicos().subscribe({
+      next: (lista: any[]) => {
+        // Mapear la respuesta del API a la estructura Cita usada en la UI
+        this.citas = (lista || []).map(m => {
+          const persona = m.persona || {};
+          const nombre = [persona.nombre1, persona.apellidoPaterno].filter(Boolean).join(' ') || persona.nombre1 || persona.apellidoPaterno || m.colegiatura || 'Dr.';
+          return {
+            doctor: nombre,
+            especialidad: m.especialidad || 'Medicina General',
+            paciente: '',
+            disponibilidad: [],
+            medico: m // keep original medico object for details (colegiatura, email, etc.)
+          };
+        });
+        this.cargandoMedicos = false;
+      },
+      error: (err: any) => {
+        console.error('Error cargando médicos:', err);
+        this.errorMedicos = 'No se pudo cargar la lista de médicos';
+        this.cargandoMedicos = false;
+        this.citas = [];
+      }
+    });
   }
 
   onBuscarEspecialidad(resultados: any[]) {
@@ -153,6 +191,16 @@ export class CitasComponent implements OnInit {
     if (confirm(mensaje)) {
       alert(`✅ Cita reservada con ${cita.doctor} a las ${horario}. Te contactaremos pronto para confirmar.`);
     }
+  }
+
+  verPerfil(cita: any) {
+    this.perfilMedicoSeleccionado = cita.medico || null;
+    this.mostrarPerfilModal = true;
+  }
+
+  cerrarPerfil() {
+    this.mostrarPerfilModal = false;
+    this.perfilMedicoSeleccionado = null;
   }
 
   reservarCita(cita: any) {

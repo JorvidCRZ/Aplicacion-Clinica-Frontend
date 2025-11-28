@@ -20,6 +20,21 @@
         </div>
     </div>
 
+    <div *ngIf="cargandoMedicos" class="row mb-3">
+        <div class="col text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando médicos...</p>
+        </div>
+    </div>
+
+    <div *ngIf="errorMedicos" class="row mb-3">
+        <div class="col">
+            <div class="alert alert-danger">{{ errorMedicos }}</div>
+        </div>
+    </div>
+
 
     <div class="row">
         @for (cita of citasFiltradas; track cita.doctor) {
@@ -40,8 +55,8 @@
                         <div class="doctor-info-clean">
                             <h3 class="doctor-name-clean">{{ cita.doctor }}</h3>
                             <div class="doctor-meta">
-                                <span class="cmp-clean">CMP: {{ 30000 + (cita.doctor.length * 1234) }}</span>
-                                <a href="#" class="ver-perfil-clean">Ver perfil →</a>
+                                <span class="cmp-clean"> {{ cita.medico?.colegiatura || (30000 + (cita.doctor.length * 1234)) }}</span>
+                                <a (click)="verPerfil(cita)" class="ver-perfil-clean" role="button">Ver perfil →</a>
                             </div>
                             <div class="consulta-badge-clean">
                                 <i class="fas fa-building"></i>
@@ -106,9 +121,6 @@
         <div class="modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
                 <h3><i class="fas fa-calendar-plus"></i> Reservar Cita</h3>
-                <button class="btn-close" (click)="cerrarModal()">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
 
             <div class="cita-seleccionada">
@@ -202,7 +214,7 @@
             </div>
 
             <div class="modal-actions">
-                <button class="btn btn-secondary" (click)="cerrarModal()">
+                <button class="btn btn-secondary btn-modal-close" (click)="cerrarModal()">
                     <i class="fas fa-times"></i>
                     Cancelar
                 </button>
@@ -212,6 +224,40 @@
                 </button>
             </div>
             }
+        </div>
+    </div>
+    }
+    
+    @if (mostrarPerfilModal) {
+    <div class="modal-overlay" (click)="cerrarPerfil()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-md"></i> Perfil del Médico</h3>
+            </div>
+
+            <div class="perfil-body">
+                <div class="doctor-info-modal perfil-grid">
+                    <img src="https://vivamas.aviva.pe/professionals/default.png" alt="Doctor" class="doctor-avatar-modal perfil-avatar">
+                    <div class="doctor-datos-modal">
+                        <h4 class="perfil-nombre">{{ perfilMedicoSeleccionado?.persona?.nombre1 }} {{ perfilMedicoSeleccionado?.persona?.apellidoPaterno }}{{ perfilMedicoSeleccionado?.persona?.apellidoMaterno ? ' ' + perfilMedicoSeleccionado?.persona?.apellidoMaterno : '' }}</h4>
+                        <a class="especialidad-modal" href="#">{{ perfilMedicoSeleccionado?.especialidad }}</a>
+
+                        <div class="perfil-fields">
+                            <p class="perfil-row"><span class="perfil-label">CMP:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.colegiatura }}</span></p>
+                            <p class="perfil-row"><span class="perfil-label">Email:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.email }}</span></p>
+                              <p class="perfil-row"><span class="perfil-label">Genero:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.genero }} </span></p>
+                               <p class="perfil-row"><span class="perfil-label">Pais:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.pais }} </span></p>
+                                <p class="perfil-row"><span class="perfil-label">Depart. :</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.departamento }} </span></p>
+                            <p class="perfil-row"><span class="perfil-label">Dirección:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.direccion }}</span></p>
+                            <p class="perfil-row"><span class="perfil-label">Experiencia:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.experienciaAnios }} años</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary btn-modal-close" (click)="cerrarPerfil()">Cerrar</button>
+            </div>
         </div>
     </div>
     }
