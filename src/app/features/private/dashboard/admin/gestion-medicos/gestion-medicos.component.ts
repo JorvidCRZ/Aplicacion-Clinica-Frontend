@@ -172,6 +172,7 @@ export class GestionMedicosComponent implements OnInit {
 
   private guardarUsuarios(users: any[]): void {
     localStorage.setItem('usuarios', JSON.stringify(users));
+    
   }
 
   agregarDoctor(): void {
@@ -196,22 +197,80 @@ export class GestionMedicosComponent implements OnInit {
     this.doctorActual = { ...doctor };
   }
 
-  guardarDoctor(): void {
-    if (!this.doctorActual) return;
-    // Intentar persistir contra backend primero
-    const payload = this.mapVMToMedico(this.doctorActual);
-    if (this.modoEdicion) {
-      this.medicoService.update(this.doctorActual.id, payload).subscribe({
-        next: _ => { this.postSaveCleanup(); },
-        error: _ => { this.saveLocalFallback(); }
-      });
-    } else {
-      this.medicoService.add(payload).subscribe({
-        next: _ => { this.postSaveCleanup(); },
-        error: _ => { this.saveLocalFallback(true); }
-      });
-    }
+
+guardarDoctor(): void {
+  if (!this.doctorActual) return;
+
+  const payload = this.mapVMToUpdate(this.doctorActual);
+
+  if (this.modoEdicion) {
+    // ✅ EDITAR DOCTOR
+    this.medicoService.update(this.doctorActual.id, payload).subscribe({
+      next: () => {
+        this.doctores = this.doctores.map(d =>
+          d.id === this.doctorActual?.id 
+            ? {
+                ...d,
+                nombre: this.doctorActual!.nombre,
+                apellidoPaterno: this.doctorActual!.apellidoPaterno,
+                apellidoMaterno: this.doctorActual!.apellidoMaterno,
+                email: this.doctorActual!.email,
+                telefono: this.doctorActual!.telefono,
+                especialidad: this.doctorActual!.especialidad,
+                nroColegiado: this.doctorActual!.nroColegiado,
+                horario: this.doctorActual!.horario,
+                tipoDocumento: this.doctorActual!.tipoDocumento,
+                numeroDocumento: this.doctorActual!.numeroDocumento
+              }
+            : d
+        );
+
+        alert("✅ Doctor actualizado exitosamente");
+        this.cancelarFormulario();
+      },
+      error: err => {
+        console.error("❌ Error al actualizar en backend:", err);
+        this.saveLocalFallback(false); // fallback a localStorage
+      }
+    });
+  } else {
+    // ✅ CREAR NUEVO DOCTOR
+    this.medicoService.create(payload).subscribe({
+      next: (nuevoMedico: Medico) => {
+        const nuevoDoctor = this.mapMedicoToVM(nuevoMedico);
+        this.doctores.push(nuevoDoctor);
+
+        alert("✅ Doctor creado exitosamente");
+        this.cancelarFormulario();
+      },
+      error: err => {
+        console.error("❌ Error al crear en backend:", err);
+        this.saveLocalFallback(true); // fallback a localStorage
+      }
+    });
   }
+}
+
+// ...existing code...
+
+private mapVMToUpdate(vm: DoctorVM): any {
+  return {
+    nombre1: vm.nombre ?? '',
+    nombre2: vm.nombre2 ?? '',  // 👈 antes decía vm.nombre2, a veces es undefined
+    apellidoPaterno: vm.apellidoPaterno ?? '',
+    apellidoMaterno: vm.apellidoMaterno ?? '',
+    dni: vm.numeroDocumento ?? '',
+    telefono: vm.telefono ?? '',
+    direccion: vm.direccion ?? '',
+    genero: vm.genero ?? '',  // 👈 si llega undefined lo bloquea
+    correo: vm.email ?? '',
+    especialidad: vm.especialidad ?? 'Sin especialidad',
+    colegiatura: vm.nroColegiado ?? '',
+    horario: vm.horario ?? ''  // 👈 aquí está el más importante
+  };
+}
+
+
 
   verDoctor(doctor: DoctorVM): void {
     this.doctorActual = { ...doctor };
@@ -285,46 +344,45 @@ export class GestionMedicosComponent implements OnInit {
     } as DoctorVM;
   }
 
-  private mapMedicoToVM(m: Medico): DoctorVM {
-    return {
-      id: m.idMedico,
-      nombre: m.persona?.nombre1 || '',
-      apellidoPaterno: m.persona?.apellidoPaterno || '',
-      apellidoMaterno: m.persona?.apellidoMaterno || '',
-      email: m.email || m.persona?.usuario?.correo || '',
-      telefono: m.persona?.telefono || '',
-      tipoDocumento: m.persona?.tipoDocumento || '',
-      numeroDocumento: m.persona?.dni || '',
-      especialidad: m.especialidad || '',
-      nroColegiado: m.colegiatura || '',
-      horario: m.horario || ''
-    };
-  }
 
-  private mapVMToMedico(vm: DoctorVM): Medico {
-    return {
-      idMedico: vm.id,
-      colegiatura: vm.nroColegiado || '',
-      experienciaAnios: 0,
-      persona: {
-        tipoDocumento: vm.tipoDocumento || 'DNI',
-        dni: vm.numeroDocumento || '',
-        nombre1: vm.nombre || '',
-        nombre2: '',
-        apellidoPaterno: vm.apellidoPaterno || '',
-        apellidoMaterno: vm.apellidoMaterno || '',
-        fechaNacimiento: new Date().toISOString(),
-        genero: 'N',
-        pais: 'PE',
-        departamento: '',
-        provincia: '',
-        distrito: '',
-        direccion: '',
-        telefono: vm.telefono || '',
-        usuario: { correo: vm.email || '', rol: { idRol: 2, nombre: 'Medico' } as any }
+private mapMedicoToVM(m: Medico): DoctorVM {
+  return {
+    id: m.idMedico,
+    nombre: m.persona?.nombre1 || '',
+    apellidoPaterno: m.persona?.apellidoPaterno || '',
+    apellidoMaterno: m.persona?.apellidoMaterno || '',
+    email: m.persona?.usuario?.correo || m.email || '',
+    telefono: m.persona?.telefono || '',
+    tipoDocumento: m.persona?.tipoDocumento || '',
+    numeroDocumento: m.persona?.dni || '',
+    especialidad: m.especialidad || '',
+    nroColegiado: m.colegiatura || '',
+    horario: m.horario || 'Sin horario' 
+  };
+}
+
+
+
+private mapVMToMedico(vm: DoctorVM): Medico {
+  return {
+    idMedico: vm.id,
+    especialidad: vm.especialidad,
+    colegiatura: vm.nroColegiado,
+    horario: vm.horario,
+    persona: {
+      nombre1: vm.nombre,
+      apellidoPaterno: vm.apellidoPaterno,
+      apellidoMaterno: vm.apellidoMaterno,
+      telefono: vm.telefono,
+      dni: vm.numeroDocumento,
+      tipoDocumento: vm.tipoDocumento,
+      usuario: {
+        correo: vm.email
       }
-    } as Medico;
-  }
+    }
+  } as Medico;
+}
+
 
   private postSaveCleanup() {
     this.doctorActual = null;
@@ -382,16 +440,20 @@ export class GestionMedicosComponent implements OnInit {
 // Modelo de vista para doctores en el admin
 interface DoctorVM {
   id: number;
+  idPersona?: number;  
   nombre: string;
+  nombre2?: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
   email: string;
   telefono: string;
-  tipoDocumento: string;
-  numeroDocumento: string;
+  tipoDocumento: string; 
+  numeroDocumento: string; 
   especialidad: string;
-  nroColegiado: string;
-  horario: string;
+  nroColegiado: string;    
+  horario: string;        
+  genero?: string;
+  direccion?: string;
 }
 
 // Nota: se soporta tanto la estructura plana como la basada en Usuario/Persona

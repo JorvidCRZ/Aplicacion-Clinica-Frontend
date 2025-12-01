@@ -5,12 +5,12 @@ import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class MedicosService {
+
   private http = inject(HttpClient);
-  
   private URL = `${environment.apiUrl}/medicos`;
 
   obtenerDisponibilidad(idMedico: number): Observable<any> {
-    return this.http.get(`${this.URL}/disponibilidad/medico/${idMedico}`);
+    return this.http.get(`${this.URL}/${idMedico}/disponibilidad`);
   }
 
   obtenerMedicoPorUsuario(idUsuario: number): Observable<any> {
@@ -25,7 +25,6 @@ export class MedicosService {
     return this.http.post(`${this.URL}/disponibilidad`, horarios);
   }
 
-  // Obtener la especialidad asociada a un médico por su id
   obtenerEspecialidadPorMedico(idMedico: number): Observable<{ nombreEspecialidad: string }> {
     return this.http.get<{ nombreEspecialidad: string }>(
       `${this.URL}/especialidad/${idMedico}`
@@ -37,7 +36,6 @@ export class MedicosService {
   }
 
   actualizarPerfilMedico(idMedico: number, perfilData: any): Observable<any> {
-  return this.http.put(`${this.URL}/perfil/actualizar/${idMedico}`, perfilData);
-}
-
+    return this.http.put(`${this.URL}/perfil/actualizar/${idMedico}`, perfilData);
+  }
 }
