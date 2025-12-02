@@ -29,42 +29,40 @@ export class PacienteService {
   }
 
   update(idPaciente: number, paciente: Paciente): Observable<Paciente> {
-    
-    const body: any = {
-      idPersona: paciente.persona?.idPersona,
-      tipoSangre: paciente.tipoSangre,
-      peso: paciente.peso,
-      altura: paciente.altura,
-      contactoEmergenciaNombre: paciente.contactoEmergenciaNombre,
-      contactoEmergenciaRelacion: paciente.contactoEmergenciaRelacion,
-      contactoEmergenciaTelefono: paciente.contactoEmergenciaTelefono
+    const body = {
+      idPersona: paciente.persona?.idPersona ?? null, // backend requiere idPersona > 0
+      tipoSangre: paciente.tipoSangre ?? null,
+      peso: paciente.peso ?? null,
+      altura: paciente.altura ?? null,
+      contactoEmergenciaNombre: paciente.contactoEmergenciaNombre ?? null,
+      contactoEmergenciaRelacion: paciente.contactoEmergenciaRelacion ?? null,
+      contactoEmergenciaTelefono: paciente.contactoEmergenciaTelefono ?? null,
+
+      persona: {
+        tipoDocumento: paciente.persona?.tipoDocumento ?? null,
+        nombre1: paciente.persona?.nombre1 ?? null,
+        nombre2: paciente.persona?.nombre2 ?? null,
+        apellidoPaterno: paciente.persona?.apellidoPaterno ?? null,
+        apellidoMaterno: paciente.persona?.apellidoMaterno ?? null,
+        dni: paciente.persona?.dni ?? null,
+        fechaNacimiento: paciente.persona?.fechaNacimiento
+          ? new Date(paciente.persona!.fechaNacimiento).toISOString()
+          : null,
+        genero: paciente.persona?.genero ?? null,
+        pais: paciente.persona?.pais ?? null,
+        departamento: paciente.persona?.departamento ?? null,
+        provincia: paciente.persona?.provincia ?? null,
+        distrito: paciente.persona?.distrito ?? null,
+        direccion: paciente.persona?.direccion ?? null,
+        telefono: paciente.persona?.telefono ?? null
+      },
+
+      usuarioAgrego: {
+        idUsuario: (paciente as any).usuario?.idUsuario ?? null,
+        correo: (paciente as any).usuario?.correo ?? (paciente as any).usuario?.email ?? null,
+        telefono: (paciente as any).usuario?.telefono ?? null
+      }
     };
-
-    if (paciente.persona) {
-      body.persona = {
-        tipoDocumento: paciente.persona.tipoDocumento,
-        nombre1: paciente.persona.nombre1,
-        nombre2: paciente.persona.nombre2,
-        apellidoPaterno: paciente.persona.apellidoPaterno,
-        apellidoMaterno: paciente.persona.apellidoMaterno,
-        dni: paciente.persona.dni,
-        fechaNacimiento: paciente.persona.fechaNacimiento,
-        genero: paciente.persona.genero,
-        pais: paciente.persona.pais,
-        departamento: paciente.persona.departamento,
-        provincia: paciente.persona.provincia,
-        distrito: paciente.persona.distrito,
-        direccion: paciente.persona.direccion,
-        telefono: paciente.persona.telefono
-      };
-    }
-
-    if (paciente.usuario?.idUsuario && paciente.usuario?.correo) {
-      body.usuario = {
-        idUsuario: paciente.usuario.idUsuario,
-        correo: paciente.usuario.correo
-      };
-    }
 
     return this.http.put<Paciente>(`${this.apiUrl}/${idPaciente}`, body);
   }

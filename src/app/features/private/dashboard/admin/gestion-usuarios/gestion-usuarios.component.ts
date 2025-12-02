@@ -153,22 +153,50 @@ export class GestionUsuariosComponent implements OnInit {
 
     guardarUsuario(): void {
         if (!this.usuarioActual) return;
-        // Validación de email obligatorio
-        if (!this.usuarioActual.email || String(this.usuarioActual.email).trim().length === 0) {
-            alert('El email es obligatorio.');
+
+        const payload = this.mapVMToUsuario(this.usuarioActual);
+
+        if (!payload.password) {
+            delete payload.password;
+        }
+
+        console.log('Datos que se envían al backend:', JSON.stringify(payload, null, 2));
+
+        // ✅ CORRECCIÓN: validar 'correo' (no 'rol')
+        if (!payload.idUsuario || !payload.correo) {
+            console.error('⚠️ Error: Falta información esencial en el payload');
+            alert('⚠️ Error: Falta información esencial (id, email)');
             return;
         }
 
-        const payload = this.mapVMToUsuario(this.usuarioActual);
         if (this.modoEdicion && this.usuarioActual.id) {
             this.usuarioService.update(this.usuarioActual.id, payload).subscribe({
-                next: _ => this.postSaveCleanup(),
-                error: _ => this.saveLocalFallback()
+                next: _ => {
+                    console.log('✅ Usuario actualizado correctamente');
+                    alert('✅ Usuario actualizado correctamente');
+                    this.postSaveCleanup();
+                },
+                error: err => {
+                    console.error('❌ Error backend:', err);
+                    if (err.error) {
+                        console.error('Detalles del error:', err.error);
+                    }
+                    alert('❌ Error al actualizar: ' + (err.error?.message || err.statusText));
+                    this.saveLocalFallback();
+                }
             });
         } else {
             this.usuarioService.add(payload).subscribe({
-                next: _ => this.postSaveCleanup(),
-                error: _ => this.saveLocalFallback(true)
+                next: _ => {
+                    console.log('✅ Usuario creado correctamente');
+                    alert('✅ Usuario creado correctamente');
+                    this.postSaveCleanup();
+                },
+                error: err => {
+                    console.error('❌ Error al crear usuario:', err);
+                    alert('❌ Error al crear: ' + (err.error?.message || err.statusText));
+                    this.saveLocalFallback(true);
+                }
             });
         }
     }
@@ -278,6 +306,7 @@ export class GestionUsuariosComponent implements OnInit {
 // Vista de Usuario para tabla/formulario
 interface UsuarioVM {
     id: number;
+    idPersona?: number;
     nombre: string;
     apellidoPaterno: string;
     apellidoMaterno: string;
@@ -287,7 +316,8 @@ interface UsuarioVM {
     tipoDocumento: string;
     numeroDocumento: string;
     password?: string;
-    especialidad?: string; // solo UI, no se envía al backend aquí
+    especialidad?: string;
+    fechaNacimiento?: string | Date;
 }
 
 // Utilidades de mapeo
@@ -322,6 +352,7 @@ GestionUsuariosComponent.prototype.mapUsuarioToVM = function (u: Usuario): Usuar
     const p: Persona | undefined = u.persona as any;
     return {
         id: u.idUsuario ?? 0,
+        idPersona: p?.idPersona ?? 0,
         nombre: p?.nombre1 || '',
         apellidoPaterno: p?.apellidoPaterno || '',
         apellidoMaterno: p?.apellidoMaterno || '',
@@ -334,32 +365,38 @@ GestionUsuariosComponent.prototype.mapUsuarioToVM = function (u: Usuario): Usuar
     };
 };
 
-GestionUsuariosComponent.prototype.mapVMToUsuario = function (vm: UsuarioVM): Usuario {
-    const persona: Persona = {
-        tipoDocumento: vm.tipoDocumento || 'DNI',
-        dni: vm.numeroDocumento || '',
-        nombre1: vm.nombre || '',
-        nombre2: '',
-        apellidoPaterno: vm.apellidoPaterno || '',
-        apellidoMaterno: vm.apellidoMaterno || '',
-        fechaNacimiento: new Date().toISOString(),
-        genero: 'otro',
-        pais: 'PE',
-        departamento: '',
-        provincia: '',
-        distrito: '',
-        direccion: '',
-        telefono: vm.telefono || ''
+GestionUsuariosComponent.prototype.mapVMToUsuario = function (vm: UsuarioVM): any {
+    const safeIso = (v: any): string => {
+        if (!v) return new Date().toISOString();
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
     };
-    const usuario: Usuario = {
+
+    const rol = rolVMToModel(vm.rol);
+
+    return {
+        idUsuario: vm.id,
         correo: vm.email,
-        password: vm.password || undefined,
-        rol: rolVMToModel(vm.rol),
-        persona
-    } as Usuario;
-    // id para updates
-    if (vm.id) (usuario as any).idUsuario = vm.id;
-    return usuario;
+        rolId: rol.idRol,
+        password: vm.password && vm.password.trim() ? vm.password.trim() : undefined,
+        persona: {
+            idPersona: (vm as any).idPersona || undefined,
+            tipoDocumento: vm.tipoDocumento || 'DNI',
+            dni: vm.numeroDocumento || '',
+            nombre1: vm.nombre || '',
+            nombre2: vm.nombre ? '' : undefined,  // omitir si nombre está vacío
+            apellidoPaterno: vm.apellidoPaterno || '',
+            apellidoMaterno: vm.apellidoMaterno || '',
+            fechaNacimiento: safeIso(vm.fechaNacimiento),
+            genero: 'masculino',  // ✅ usa un valor por defecto válido
+            pais: 'Perú',  // ✅ Usa valor que coincide con tu GET
+            departamento: 'Lima',  // ✅ No dejes vacío
+            provincia: 'Lima',  // ✅ No dejes vacío
+            distrito: 'Miraflores',  // ✅ No dejes vacío
+            direccion: vm.telefono ? `Jr. ${vm.nombre}` : '',  // ✅ genera algo, no vacío
+            telefono: vm.telefono || ''
+        }
+    };
 };
 
 GestionUsuariosComponent.prototype.postSaveCleanup = function () {

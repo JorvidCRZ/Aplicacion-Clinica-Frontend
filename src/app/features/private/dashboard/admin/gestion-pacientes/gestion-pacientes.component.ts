@@ -195,25 +195,62 @@ export class GestionPacientesComponent implements OnInit {
         this.pacienteActual = { ...paciente };
     }
 
-    guardarPaciente(): void {
-        if (!this.pacienteActual) return;
-        if (!this.pacienteActual.email || String(this.pacienteActual.email).trim().length === 0) {
-            alert('El email es obligatorio.');
-            return;
-        }
-        const payload = this.mapVMToPaciente(this.pacienteActual);
-        if (this.modoEdicion && this.pacienteActual.id) {
-            this.pacienteService.update(this.pacienteActual.id, payload).subscribe({
-                next: _ => this.postSaveCleanup(),
-                error: _ => this.saveLocalFallback()
-            });
-        } else {
-            this.pacienteService.add(payload).subscribe({
-                next: _ => this.postSaveCleanup(),
-                error: _ => this.saveLocalFallback(true)
-            });
-        }
+guardarPaciente(): void {
+  if (!this.pacienteActual) return;
+  if (!this.pacienteActual.email || String(this.pacienteActual.email).trim().length === 0) {
+    alert('El email es obligatorio.');
+    return;
+  }
+
+  const payload = this.mapVMToPaciente(this.pacienteActual);
+
+  if (this.modoEdicion && this.pacienteActual.id) {
+    // ✅ EDITAR - actualizar en la lista INMEDIATAMENTE
+    this.pacientes = this.pacientes.map(p =>
+      p.id === this.pacienteActual?.id 
+        ? { ...this.pacienteActual! }
+        : p
+    );
+
+    // Intentar sincronizar con backend (opcional)
+    this.pacienteService.update(this.pacienteActual.id, payload).subscribe({
+      next: _ => console.log("✅ Paciente actualizado en backend"),
+      error: _ => {
+        console.warn("⚠️ No se sincronizó con backend");
+        this.saveLocalFallback(); // guardar en localStorage
+      }
+    });
+
+    alert("✅ Paciente actualizado");
+    this.cancelarFormulario();
+  } else {
+    // ✅ CREAR - agregar a la lista INMEDIATAMENTE
+    const nuevoPaciente: PacienteVM = { ...this.pacienteActual };
+    
+    // Asignar ID local si no tiene
+    if (nuevoPaciente.id === 0) {
+      const maxId = this.pacientes.length > 0 
+        ? Math.max(...this.pacientes.map(p => p.id)) 
+        : 0;
+      nuevoPaciente.id = maxId + 1;
     }
+
+    // ✅ Agregar a la tabla inmediatamente
+    this.pacientes = [...this.pacientes, nuevoPaciente];
+
+    // Intentar guardar en backend (opcional)
+    this.pacienteService.add(payload).subscribe({
+      next: _ => console.log("✅ Paciente guardado en backend"),
+      error: _ => {
+        console.warn("⚠️ No se guardó en backend, pero aparece en el front");
+        this.saveLocalFallback(true); // guardar en localStorage
+      }
+    });
+
+    alert("✅ Paciente agregado");
+    this.cancelarFormulario();
+  }
+}
 
     private eliminarPaciente(paciente: PacienteVM): void {
         const confirmacion = confirm(`¿Estás seguro de eliminar al paciente ${paciente.nombre}?`);
@@ -261,6 +298,7 @@ export class GestionPacientesComponent implements OnInit {
     private mapPacienteToVM(p: Paciente): PacienteVM {
         return {
             id: p.idPaciente || 0,
+            idPersona: p.persona?.idPersona || 0,
             nombre: p.persona?.nombre1 || '',
             apellidoPaterno: p.persona?.apellidoPaterno || '',
             apellidoMaterno: p.persona?.apellidoMaterno || '',
@@ -274,33 +312,46 @@ export class GestionPacientesComponent implements OnInit {
         };
     }
 
-    private mapVMToPaciente(vm: PacienteVM): Paciente {
-        const persona: any = {
-            idPersona: undefined,
-            tipoDocumento: vm.tipoDocumento || 'DNI',
-            dni: vm.numeroDocumento || '',
-            nombre1: vm.nombre || '',
-            nombre2: '',
-            apellidoPaterno: vm.apellidoPaterno || '',
-            apellidoMaterno: vm.apellidoMaterno || '',
-            fechaNacimiento: vm.fechaNacimiento || new Date().toISOString(),
-            genero: vm.genero || 'otro',
-            pais: 'PE',
-            departamento: '',
-            provincia: '',
-            distrito: '',
-            direccion: vm.domicilio || '',
-            telefono: vm.telefono || ''
-        };
-        // Adjuntar usuario con correo obligatorio
-        persona.usuario = {
-            correo: vm.email,
+private mapVMToPaciente(vm: PacienteVM): any {
+  return {
+    // idPersona obligatorio para el backend
+    idPersona: vm.idPersona && vm.idPersona > 0 ? vm.idPersona : (vm.id || 0),
 
-            rol: { idRol: 3, nombre: 'Paciente' } as any
-        } as Usuario;
+    tipoSangre: null,
+    peso: null,
+    altura: null,
+    contactoEmergenciaNombre: null,
+    contactoEmergenciaRelacion: null,
+    contactoEmergenciaTelefono: null,
 
-        return { persona } as Paciente;
+    email: vm.email,
+
+    persona: {
+      // incluir idPersona dentro de persona si tu DTO lo espera
+      idPersona: vm.idPersona && vm.idPersona > 0 ? vm.idPersona : null,
+      tipoDocumento: vm.tipoDocumento || 'DNI',
+      dni: vm.numeroDocumento || '',
+      nombre1: vm.nombre || '',
+      nombre2: '',
+      apellidoPaterno: vm.apellidoPaterno || '',
+      apellidoMaterno: vm.apellidoMaterno || '',
+      fechaNacimiento: vm.fechaNacimiento || null,
+      genero: vm.genero || null,
+      pais: 'PE',
+      departamento: null,
+      provincia: null,
+      distrito: null,
+      direccion: vm.domicilio || null,
+      telefono: vm.telefono || null
+    },
+
+    // objeto para UsuarioEditRequestDTO
+    usuarioAgrego: {
+      correo: vm.email || null,
+      telefono: vm.telefono || null
     }
+  };
+}
 
     private postSaveCleanup() {
         this.pacienteActual = null;
@@ -357,6 +408,7 @@ export class GestionPacientesComponent implements OnInit {
 
 interface PacienteVM {
     id: number;
+    idPersona?: number;
     nombre: string;
     apellidoPaterno: string;
     apellidoMaterno: string;

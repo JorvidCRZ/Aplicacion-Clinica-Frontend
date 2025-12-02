@@ -389,7 +389,7 @@
 .modal-content {
     background: var(--blanco);
     border-radius: 20px;
-    max-width: 500px;
+    max-width: 620px;
     width: 95%;
     max-height: 90vh;
     overflow-y: auto;
@@ -430,22 +430,35 @@
 }
 
 .btn-close {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 8px;
-    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    color: #0f172a;
+    padding: 6px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background 0.2s ease;
-    width: 36px;
-    height: 36px;
+    transition: all 0.18s ease;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.08);
+}
+
+.btn-close i {
+    color: #0f172a;
+    font-size: 14px;
 }
 
 .btn-close:hover {
-    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px) rotate(-10deg);
+    box-shadow: 0 10px 26px rgba(2,6,23,0.12);
+    background: #f8fafc;
+}
+
+.btn-close:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.12);
 }
 
 /* Información de la cita seleccionada */
@@ -468,6 +481,69 @@
     object-fit: cover;
     border: 3px solid #6366f1;
     background: #f1f5ff;
+}
+
+/* Estilos específicos para modal de perfil */
+.perfil-body {
+    padding: 20px 24px 8px 24px;
+}
+
+.perfil-grid {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+}
+
+.perfil-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 4px solid rgba(99,102,241,0.15);
+    box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+    background: linear-gradient(180deg,#f8fafc,#eef2ff);
+}
+
+.perfil-nombre {
+    margin: 0 0 6px 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.especialidad-modal {
+    display: inline-block;
+    margin-bottom: 14px;
+    color: #4f46e5;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.perfil-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px 18px;
+}
+
+.perfil-row {
+    margin: 0;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.perfil-label {
+    display: inline-block;
+    min-width: 110px;
+    color: #475569;
+    font-weight: 700;
+}
+
+.perfil-value {
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.modal-content .modal-header {
+    border-radius: 12px 12px 0 0;
 }
 
 .doctor-datos-modal h4 {
@@ -677,6 +753,44 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+}
+
+/* Estilo específico para el botón Cerrar en el pie del modal */
+.btn-modal-close {
+    background: linear-gradient(180deg, #ffffff, #fbfbfb);
+    color: #0f172a;
+    border: 1px solid #d1d5db;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    box-shadow: 0 6px 16px rgba(2,6,23,0.06);
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-modal-close i {
+    color: #475569;
+    font-size: 14px;
+}
+
+.btn-modal-close:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(180deg, #fbfbfb, #f3f4f6);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 26px rgba(2,6,23,0.09);
+}
+
+.btn-modal-close:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(2,6,23,0.06) inset;
+}
+
+.btn-modal-close:focus {
+    outline: none;
+    box-shadow: 0 0 0 6px rgba(99,102,241,0.09);
 }
 
 /* Responsive para el modal */

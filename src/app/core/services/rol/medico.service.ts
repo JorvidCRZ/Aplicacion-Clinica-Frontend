@@ -22,9 +22,14 @@ export class MedicoService {
     return this.http.post<Medico>(this.apiUrl, medico);
   }
 
-  update(id: number, medico: Medico): Observable<Medico> {
-    return this.http.put<Medico>(`${this.apiUrl}/${id}`, medico);
+  create(medico: any): Observable<Medico> {
+    return this.http.post<Medico>(this.apiUrl, medico);
   }
+
+  update(id: number, medico: any) {
+    return this.http.put(`${this.apiUrl}/perfil/actualizar/${id}`, medico);
+  }
+
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`); 
