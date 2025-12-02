@@ -17,6 +17,7 @@ import { ErrorComponent } from './shared/components/error/error.component';
 import { MedicoComponent } from './features/private/dashboard/medico/medico.component';
 
 export const routes: Routes = [
+    // --- RUTAS PÚBLICAS ---
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
     { path: 'inicio', component: InicioComponent },
     { path: 'especialidades', component: EspecialidadesComponent },
@@ -35,6 +36,7 @@ export const routes: Routes = [
     },
     { path: 'servicio-formulario', component: ServicioFormularioComponent, canActivate: [AuthGuard] },
 
+    // --- DASHBOARD PACIENTE ---
     {
         path: 'paciente',
         component: PacienteComponent,
@@ -50,6 +52,7 @@ export const routes: Routes = [
         ]
     },
 
+    // --- DASHBOARD MÉDICO ---
     {
         path: 'medico',
         component: MedicoComponent,
@@ -66,6 +69,7 @@ export const routes: Routes = [
         ]
     },
 
+    // --- DASHBOARD ADMIN ---
     {
         path: 'admin',
         component: AdminComponent,
@@ -75,6 +79,11 @@ export const routes: Routes = [
             { path: '', redirectTo: 'panel', pathMatch: 'full' },
             { path: 'panel', loadComponent: () => import('./features/private/dashboard/admin/panel/panel.component').then(m => m.PanelComponent) },
             { path: 'info', loadComponent: () => import('./features/private/dashboard/admin/info/info.component').then(m => m.InfoComponent) },
+            
+         
+            { path: 'solicitudes', loadComponent: () => import('./features/private/dashboard/admin/solicitudes/solicitudes').then(m => m.SolicitudesComponent) },
+            // ------------------------------------------------------------------
+
             { path: 'gestion-admins', loadComponent: () => import('./features/private/dashboard/admin/gestion-admins/gestion-admins.component').then(m => m.GestionAdminsComponent) },
             { path: 'gestion-citas', loadComponent: () => import('./features/private/dashboard/admin/gestion-citas/gestion-citas.component').then(m => m.GestionCitasComponent) },
             { path: 'gestion-medicos', loadComponent: () => import('./features/private/dashboard/admin/gestion-medicos/gestion-medicos.component').then(m => m.GestionMedicosComponent) },

@@ -1,11 +1,52 @@
 <div class="horarios-wrapper">
-    <!-- Layout Principal -->
     <main class="main-layout">
 
-        <!-- Sidebar: Agregar Horario -->
         <aside class="sidebar">
+            
+            <div class="request-form mb-4 p-3 bg-white rounded shadow-sm">
+                <h3 class="text-primary mb-3" style="font-size: 1.1rem; font-weight: bold;">
+                    📨 Solicitud de Horario 
+                </h3>
+                <small class="d-block text-muted mb-2">Envía una notificación al Admin para pedir un horario extra.</small>
+                
+                <form (ngSubmit)="enviarSolicitudEspecial()" #solicitudForm="ngForm">
+                    <div class="field mb-2">
+                        <label class="form-label small">Fecha</label>
+                        <input type="date" class="form-control form-control-sm" [(ngModel)]="solicitudEspecial.fecha" name="solFecha" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mb-2">
+                        <div class="field w-50">
+                            <label class="form-label small">Inicio</label>
+                            <input type="time" class="form-control form-control-sm" [(ngModel)]="solicitudEspecial.horaInicio" name="solInicio" required>
+                        </div>
+                        <div class="field w-50">
+                            <label class="form-label small">Fin</label>
+                            <input type="time" class="form-control form-control-sm" [(ngModel)]="solicitudEspecial.horaFin" name="solFin" required>
+                        </div>
+                    </div>
+
+                    <div class="field mb-2">
+                        <label class="form-label small">Motivo</label>
+                        <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="solicitudEspecial.motivo" name="solMotivo" required placeholder="Ej: Guardia nocturna..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary w-100" [disabled]="!solicitudForm.form.valid || loadingSolicitud">
+                        {{ loadingSolicitud ? 'Enviando...' : 'Enviar al Admin' }}
+                    </button>
+
+                    @if (mensajeSolicitud) {
+                        <div class="alert alert-info mt-2 py-1 px-2 small">
+                            {{ mensajeSolicitud }}
+                        </div>
+                    }
+                </form>
+            </div>
+            
+            <hr class="my-4">
+
             <div class="add-form">
-                <h3>Nuevo Horario</h3>
+                <h3>Nuevo Horario Semanal</h3>
                 <form (ngSubmit)="agregarHorario()" #horarioForm="ngForm">
 
                     <div class="field">
@@ -59,10 +100,8 @@
             </div>
         </aside>
 
-        <!-- Contenido: Calendario Semanal -->
         <section class="calendar">
 
-            <!-- Stats Rápidas -->
             <div class="quick-stats">
                 <div class="stat">
                     <span class="number">{{ obtenerDiasActivos() }}</span>
@@ -78,12 +117,10 @@
                 </div>
             </div>
 
-            <!-- Grilla de Días -->
             <div class="days-grid">
                 @for (dia of diasSemana; track dia.id) {
                     <div class="day-card" [class.active]="dia.activo">
 
-                    <!-- Header del Día -->
                     <div class="day-header">
                         <h4>{{ dia.nombre }}</h4>
                         <label class="toggle">
@@ -92,10 +129,8 @@
                         </label>
                     </div>
 
-                    <!-- Horarios del Día -->
                     <div class="day-content">
 
-                        <!-- Estado Vacío -->
                         @if (dia.horarios.length === 0) {
                             <div class="empty">
                                 @if (dia.activo) {
@@ -107,7 +142,6 @@
                             </div>
                         }
 
-                        <!-- Lista de Horarios -->
                         @for (horario of dia.horarios; track horario.id) {
                             <div class="schedule-item" [attr.data-type]="horario.tipo">
                                 <div class="schedule-info">
@@ -119,7 +153,6 @@
                         }
                     </div>
 
-                    <!-- Footer del Día -->
                     @if (dia.activo && dia.horarios.length > 0) {
                         <div class="day-footer">
                             <span class="total-hours">{{ calcularTotalHoras(dia) }}</span>

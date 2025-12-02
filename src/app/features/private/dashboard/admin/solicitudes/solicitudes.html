@@ -1,0 +1,76 @@
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold m-0">Solicitudes de Horario</h2>
+        <button class="btn btn-outline-primary btn-sm" (click)="cargarPendientes()">
+            🔄 Actualizar
+        </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            
+            @if (loading) {
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Cargando solicitudes...</p>
+                </div>
+            }
+
+            @if (!loading && solicitudes.length === 0) {
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-check-circle text-success fs-1 mb-3"></i>
+                    <h5 class="text-muted">¡Todo al día!</h5>
+                    <p class="small text-secondary">No hay solicitudes pendientes de revisión.</p>
+                </div>
+            }
+
+            @if (!loading && solicitudes.length > 0) {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="text-secondary small text-uppercase">
+                                <th class="ps-4">Médico</th>
+                                <th>Fecha Solicitada</th>
+                                <th>Horario</th>
+                                <th>Motivo</th>
+                                <th class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (sol of solicitudes; track sol.id) {
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2">{{ sol.medicoNombre.charAt(0) }}</div>
+                                            <div>
+                                                <span class="fw-bold d-block text-dark">{{ sol.medicoNombre }}</span>
+                                                <small class="text-muted">ID: {{ sol.medicoId }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ sol.fecha | date:'dd MMM yyyy' }}</td>
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            {{ sol.horaInicio }} - {{ sol.horaFin }}
+                                        </span>
+                                    </td>
+                                    <td class="text-secondary small" style="max-width: 200px;">
+                                        {{ sol.motivo }}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-success btn-sm me-2" (click)="procesarSolicitud(sol.id, true)" title="Aprobar">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" (click)="procesarSolicitud(sol.id, false)" title="Rechazar">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

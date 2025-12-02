@@ -1,0 +1,25 @@
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    background-color: var(--azul-claro);
+    color: var(--azul-oscuro);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.table th {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.btn-sm {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    line-height: 32px;
+    border-radius: 50%; 
+}

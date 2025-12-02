@@ -1,71 +1,121 @@
 <header class="py-3 px-0 py-md-1" id="enlaces-inicio">
-    <div class="contenedor container d-flex py-3">
-        <div class="brand d-flex align-items-center me-auto d-flex align-items-center">
-            <app-logo></app-logo>
-        </div>
-        <div class="d-none d-lg-flex flex-grow-1 mx-3">
-            <app-navbar [menuItems]="menuItems"></app-navbar>
-        </div>
-        <button class="btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
-            aria-controls="offcanvasMenu">
-            <i class="iconos fa-solid fa-bars"></i>
-        </button>
-        <div class="d-none d-lg-block">
-            <app-account-menu [links]="accountLinks"></app-account-menu>
-        </div>
+  <div class="contenedor container d-flex py-3 align-items-center">
+    
+    <div class="brand d-flex align-items-center me-auto">
+      <app-logo></app-logo>
     </div>
 
-    <div class="contenedor-mobile offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu"
-        aria-labelledby="offcanvasMenuLabel">
-        <div class="offcanvas-header d-flex align-items-center justify-content-between">
-            <app-logo></app-logo>
-            <div class="d-flex flex-column align-items-center">
-                <i class="iconos {{ userAuthService.getUserIcon() }}"
-                    [style.font-size]="userAuthService.getRoleDisplayName() ? '1rem' : '1.5rem'"></i>
-                <span class="fw-semibold mt-1" [style.font-size]="userAuthService.getRoleDisplayName() ? '0.75rem' : '1rem'"
-                    style="color:var(--blanco); line-height: 1;">
-                    {{ userAuthService.getRoleDisplayName() | titlecase }}
-                </span>
-            </div>
-            <button type="button" class="btn-close" style="filter: brightness(0) invert(1);" data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body d-flex flex-column">
-            <app-navbar [menuItems]="menuItems"></app-navbar>
-            <hr>
-            <div class="text-center">
-                <h6 class="contenido text-uppercase mb-3">Mi Cuenta</h6>
-                <div class="contenido mb-3">
-                    @if(authService.isLoggedIn()) {
-                    <ul class="list-unstyled">
-                        @for(link of accountLinks; track link.route) {
-                        <li class="mb-2">
-                            <a class="text-decoration-none d-flex align-items-center" [routerLink]="link.route">
-                                <i class="{{ link.icon }} me-2"></i>{{ link.label }}
-                            </a>
-                        </li>
-                        }
-                        <li class="mb-2">
-                            <a class="cerrar text-decoration-none text-danger d-flex align-items-center"
-                                (click)="authService.logout()">
-                                <i class="fa fa-sign-out me-2"></i> Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                    }@else {
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/login']">
-                                <i class="fa fa-user me-2"></i> Iniciar Sesión
-                            </a>
-                            <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/registro']">
-                                <i class="fa fa-sign-in me-2"></i> Registrarse
-                            </a>
-                        </li>
-                    </ul>
-                    }
-                </div>
-            </div>
-        </div>
+    <div class="d-none d-lg-flex flex-grow-1 mx-3">
+      <app-navbar [menuItems]="menuItems"></app-navbar>
     </div>
+
+    @if (authService.isLoggedIn()) {
+      <div class="position-relative me-3 notificaciones-wrapper">
+        <button class="btn btn-campana position-relative" (click)="toggleMenu()">
+          <i class="fa-solid fa-bell" style="font-size: 1.2rem; color: var(--blanco);"></i>
+          
+          @if (notificaciones.length > 0) {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ notificaciones.length }}
+              <span class="visually-hidden">mensajes no leídos</span>
+            </span>
+          }
+        </button>
+
+        @if (mostrarMenu) {
+          <div class="dropdown-notificaciones shadow rounded">
+            <div class="dropdown-header border-bottom p-2">
+              <h6 class="m-0 text-dark fw-bold">Notificaciones</h6>
+            </div>
+
+            <div class="lista-notificaciones">
+              @if (notificaciones.length === 0) {
+                <div class="p-3 text-center text-muted">
+                  <small>No tienes notificaciones nuevas</small>
+                </div>
+              }
+
+              @for (noti of notificaciones; track noti.id) {
+                <div class="item-notificacion p-2 border-bottom" 
+                     [class.bg-light]="!noti.leida"
+                     (click)="marcarLeida(noti)">
+                  <div class="d-flex justify-content-between align-items-start">
+                    <strong class="text-dark" style="font-size: 0.85rem;">{{ noti.titulo }}</strong>
+                    <small class="text-muted ms-2" style="font-size: 0.7rem;">
+                      {{ noti.fechaCreacion | date:'shortTime' }}
+                    </small>
+                  </div>
+                  <p class="m-0 text-secondary text-truncate" style="font-size: 0.8rem; max-width: 250px;">
+                    {{ noti.mensaje }}
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+    <button class="btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu"
+      aria-controls="offcanvasMenu">
+      <i class="iconos fa-solid fa-bars"></i>
+    </button>
+
+    <div class="d-none d-lg-block">
+      <app-account-menu [links]="accountLinks"></app-account-menu>
+    </div>
+  </div>
+
+  <div class="contenedor-mobile offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu"
+    aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header d-flex align-items-center justify-content-between">
+      <app-logo></app-logo>
+      <div class="d-flex flex-column align-items-center">
+        <i class="iconos {{ userAuthService.getUserIcon() }}"
+          [style.font-size]="userAuthService.getRoleDisplayName() ? '1rem' : '1.5rem'"></i>
+        <span class="fw-semibold mt-1" [style.font-size]="userAuthService.getRoleDisplayName() ? '0.75rem' : '1rem'"
+          style="color:var(--blanco); line-height: 1;">
+          {{ userAuthService.getRoleDisplayName() | titlecase }}
+        </span>
+      </div>
+      <button type="button" class="btn-close" style="filter: brightness(0) invert(1);" data-bs-dismiss="offcanvas"
+        aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+      <app-navbar [menuItems]="menuItems"></app-navbar>
+      <hr>
+      <div class="text-center">
+        <h6 class="contenido text-uppercase mb-3">Mi Cuenta</h6>
+        <div class="contenido mb-3">
+          @if(authService.isLoggedIn()) {
+          <ul class="list-unstyled">
+            @for(link of accountLinks; track link.route) {
+            <li class="mb-2">
+              <a class="text-decoration-none d-flex align-items-center" [routerLink]="link.route">
+                <i class="{{ link.icon }} me-2"></i>{{ link.label }}
+              </a>
+            </li>
+            }
+            <li class="mb-2">
+              <a class="cerrar text-decoration-none text-danger d-flex align-items-center"
+                (click)="authService.logout()">
+                <i class="fa fa-sign-out me-2"></i> Cerrar Sesión
+              </a>
+            </li>
+          </ul>
+          }@else {
+          <ul class="list-unstyled">
+            <li class="mb-2">
+              <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/login']">
+                <i class="fa fa-user me-2"></i> Iniciar Sesión
+              </a>
+              <a class="text-decoration-none d-flex align-items-center" [routerLink]="['/registro']">
+                <i class="fa fa-sign-in me-2"></i> Registrarse
+              </a>
+            </li>
+          </ul>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
 </header>

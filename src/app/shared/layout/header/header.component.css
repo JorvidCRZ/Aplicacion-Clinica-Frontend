@@ -1,3 +1,6 @@
+/* ================================================= */
+/* ESTILOS GENERALES DEL HEADER          */
+/* ================================================= */
 header {
     background: linear-gradient(90deg, var(--azul-claro) 0%, var(--celeste) 100%);
     padding: 10px 40px;
@@ -45,7 +48,6 @@ header {
 .btn-close {
     margin: 0;
 }
-
 
 li a {
     color: var(--blanco);
@@ -103,5 +105,137 @@ li a {
         background: var(--gris-claro);
         color: var(--rojo);
         transition: all 0.3s ease-in-out;
+    }
+}
+
+/* ================================================= */
+/* NUEVOS ESTILOS NOTIFICACIONES          */
+/* ================================================= */
+
+.notificaciones-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+/* Botón Campana */
+.btn-campana {
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil transparente */
+    border: none;
+    border-radius: 50%; /* Círculo perfecto */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-campana:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.btn-campana:active {
+    transform: scale(0.95);
+}
+
+/* Menú Desplegable (Caja Blanca) */
+.dropdown-notificaciones {
+    position: absolute;
+    top: 55px; /* Separación del header */
+    right: -10px;
+    width: 320px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1050;
+    overflow: visible; /* Para que se vea el triangulito */
+    animation: fadeIn 0.2s ease-out;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Triangulito decorativo arriba del menú */
+.dropdown-notificaciones::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 22px; /* Alineado con el centro de la campana */
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #ffffff;
+}
+
+.dropdown-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 10px 15px;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Lista Scrollable */
+.lista-notificaciones {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Items individuales */
+.item-notificacion {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f1f1f1;
+    color: #333; /* Texto oscuro para leer bien sobre blanco */
+}
+
+.item-notificacion:hover {
+    background-color: var(--gris); /* Usando tu variable gris */
+}
+
+/* Estilo para notificaciones no leídas */
+.bg-light {
+    background-color: #e3f2fd !important; /* Un azul muy clarito para resaltar */
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Personalización del Scrollbar dentro de notificaciones */
+.lista-notificaciones::-webkit-scrollbar {
+    width: 6px;
+}
+.lista-notificaciones::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.lista-notificaciones::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.lista-notificaciones::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ajuste Responsivo para el menú */
+@media (max-width: 576px) {
+    .dropdown-notificaciones {
+        width: 280px;
+        right: -60px;
+    }
+    .dropdown-notificaciones::before {
+        right: 72px;
     }
 }
