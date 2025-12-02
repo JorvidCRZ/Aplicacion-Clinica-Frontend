@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../../core/services/auth/auth.service';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
+import { CitaCompletaFull } from '../../../../../core/models/common/cita';
 // import CitaCompleta removed — backend used directly
 import { MedicosService } from '../../../../../core/services/logic/medico.service';
+
+
 
 
 // 📅 Interfaces para gestión de citas del doctor
@@ -50,6 +53,14 @@ export class CitasComponent implements OnInit {
     private authService = inject(AuthService);
     private citasSrv = inject(CitaService);
     private medicosSrv = inject(MedicosService);
+
+    detalleCita: CitaCompletaFull | null = null; // Almacena la cita completa obtenida del backend
+    mostrarModal = false;            // Controla la visibilidad del modal
+    showRawDetalle = false;
+    showActions = false;
+    pacienteInfo: any | null = null;
+    medicoInfo: any | null = null;
+
     // 👨‍⚕️ Doctor actual
     doctorActual: DoctorVM | null = null;
 
@@ -199,21 +210,47 @@ export class CitasComponent implements OnInit {
 }
 
 private mapCitaBackend(c: any, idx: number): Cita {
+    // Preferir el id que venga del backend; usar varios alias posibles
+    const backendId = c?.id || c?.idCita || c?.id_cita || c?.citaId || idx;
+
+    // Extraer nombre/documento/telefono del paciente teniendo en cuenta varias formas
+    let pacienteNombre = '';
+    let pacienteDocumento = c?.documento || null;
+    let pacienteTelefono = c?.telefono || null;
+    let pacienteId = null as any;
+
+    if (typeof c?.paciente === 'string') {
+        pacienteNombre = c.paciente;
+    } else if (c?.paciente) {
+        const p = c.paciente;
+        pacienteId = p?.id || p?.idPaciente || null;
+        if (p?.persona) {
+            const per = p.persona;
+            pacienteNombre = `${per.nombre1 || ''} ${per.nombre2 || ''} ${per.apellidoPaterno || ''} ${per.apellidoMaterno || ''}`.trim();
+            pacienteDocumento = per?.dni || pacienteDocumento;
+            pacienteTelefono = per?.telefono || pacienteTelefono;
+        } else {
+            pacienteNombre = p?.nombre || p?.nombres || pacienteNombre;
+            pacienteDocumento = p?.documento || pacienteDocumento;
+            pacienteTelefono = p?.telefono || pacienteTelefono;
+        }
+    }
+
     return {
-        id: idx,
+        id: Number(backendId),
         fecha: c.fecha,
         hora: c.hora,
         paciente: {
-            id: idx,
-            nombre: c.paciente,
-            documento: c.documento,
-            telefono: c.telefono,
-            email: '' // tu backend no envía email
+            id: pacienteId || Number(backendId) || idx,
+            nombre: pacienteNombre || '',
+            documento: pacienteDocumento || '',
+            telefono: pacienteTelefono || '',
+            email: c?.paciente?.email || c?.email || ''
         },
         tipoConsulta: c.tipoConsulta,
         especialidad: this.doctorActual?.especialidad || '',
         motivo: c.tipoConsulta,
-        estado: c.estado.toLowerCase(), // programada | completada | cancelada
+        estado: (c.estado || '').toString().toLowerCase(), // programada | completada | cancelada
         duracionEstimada: 30
     };
 }
@@ -295,30 +332,33 @@ private mapCitaBackend(c: any, idx: number): Cita {
     }
 
     // ⚡ Acciones de citas
-    iniciarConsulta(cita: Cita): void {
+    iniciarConsulta(cita: any): void {
         console.log('Iniciando consulta:', cita);
-        // Aquí iría la lógica para iniciar la consulta
-        alert(`Iniciando consulta con ${cita.paciente.nombre}`);
+        const nombre = this.getPacienteNombre(cita);
+        alert(`Iniciando consulta con ${nombre}`);
     }
 
-    reprogramarCita(cita: Cita): void {
+    reprogramarCita(cita: any): void {
         console.log('Reprogramando cita:', cita);
-        alert(`Reprogramar cita de ${cita.paciente.nombre}`);
+        const nombre = this.getPacienteNombre(cita);
+        alert(`Reprogramar cita de ${nombre}`);
     }
 
-    solicitarCancelacion(cita: Cita): void {
-        if (confirm(`¿Está seguro de solicitar la cancelación de la cita de ${cita.paciente.nombre}?\n\nEsta solicitud será enviada al administrador para su aprobación.`)) {
+    solicitarCancelacion(cita: any): void {
+        const nombre = this.getPacienteNombre(cita);
+        const id = (cita && (cita.id || cita.idCita)) || 0;
+        if (confirm(`¿Está seguro de solicitar la cancelación de la cita de ${nombre}?\n\nEsta solicitud será enviada al administrador para su aprobación.`)) {
             // Marcar como solicitud pendiente
-            this.solicitudesCancelacion.set(cita.id, true);
+            this.solicitudesCancelacion.set(id, true);
 
             // Simular envío al backend
             console.log('Solicitud de cancelación enviada:', {
-                citaId: cita.id,
+                citaId: id,
                 doctorId: 'doctor-actual', // En app real vendría del AuthService
-                paciente: cita.paciente.nombre,
-                fecha: cita.fecha,
-                hora: cita.hora,
-                motivo: '', // Se podría agregar un campo para el motivo
+                paciente: nombre,
+                fecha: cita.fecha || cita.fechaCita,
+                hora: cita.hora || cita.horaCita,
+                motivo: cita.motivo || cita.motivoConsulta || '',
                 timestamp: new Date().toISOString()
             });
 
@@ -337,9 +377,200 @@ private mapCitaBackend(c: any, idx: number): Cita {
     }
 
     verDetalles(cita: Cita): void {
-        console.log('Ver detalles:', cita);
-        alert(`Detalles de la cita de ${cita.paciente.nombre}`);
+        if (!cita.id) return;
+
+        this.citasSrv.obtenerCitaPorIdFull(cita.id).subscribe({
+            next: (data: CitaCompletaFull) => {
+                console.log('Detalles completos de la cita:', data);
+                this.detalleCita = data;
+                this.computePacienteInfo();
+                this.computeMedicoInfo();
+                this.mostrarModal = true;
+                // Bloquear scroll del body para que el modal gestione el desplazamiento
+                try { document.body.style.overflow = 'hidden'; } catch (e) { /* ignore */ }
+            },
+            error: (err) => {
+                console.error('Error al obtener detalles completos:', err);
+                alert('No se pudieron cargar los detalles de la cita.');
+            }
+        });
     }
+
+    toggleRawDetalle(): void {
+        this.showRawDetalle = !this.showRawDetalle;
+    }
+
+    toggleActions(): void {
+        this.showActions = !this.showActions;
+    }
+
+    // Nota: el cierre por overlay fue deshabilitado; solo el botón X cierra la modal.
+
+    calcularEdad(fechaNacimiento?: string | null): string {
+        if (!fechaNacimiento) return '-';
+        try {
+            const today = new Date();
+            const dob = new Date(fechaNacimiento);
+            let edad = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                edad--;
+            }
+            return String(edad);
+        } catch (e) {
+            return '-';
+        }
+    }
+
+    formatDireccion(p: any | undefined): string {
+        if (!p) return null as any;
+        const parts: string[] = [];
+        if (p.direccion) parts.push(p.direccion);
+        if (p.distrito) parts.push(p.distrito);
+        if (p.provincia) parts.push(p.provincia);
+        if (p.departamento) parts.push(p.departamento);
+        return parts.join(', ') || null as any;
+    }
+    cerrarModal(): void {
+        this.mostrarModal = false;
+        this.detalleCita = null;
+        // Restaurar scroll del body
+        try { document.body.style.overflow = ''; } catch (e) { /* ignore */ }
+    }
+
+    // computePacienteInfo y computeMedicoInfo usan this.detalleCita
+    computePacienteInfo() {
+        if (!this.detalleCita) { this.pacienteInfo = null; return; }
+        const p = this.detalleCita.paciente;
+        const persona = p?.persona;
+        this.pacienteInfo = {
+            nombre: persona ? `${persona.nombre1 || ''} ${persona.nombre2 || ''} ${persona.apellidoPaterno || ''} ${persona.apellidoMaterno || ''}`.trim() : '',
+            dni: persona?.dni || persona?.idPersona || null,
+            edad: persona?.fechaNacimiento ? this.calcularEdad(persona.fechaNacimiento) : null,
+            telefono: persona?.telefono || null,
+            email: persona?.email || p?.email || null,
+            direccion: this.formatDireccion(persona),
+            tipoSangre: (persona as any)?.tipoSangre || null,
+            peso: (persona as any)?.peso || null,
+            altura: (persona as any)?.altura || null,
+            contactoEmergenciaNombre: p?.contactoEmergenciaNombre || (p as any)?.contactoEmergencia?.nombre || null,
+            contactoEmergenciaRelacion: p?.contactoEmergenciaRelacion || (p as any)?.contactoEmergencia?.relacion || null,
+            contactoEmergenciaTelefono: p?.contactoEmergenciaTelefono || (p as any)?.contactoEmergencia?.telefono || null,
+            registradoPor: p?.usuarioAgrego?.correo || p?.usuarioAgrego?.persona?.nombre1 || null
+        };
+    }
+
+    computeMedicoInfo() {
+        if (!this.detalleCita) { this.medicoInfo = null; return; }
+        const det = this.detalleCita.detalleCita;
+        const me = det?.medicoEspecialidad;
+        const sub = det?.subEspecialidad;
+        const medico = me?.medico;
+        const mp = medico?.persona;
+        this.medicoInfo = {
+            nombre: mp ? `${mp.nombre1 || ''} ${mp.nombre2 || ''} ${mp.apellidoPaterno || ''} ${mp.apellidoMaterno || ''}`.trim() : null,
+            colegiatura: medico?.colegiatura || null,
+            experiencia: (medico as any)?.experiencia || medico?.experienciaAnios || null,
+            especialidad: me?.especialidad?.nombre || sub?.especialidad?.nombre || null,
+            subespecialidad: sub?.nombre || me?.especialidad?.nombre || null,
+            precioSubespecial: sub?.precioSubespecial || det?.precioConsulta || null
+        };
+    }
+
+    // Formatea cualquier campo para mostrar un valor por defecto cuando está vacío
+    display(value: any, unit?: string): string {
+        if (value === null || value === undefined || value === '') return 'No encontrado';
+        if (Array.isArray(value) && value.length === 0) return 'No encontrado';
+        // Para objetos simples, intentar mostrar una propiedad importante o JSON reducido
+        if (typeof value === 'object') {
+            // si tiene nombre, devolverlo
+            if ((value as any).nombre) return String((value as any).nombre);
+            try { return JSON.stringify(value); } catch { return 'No encontrado'; }
+        }
+        const s = String(value);
+        return unit ? `${s} ${unit}` : s;
+    }
+
+    // Helpers para detectar valores faltantes (usados por la plantilla)
+    isMissing(value: any): boolean {
+        if (value === null || value === undefined) return true;
+        if (typeof value === 'string') {
+            const t = value.trim();
+            return t === '' || t === '-' || t.toLowerCase() === 'n/a';
+        }
+        if (Array.isArray(value)) return value.length === 0;
+        if (typeof value === 'object') {
+            if (!value) return true;
+            return Object.keys(value).length === 0;
+        }
+        return false;
+    }
+
+    isMissingContacto(p: any): boolean {
+        if (!p) return true;
+        const nombre = p.contactoEmergenciaNombre || (p as any)?.contactoEmergencia?.nombre || null;
+        const relacion = p.contactoEmergenciaRelacion || (p as any)?.contactoEmergencia?.relacion || null;
+        const telefono = p.contactoEmergenciaTelefono || (p as any)?.contactoEmergencia?.telefono || null;
+        return this.isMissing(nombre) && this.isMissing(relacion) && this.isMissing(telefono);
+    }
+
+    formatContacto(p: any): string {
+        if (!p) return 'No encontrado';
+        const nombre = p.contactoEmergenciaNombre || (p as any)?.contactoEmergencia?.nombre || null;
+        const relacion = p.contactoEmergenciaRelacion || (p as any)?.contactoEmergencia?.relacion || null;
+        const telefono = p.contactoEmergenciaTelefono || (p as any)?.contactoEmergencia?.telefono || null;
+        if (!nombre && !relacion && !telefono) return 'No encontrado';
+        const parts: string[] = [];
+        if (nombre) parts.push(String(nombre));
+        if (relacion) parts.push(`(${relacion})`);
+        if (telefono) parts.push(`• ${telefono}`);
+        return parts.join(' ');
+    }
+
+    // Helpers para mostrar datos en el modal
+    getEstadoLabel(estado: string | null | undefined): string {
+        if (!estado) return 'Desconocido';
+        const e = estado.toString();
+        switch (e.toLowerCase()) {
+            case 'programada': return 'Programada';
+            case 'completada': return 'Completada';
+            case 'cancelada': return 'Cancelada';
+            case 'no-show': return 'No Show';
+            default: return estado;
+        }
+    }
+
+    getBadgeClass(estado: string | null | undefined): string {
+        if (!estado) return 'badge-unknown';
+        return `badge-${estado.toString().toLowerCase()}`;
+    }
+
+    formatDateTime(fecha: string | undefined, hora?: string | undefined): string {
+        if (!fecha) return '';
+        try {
+            const d = new Date(fecha + (hora ? ('T' + hora) : 'T00:00:00'));
+            const opciones: any = { dateStyle: 'medium' };
+            if (hora) opciones.timeStyle = 'short';
+            return d.toLocaleString('es-ES', opciones);
+        } catch (e) {
+            return fecha + (hora ? (' ' + hora) : '');
+        }
+    }
+
+    getPacienteNombre(cita: any | null): string {
+        if (!cita) return '';
+        const p = cita.paciente?.persona || cita.paciente;
+        if (!p) return '';
+        const parts: string[] = [];
+        if (p.nombre1) parts.push(p.nombre1);
+        if (p.nombre2) parts.push(p.nombre2);
+        if (p.apellidoPaterno) parts.push(p.apellidoPaterno);
+        if (p.apellidoMaterno) parts.push(p.apellidoMaterno);
+        if (parts.length === 0 && typeof cita.paciente === 'string') return cita.paciente;
+        return parts.join(' ').trim();
+    }
+
+
 
     // 🗓️ Utilidades de fecha
     private obtenerFechaHoy(): string {

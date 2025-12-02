@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CitaCompleta } from '../../models/common/cita';
+import { CitaCompleta, CitaCompletaFull } from '../../models/common/cita';
 
 @Injectable({
     providedIn: 'root'
@@ -70,11 +70,16 @@ export class CitaService {
         return this.http.get<{ horasTotales: number; promedioMinutos: number }>(`${this.apiBase}/dashboard/medico/${idMedico}/horas-promedio`);
     }
 
+
+    // Obtener detalles completos de una cita desde el backend: GET /citas/{id}
+    obtenerCitaPorIdFull(id: number): Observable<CitaCompletaFull> {
+        return this.http.get<CitaCompletaFull>(`${this.apiBase}/${id}`);
+    }
+
+    
      // ======== HISTORIAL CITAS POR MEDICO =========
     // Endpoint: GET /api/historial/citas/medico/{id_medico}
     obtenerHistorialCitasPorMedico(idMedico: number): Observable<any[]> {
         return this.http.get<any[]>(`${environment.apiUrl}/api/historial/citas/medico/${idMedico}`);
     }
-    
-    
 }

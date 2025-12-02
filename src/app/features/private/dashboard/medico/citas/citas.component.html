@@ -249,4 +249,89 @@
         }
         }
     </div>
+    <!-- Modal de detalles de cita -->
+    @if (mostrarModal) {
+    <div class="modal-overlay">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h4>Detalles de la cita</h4>
+                <button type="button" class="close-btn" (click)="cerrarModal()" aria-label="Cerrar">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div class="left-col">
+                        <div class="date-card">
+                            <div class="date-day">{{ detalleCita?.fechaCita | date:'dd' }}</div>
+                            <div class="date-month">{{ detalleCita?.fechaCita | date:'MMM yyyy' }}</div>
+                        </div>
+                        <div class="date-meta">
+                            <div class="meta-line">{{ detalleCita ? formatDateTime(detalleCita.fechaCita || undefined, detalleCita.horaCita || undefined) : '' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="right-col">
+                        <section class="section paciente-section">
+                            <h5>Paciente</h5>
+                            <div class="paciente-row">
+                                <div class="paciente-nombre">{{ pacienteInfo?.nombre || getPacienteNombre(detalleCita) }}</div>
+                            </div>
+                            <div class="paciente-grid">
+                                <div><small class="label">DNI</small><div>{{ display(pacienteInfo?.dni) }}</div></div>
+                                <div><small class="label">Edad</small><div>{{ display(pacienteInfo?.edad, 'años') }}</div></div>
+                                <div><small class="label">Tel</small><div>{{ display(pacienteInfo?.telefono) }}</div></div>
+                                <div><small class="label">Email</small><div>{{ display(pacienteInfo?.email) }}</div></div>
+                                <div class="full"><small class="label">Dirección</small><div>{{ display(pacienteInfo?.direccion) }}</div></div>
+                                <div><small class="label">Tipo sangre</small><div>{{ display(pacienteInfo?.tipoSangre) }}</div></div>
+                                <div><small class="label">Peso</small><div>{{ display(pacienteInfo?.peso) }}</div></div>
+                                <div><small class="label">Altura</small><div>{{ display(pacienteInfo?.altura) }}</div></div>
+                                <div class="full"><small class="label">Contacto emergencia</small><div>{{ formatContacto(pacienteInfo) }}</div></div>
+                                <div><small class="label">Registrado por</small><div>{{ display(pacienteInfo?.registradoPor) }}</div></div>
+                            </div>
+                        </section>
+
+                        <section class="section consulta-section">
+                            <h5>Consulta</h5>
+                            <div class="consulta-line"><strong>Especialidad:</strong> {{ display(medicoInfo?.especialidad) }}</div>
+                            <div class="consulta-line"><strong>Motivo:</strong> {{ display(detalleCita?.motivoConsulta) }}</div>
+                            <div class="estado-badge"> <span [ngClass]="['badge', getBadgeClass(detalleCita?.estado)]">{{ getEstadoLabel(detalleCita?.estado) }}</span> </div>
+                        </section>
+
+                        <section class="section medico-section" *ngIf="medicoInfo">
+                            <h5>Médico</h5>
+                            <div style="padding-bottom: 20px;"><strong>{{ medicoInfo?.nombre }}</strong></div>
+                            <div><small>Colegiatura:</small> {{ display(medicoInfo?.colegiatura) }}</div>
+                            <div *ngIf="medicoInfo?.subespecialidad"><small>Subespecialidad:</small> {{ display(medicoInfo?.subespecialidad) }}</div>
+                            <div> <small>Exp:</small> {{ display(medicoInfo?.experiencia, 'años') }}</div>
+                        </section>
+
+                        <section class="section horario-section">
+                            <h5>Horario</h5>
+                            <div><strong>Duración estimada:</strong> <span [class.missing]="isMissing(detalleCita?.disponibilidad?.duracionMinutos)">{{ display(detalleCita?.disponibilidad?.duracionMinutos, 'min') }}</span></div>
+                            <div><strong>Turno:</strong> <span [class.missing]="isMissing(detalleCita?.disponibilidad?.nombreTurno)">{{ display(detalleCita?.disponibilidad?.nombreTurno) }}</span></div>
+                            <div><strong>Horario:</strong> <span [class.missing]="isMissing(detalleCita?.disponibilidad?.horaInicio)">{{ display(detalleCita?.disponibilidad?.horaInicio) }}</span> - <span [class.missing]="isMissing(detalleCita?.disponibilidad?.horaFin)">{{ display(detalleCita?.disponibilidad?.horaFin) }}</span></div>
+                        </section>
+
+                        <section class="section precios-section">
+                            <h5>Precios</h5>
+                            <div><strong>Precio subespecialidad:</strong> <span [class.missing]="isMissing(medicoInfo?.precioSubespecial)">{{ display(medicoInfo?.precioSubespecial) }}</span><span *ngIf="medicoInfo?.precioSubespecial">$</span></div>
+                            <div><strong>Precio consulta:</strong> <span [class.missing]="isMissing(detalleCita?.detalleCita?.precioConsulta)">{{ display(detalleCita?.detalleCita?.precioConsulta) }}</span>$</div>
+                            <div><strong>Precio total:</strong> <span [class.missing]="isMissing(detalleCita?.detalleCita?.precioTotal)">{{ display(detalleCita?.detalleCita?.precioTotal) }}</span>$</div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="footer-right">
+                    <!-- Solo el botón X cierra la modal por diseño -->
+                </div>
+            </div>
+            <div class="modal-body debug" *ngIf="showRawDetalle">
+                <pre style="white-space:pre-wrap; font-size:12px; max-height:300px; overflow:auto">{{ detalleCita | json }}</pre>
+            </div>
+        </div>
+    </div>
+    }
+
 </div>
