@@ -20,7 +20,8 @@
         </div>
     </div>
 
-    <div *ngIf="cargandoMedicos" class="row mb-3">
+    @if (cargandoMedicos) {
+    <div class="row mb-3">
         <div class="col text-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Cargando...</span>
@@ -28,12 +29,15 @@
             <p class="mt-2">Cargando médicos...</p>
         </div>
     </div>
+    }
 
-    <div *ngIf="errorMedicos" class="row mb-3">
+    @if (errorMedicos) {
+    <div class="row mb-3">
         <div class="col">
             <div class="alert alert-danger">{{ errorMedicos }}</div>
         </div>
     </div>
+    }
 
 
     <div class="row">
@@ -67,40 +71,47 @@
 
                     <div class="disponibilidad-side">
 
+                        @if (tieneHorariosSemanaActual(cita)) {
                         <div class="dias-clean">
-                            @for (dia of diasDisponibles; track dia.codigo) {
+                            @for (dia of getDiasDisponiblesSemana(cita); track dia.fecha) {
                             <button class="dia-btn-clean" 
-                                [class.active]="getCardState(cita.doctor).diaSeleccionado === dia.codigo"
-                                (click)="seleccionarDiaCard(cita.doctor, dia.codigo)">
+                                [class.active]="getCardState(cita).diaSeleccionado === dia.fecha"
+                                (click)="seleccionarDiaCard(cita.medico.idMedico, dia.fecha)">
                                 <div class="dia-info">
-                                    <span class="dia-nombre-clean">{{ dia.nombre }}</span>
-                                    <span class="dia-fecha-clean">{{ dia.fecha }}</span>
+                                    <span class="dia-nombre-clean">{{ dia.diaSemana }}</span>
+                                    <span class="dia-fecha-clean">{{ dia.fechaCorta }}</span>
                                 </div>
                             </button>
                             }
                         </div>
-
+                        
                         <div class="horarios-clean">
-                            @for (horario of getHorariosDelDia(cita.doctor); track horario) {
+                            @for (horario of getHorariosDelDia(cita); track horario) {
                             <button class="horario-btn-clean" 
-                                [class.selected]="getCardState(cita.doctor).horarioSeleccionado === horario"
-                                (click)="seleccionarHorarioCard(cita.doctor, horario)">
+                                [class.selected]="getCardState(cita).horarioSeleccionado === horario"
+                                (click)="seleccionarHorarioCard(cita.medico.idMedico, horario)">
                                 {{ horario }}
                             </button>
                             }
 
-                            @if (getHorariosDelDia(cita.doctor).length === 0) {
+                            @if (getHorariosDelDia(cita).length === 0) {
                             <div class="no-horarios-clean">
-                                <p>No hay horarios disponibles</p>
+                                <p>Selecciona un día para ver horarios</p>
                             </div>
                             }
                         </div>
+                        } @else {
+                        <div class="no-horarios-disponibles">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No hay horarios disponibles esta semana</p>
+                        </div>
+                        }
 
                         <button class="btn-reservar-clean" (click)="reservarCita(cita)"
-                            [disabled]="!getCardState(cita.doctor).horarioSeleccionado">
-                            @if (getCardState(cita.doctor).horarioSeleccionado) {
+                            [disabled]="!getCardState(cita).horarioSeleccionado">
+                            @if (getCardState(cita).horarioSeleccionado) {
                             <i class="fas fa-calendar-check"></i>
-                            Reservar {{ getDiaActual(cita.doctor)?.nombre }} {{ getCardState(cita.doctor).horarioSeleccionado }}
+                            Reservar {{ getDiaActual(cita)?.diaSemana }} {{ getCardState(cita).horarioSeleccionado }}
                             } @else {
                             <i class="fas fa-calendar-plus"></i>
                             Selecciona día y horario

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Usuario } from '../../models/users/usuario';
 import { environment } from '../../../../environments/environment';
 import { UsuarioRegistro } from '../../models/users/registro';
+import { CambiarPasswordRequest } from '../../models/users/login';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
@@ -30,4 +31,9 @@ export class UsuarioService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  cambiarContrasena(id: number, data: CambiarPasswordRequest): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/cambiar-contrasena/${id}`, data);
+  }
+
 }

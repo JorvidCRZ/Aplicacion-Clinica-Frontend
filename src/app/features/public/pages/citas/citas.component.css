@@ -28,6 +28,29 @@
     text-align: center;
 }
 
+/* No hay horarios disponibles */
+.no-horarios-disponibles {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--gris-oscuro);
+    border: 2px dashed var(--plomo);
+    border-radius: 12px;
+    background: var(--gris-claro);
+    margin: 16px 0;
+}
+
+.no-horarios-disponibles i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--azul-medio);
+}
+
+.no-horarios-disponibles p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 /* Contenido principal */
 .card-content-clean {
     display: flex;

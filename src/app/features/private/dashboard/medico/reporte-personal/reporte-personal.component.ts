@@ -124,10 +124,7 @@ export class ReportePersonalComponent implements OnInit {
     if (!this.doctorActual) return;
     this.cargando = true;
 
-    // Seed si no hay citas para mostrar demo coherente
-    const nombreDoctor = `${this.doctorActual.nombre} ${this.doctorActual.apellidoPaterno || ''}`.trim();
-    this.citasSrv.seedIfEmptyForDoctor(nombreDoctor, this.doctorActual.especialidad);
-    // Cargar y filtrar citas por el doctor
+    // Cargar citas desde el servicio
     this.citas = this.citasSrv.obtenerCitas();
     this.citasDoctor = this.filtrarCitasPorDoctor(this.citas);
 
@@ -536,9 +533,69 @@ export class ReportePersonalComponent implements OnInit {
     }
   }
 
+  // =================================================== 
+  // MÉTODOS UTILITARIOS
+  // ===================================================
+  
+  fechaISO(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
+  buildDateTime(fecha: string, hora: string): Date {
+    const [h, m] = (hora || '00:00').split(':').map(Number);
+    return new Date(`${fecha}T${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`);
+  }
+
+  enRangoFecha(fecha: string, ini: Date, fin: Date): boolean {
+    const f = new Date(fecha + 'T00:00:00');
+    const i = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate());
+    const e = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate());
+    return f >= i && f <= e;
+  }
+
+  rangoSemanaActual(): { inicio: Date; fin: Date } {
+    const hoy = new Date();
+    const dia = hoy.getDay();
+    const diffLunes = (dia === 0 ? -6 : 1) - dia;
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() + diffLunes);
+    const fin = new Date(inicio);
+    fin.setDate(inicio.getDate() + 6);
+    return { inicio, fin };
+  }
+
+  rangoMesActual(): { inicio: Date; fin: Date } {
+    const hoy = new Date();
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+    return { inicio, fin };
+  }
+
+  obtenerRangoPeriodo(periodo: string): { inicio: Date; fin: Date } {
+    const hoy = new Date();
+    if (periodo === 'resumen' || periodo === 'hoy') {
+      const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+      const fin = new Date(inicio);
+      return { inicio, fin };
+    }
+    if (periodo === 'semana') {
+      return this.rangoSemanaActual();
+    }
+    return this.rangoMesActual();
+  }
+
+  nombreCorto(nombre: string): string {
+    const partes = (nombre || '').split(' ');
+    if (partes.length >= 2) return `${partes[0]} ${partes[1][0]}.`;
+    return nombre || '';
+  }
+
 }
 
-// Tipos y utilidades locales
+// =================================================== 
+// INTERFACES Y TIPOS
+// ===================================================
+
 interface DoctorVM {
   id: number;
   nombre: string;
@@ -547,66 +604,3 @@ interface DoctorVM {
   especialidad?: string;
   nroColegiado?: string;
 }
-
-export interface ReportePersonalComponent {
-  fechaISO(d: Date): string;
-  buildDateTime(fecha: string, hora: string): Date;
-  enRangoFecha(fecha: string, ini: Date, fin: Date): boolean;
-  rangoSemanaActual(): { inicio: Date; fin: Date };
-  rangoMesActual(): { inicio: Date; fin: Date };
-  obtenerRangoPeriodo(periodo: string): { inicio: Date; fin: Date };
-  nombreCorto(nombre: string): string;
-}
-
-ReportePersonalComponent.prototype.fechaISO = function(d: Date): string {
-  return d.toISOString().split('T')[0];
-};
-
-ReportePersonalComponent.prototype.buildDateTime = function(fecha: string, hora: string): Date {
-  const [h, m] = (hora || '00:00').split(':').map(Number);
-  return new Date(`${fecha}T${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:00`);
-};
-
-ReportePersonalComponent.prototype.enRangoFecha = function(fecha: string, ini: Date, fin: Date): boolean {
-  const f = new Date(fecha + 'T00:00:00');
-  const i = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate());
-  const e = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate());
-  return f >= i && f <= e;
-};
-
-ReportePersonalComponent.prototype.rangoSemanaActual = function(): { inicio: Date; fin: Date } {
-  const hoy = new Date();
-  const dia = hoy.getDay();
-  const diffLunes = (dia === 0 ? -6 : 1) - dia;
-  const inicio = new Date(hoy);
-  inicio.setDate(hoy.getDate() + diffLunes);
-  const fin = new Date(inicio);
-  fin.setDate(inicio.getDate() + 6);
-  return { inicio, fin };
-};
-
-ReportePersonalComponent.prototype.rangoMesActual = function(): { inicio: Date; fin: Date } {
-  const hoy = new Date();
-  const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-  const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-  return { inicio, fin };
-};
-
-ReportePersonalComponent.prototype.obtenerRangoPeriodo = function(periodo: string): { inicio: Date; fin: Date } {
-  const hoy = new Date();
-  if (periodo === 'resumen' || periodo === 'hoy') {
-    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-    const fin = new Date(inicio);
-    return { inicio, fin };
-  }
-  if (periodo === 'semana') {
-    return this.rangoSemanaActual();
-  }
-  return this.rangoMesActual();
-};
-
-ReportePersonalComponent.prototype.nombreCorto = function(nombre: string): string {
-  const partes = (nombre || '').split(' ');
-  if (partes.length >= 2) return `${partes[0]} ${partes[1][0]}.`;
-  return nombre || '';
-};

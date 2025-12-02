@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
 import { PagosService, Factura as FacturaLocal } from '../../../../../core/services/logic/pagos.service';
 import { environment } from '../../../../../../environments/environment';
-import { ReportesService } from '../../../../../core/services/reportes.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 import { CitaCompleta } from '../../../../../core/models/common/cita';
 
 // 📊 Interfaces para Reportes
@@ -52,10 +50,11 @@ interface DatoGrafico {
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })
+
 export class ReportesComponent implements OnInit {
   constructor(
     private citaService: CitaService,
