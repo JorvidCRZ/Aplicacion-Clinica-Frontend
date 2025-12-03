@@ -145,10 +145,10 @@ export class CitaService {
 
     // Resolver ID de médico-especialidad (necesitarás un endpoint en el backend)
     resolverMedicoEspecialidad(doctorNombre: string, especialidad: string): Observable<number> {
-        const payload = { doctorNombre, especialidad };
-        return this.http.post<{idMedicoEspecialidad: number}>(`${this.apiBase}/resolver-medico-especialidad`, payload)
+        // Endpoint que debes crear en el backend: GET /api/medico-especialidad/buscar
+        const params = { medicoNombre: doctorNombre, especialidad: especialidad };
+        return this.http.get<{idMedicoEspecialidad: number}>(`${environment.apiUrl}/medico-especialidad/buscar`, { params })
             .pipe(
-                // Extraer solo el ID de la respuesta
                 map(response => response.idMedicoEspecialidad)
             );
     }

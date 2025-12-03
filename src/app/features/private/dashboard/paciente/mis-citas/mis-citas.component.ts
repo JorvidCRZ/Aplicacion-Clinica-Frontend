@@ -25,6 +25,8 @@ interface Cita {
   duracion: number; // en minutos
   puedeReagendar: boolean;
   puedeCancelar: boolean;
+  notas?: string;
+  codigoReserva?: string;
 }
 
 @Component({
@@ -70,6 +72,10 @@ export class MisCitasComponent implements OnInit {
     completadas: 0,
     canceladas: 0
   };
+
+  // Modal de detalle
+  mostrarModalDetalle = false;
+  citaSeleccionada: Cita | null = null;
 
   ngOnInit() {
     this.cargarDatosPaciente();
@@ -157,7 +163,7 @@ export class MisCitasComponent implements OnInit {
         avatar: this.obtenerAvatarPorEspecialidad(cita.especialidad)
       },
       tipo: cita.subEspecialidad || 'Consulta General',
-      motivo: 'Consulta médica', // El backend no devuelve motivo en este DTO
+      motivo: cita.motivoConsulta || cita.observaciones || 'Consulta médica',
       estado: this.mapearEstadoCita(cita.estado),
       precio: cita.precio,
       consultorio: 'Por asignar', // El backend no devuelve consultorio en este DTO
@@ -251,7 +257,7 @@ export class MisCitasComponent implements OnInit {
 
   private puedeReagendar(estado: string, fecha: string): boolean {
     const estadosReagendables = ['confirmada', 'pendiente'];
-    const fechaCita = new Date(fecha);
+    const fechaCita = this.parsearFechaLocal(fecha);
     const hoy = new Date();
     
     return estadosReagendables.includes(estado.toLowerCase()) && fechaCita > hoy;
@@ -259,7 +265,7 @@ export class MisCitasComponent implements OnInit {
 
   private puedeCancelar(estado: string, fecha: string): boolean {
     const estadosCancelables = ['confirmada', 'pendiente'];
-    const fechaCita = new Date(fecha);
+    const fechaCita = this.parsearFechaLocal(fecha);
     const hoy = new Date();
     
     // Puede cancelar si falta más de 24 horas
@@ -286,6 +292,26 @@ export class MisCitasComponent implements OnInit {
       'Urología': 130
     };
     return precios[especialidad] ?? 100;
+  }
+
+  obtenerIconoPorEspecialidad(especialidad: string): string {
+    const iconos: Record<string, string> = {
+      'Cardiología': 'fa-heartbeat',
+      'Dermatología': 'fa-hand-sparkles',
+      'Pediatría': 'fa-baby',
+      'Ginecología': 'fa-venus',
+      'Medicina General': 'fa-stethoscope',
+      'Traumatología': 'fa-bone',
+      'Psicología': 'fa-brain',
+      'Odontología': 'fa-tooth',
+      'Oftalmología': 'fa-eye',
+      'Neurología': 'fa-head-side-virus',
+      'Endocrinología': 'fa-pills',
+      'Reumatología': 'fa-hand-holding-medical',
+      'Urología': 'fa-procedures',
+      'Psiquiatría': 'fa-user-md'
+    };
+    return iconos[especialidad] || 'fa-user-md';
   }
 
   calcularEstadisticas() {
@@ -371,8 +397,13 @@ export class MisCitasComponent implements OnInit {
   }
 
   verDetalleCita(cita: Cita) {
-    console.log('Ver detalle de cita:', cita);
-    // Implementar modal o navegación a detalle
+    this.citaSeleccionada = cita;
+    this.mostrarModalDetalle = true;
+  }
+
+  cerrarModalDetalle() {
+    this.mostrarModalDetalle = false;
+    this.citaSeleccionada = null;
   }
 
   cancelarCita(cita: Cita) {
@@ -444,13 +475,19 @@ export class MisCitasComponent implements OnInit {
   }
 
   formatearFecha(fecha: string): string {
-    const fechaObj = new Date(fecha);
+    const fechaObj = this.parsearFechaLocal(fecha);
     return fechaObj.toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  private parsearFechaLocal(fechaStr: string): Date {
+    // Parsear "YYYY-MM-DD" en zona horaria local
+    const [year, month, day] = fechaStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
   }
 
   formatearHora(hora: string): string {

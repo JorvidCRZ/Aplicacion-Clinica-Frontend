@@ -192,17 +192,19 @@
                     <!-- Doctor info -->
                     <div class="doctor-info">
                         <div class="doctor-avatar">
-                            @if (cita.doctor.avatar) {
-                                <img [src]="cita.doctor.avatar" [alt]="cita.doctor.nombre">
-                            } @else {
-                                <div class="avatar-placeholder">
-                                    <i class="fas fa-user-md"></i>
-                                </div>
-                            }
+                            <div class="avatar-placeholder">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+                            <div class="especialidad-icon">
+                                <i class="fas" [ngClass]="obtenerIconoPorEspecialidad(cita.doctor.especialidad)"></i>
+                            </div>
                         </div>
                         <div class="doctor-datos">
                             <h4>{{ cita.doctor.nombre }} {{ cita.doctor.apellido }}</h4>
-                            <p class="especialidad">{{ cita.doctor.especialidad }}</p>
+                            <p class="especialidad">
+                                <i class="fas" [ngClass]="obtenerIconoPorEspecialidad(cita.doctor.especialidad)"></i>
+                                {{ cita.doctor.especialidad }}
+                            </p>
                             <p class="consultorio">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ cita.consultorio }}
@@ -344,3 +346,148 @@
         </div>
     }
 </div>
+
+<!-- 🔍 MODAL DETALLE DE CITA -->
+@if (mostrarModalDetalle && citaSeleccionada) {
+    <div class="modal-overlay" (click)="cerrarModalDetalle()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-file-medical"></i>
+                    Detalle de Cita
+                </h3>
+                <button class="btn-cerrar" (click)="cerrarModalDetalle()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Estado de la cita -->
+                <div class="detalle-seccion estado-seccion">
+                    <div class="estado-badge" [ngClass]="'estado-' + citaSeleccionada.estado">
+                        <i class="fas" [ngClass]="{
+                            'fa-clock': citaSeleccionada.estado === 'programada',
+                            'fa-check-circle': citaSeleccionada.estado === 'completada',
+                            'fa-times-circle': citaSeleccionada.estado === 'cancelada',
+                            'fa-exclamation-circle': citaSeleccionada.estado === 'no-show'
+                        }"></i>
+                        {{ citaSeleccionada.estado | uppercase }}
+                    </div>
+                </div>
+
+                <!-- Fecha y hora -->
+                <div class="detalle-seccion">
+                    <h4><i class="fas fa-calendar-day"></i> Fecha y Hora</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Fecha:</span>
+                            <span class="valor">{{ formatearFecha(citaSeleccionada.fecha) }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Hora:</span>
+                            <span class="valor">{{ citaSeleccionada.hora }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Duración:</span>
+                            <span class="valor">{{ citaSeleccionada.duracion }} minutos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del doctor -->
+                <div class="detalle-seccion">
+                    <h4><i class="fas fa-user-doctor"></i> Información del Médico</h4>
+                    <div class="doctor-detalle">
+                        <div class="doctor-avatar-detalle">
+                            <div class="avatar-placeholder">
+                                <i class="fa-solid fa-user-doctor"></i>
+                            </div>
+                            <div class="especialidad-icon">
+                                <i class="fas" [ngClass]="obtenerIconoPorEspecialidad(citaSeleccionada.doctor.especialidad)"></i>
+                            </div>
+                        </div>
+                        <div class="doctor-info-detalle">
+                            <p class="nombre-doctor">{{ citaSeleccionada.doctor.nombre }} {{ citaSeleccionada.doctor.apellido }}</p>
+                            <p class="especialidad-doctor">
+                                <i class="fas" [ngClass]="obtenerIconoPorEspecialidad(citaSeleccionada.doctor.especialidad)"></i>
+                                {{ citaSeleccionada.doctor.especialidad }}
+                            </p>
+                            @if (citaSeleccionada.consultorio) {
+                                <p class="consultorio-doctor">
+                                    <i class="fas fa-door-open"></i>
+                                    {{ citaSeleccionada.consultorio }}
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles de la cita -->
+                <div class="detalle-seccion">
+                    <h4><i class="fas fa-info-circle"></i> Detalles</h4>
+                    <div class="info-grid">
+                        <div class="info-item full-width">
+                            <span class="label">Tipo de consulta:</span>
+                            <span class="valor">{{ citaSeleccionada.tipo }}</span>
+                        </div>
+                        <div class="info-item full-width">
+                            <span class="label">Motivo:</span>
+                            <span class="valor">{{ citaSeleccionada.motivo }}</span>
+                        </div>
+                        @if (citaSeleccionada.notas) {
+                            <div class="info-item full-width">
+                                <span class="label">Notas adicionales:</span>
+                                <span class="valor">{{ citaSeleccionada.notas }}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Información de pago -->
+                <div class="detalle-seccion precio-seccion">
+                    <h4><i class="fas fa-dollar-sign"></i> Información de Pago</h4>
+                    <div class="precio-detalle">
+                        <span class="precio-label">Precio de consulta:</span>
+                        <span class="precio-valor">S/. {{ citaSeleccionada.precio }}</span>
+                    </div>
+                </div>
+
+                @if (citaSeleccionada.codigoReserva) {
+                    <div class="detalle-seccion">
+                        <h4><i class="fas fa-barcode"></i> Código de Reserva</h4>
+                        <div class="codigo-reserva">
+                            <code>{{ citaSeleccionada.codigoReserva }}</code>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer">
+                @if (citaSeleccionada.estado === 'programada') {
+                    @if (citaSeleccionada.puedeReagendar) {
+                        <button class="btn btn-warning" (click)="reagendarCita(citaSeleccionada); cerrarModalDetalle()">
+                            <i class="fas fa-calendar-alt"></i>
+                            Reagendar
+                        </button>
+                    }
+                    @if (citaSeleccionada.puedeCancelar) {
+                        <button class="btn btn-danger" (click)="cancelarCita(citaSeleccionada); cerrarModalDetalle()">
+                            <i class="fas fa-times"></i>
+                            Cancelar Cita
+                        </button>
+                    }
+                }
+                @if (citaSeleccionada.estado === 'completada') {
+                    <button class="btn btn-success" (click)="descargarComprobante(citaSeleccionada)">
+                        <i class="fas fa-download"></i>
+                        Descargar Comprobante
+                    </button>
+                }
+                <button class="btn btn-secondary" (click)="cerrarModalDetalle()">
+                    <i class="fas fa-arrow-left"></i>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+}
