@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
-import { HorarioService, BloqueHorario } from '../../../../../core/services/logic/horario.service';
+import { HorarioService, BloqueHorario, BloqueHorarioDetallado, BloquesPorDia } from '../../../../../core/services/logic/horario.service';
 import { MedicoService } from '../../../../../core/services/rol/medico.service';
 
 @Component({
@@ -75,7 +75,6 @@ export class GestionHorariosComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarMedicos();
-    this.cargarHorarios();
   }
 
   cargarMedicos(): void {
@@ -86,6 +85,8 @@ export class GestionHorariosComponent implements OnInit {
           nombre: `${m.persona?.nombre1 || ''} ${m.persona?.apellidoPaterno || ''}`.trim(),
           especialidad: m.especialidad
         }));
+        // cargar disponibilidades después de tener la lista de médicos
+        this.cargarHorarios();
       },
       error: (err) => console.error('Error cargando médicos:', err)
     });
@@ -93,11 +94,58 @@ export class GestionHorariosComponent implements OnInit {
 
   cargarHorarios(): void {
     this.isLoading = true;
-    // Simulación temporal - reemplazar con endpoint real
-    setTimeout(() => {
-      this.horarios = this.obtenerHorariosEjemplo();
-      this.isLoading = false;
-    }, 500);
+    // Obtener disponibilidades reales desde el backend
+    this.horarioService.getDisponibilidades().subscribe({
+      next: (lista) => {
+        this.horarios = lista.map(d => {
+          // Normalizar nombre para búsqueda: quitar prefijos Dr./Dra. y comparar en minúsculas
+          const normalize = (s: string) => (s || '').replace(/^(dr\.|dr|dra\.|dra)\s*/i, '').trim().toLowerCase();
+          const nombreResp = normalize(d.medico || '');
+          const encontrado = this.medicos.find(m => {
+            const nombreLista = (m.nombre || '').toLowerCase();
+            return (nombreLista && (nombreLista.includes(nombreResp) || nombreResp.includes(nombreLista)));
+          });
+          const idMedico = encontrado ? encontrado.id : 0;
+          if (!idMedico) console.warn('No se encontró idMedico para:', d.medico);
+
+          return {
+            id: d.id,
+            idMedico: idMedico,
+            nombreMedico: d.medico,
+            especialidad: d.especialidad,
+            diasSemana: d.dias,
+            horaInicio: d.horaInicio ? d.horaInicio.slice(0,5) : '',
+            horaFin: d.horaFin ? d.horaFin.slice(0,5) : '',
+            duracionBloque: d.duracion,
+            // inicialmente usar el valor que proporciona el endpoint como fallback
+            bloquesTotales: d.bloques,
+            estado: (d.estado || '').toLowerCase().includes('no') ? 'No Disponible' : 'Disponible'
+          } as HorarioVM;
+        });
+        // Ahora por cada horario con idMedico, pedir los bloques reales y actualizar el contador
+        this.horarios.forEach(h => {
+          if (h.idMedico && h.idMedico > 0) {
+            this.horarioService.getBloquesPorDia(h.idMedico).subscribe({
+              next: (res) => {
+                const total = (res || []).reduce((acc, dia) => acc + (dia.bloques?.length || 0), 0);
+                h.bloquesTotales = total;
+              },
+              error: (err) => {
+                console.error('Error contando bloques para idMedico', h.idMedico, err);
+                // mantener el valor original si falla
+              }
+            });
+          }
+        });
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error cargando disponibilidades:', err);
+        // fallback a datos de ejemplo si falla la llamada
+        this.horarios = this.obtenerHorariosEjemplo();
+        this.isLoading = false;
+      }
+    });
   }
 
   private obtenerHorariosEjemplo(): HorarioVM[] {
@@ -233,40 +281,115 @@ export class GestionHorariosComponent implements OnInit {
   }
 
   verBloques(horario: HorarioVM): void {
-    this.horarioActual = {
-      idMedico: horario.idMedico,
-      diasSemana: horario.diasSemana.split(', ').map(d => this.mapDiaAbrevToFull(d)),
-      horaInicio: horario.horaInicio,
-      horaFin: horario.horaFin,
-      duracionBloque: horario.duracionBloque,
-      fechaInicio: this.obtenerFechaHoy(),
-      fechaFin: this.obtenerFechaEnDias(14)
-    };
-    this.generarVistaPrevia();
-    this.mostrarBloques = true;
+    // Determinar idMedico: usar el id de la fila o buscar por nombre en la lista de médicos
+    let idMedico = horario.idMedico && horario.idMedico > 0 ? horario.idMedico : 0;
+    if (!idMedico && this.medicos && this.medicos.length > 0) {
+      const normalize = (s: string) => (s || '').replace(/^(dr\.|dr|dra\.|dra)\s*/i, '').trim().toLowerCase();
+      const nombreResp = normalize(horario.nombreMedico || '');
+      const encontrado = this.medicos.find(m => {
+        const nombreLista = (m.nombre || '').toLowerCase();
+        return nombreLista && (nombreLista.includes(nombreResp) || nombreResp.includes(nombreLista));
+      });
+      if (encontrado) idMedico = encontrado.id;
+    }
+
+    if (!idMedico || idMedico === 0) {
+      alert('No se pudo determinar el ID del médico para obtener los bloques.');
+      return;
+    }
+
+    // Pedir bloques por día desde el backend
+    this.isLoading = true;
+    const urlBloquesDia = `${(window as any)['env']?.apiUrl || 'http://localhost:8080'}/horario-bloque/medicos/${idMedico}/bloques-por-dia`;
+    console.log('Solicitando (bloques-por-dia) ->', urlBloquesDia);
+    this.horarioService.getBloquesPorDia(idMedico).subscribe({
+      next: (res: BloquesPorDia[]) => {
+        const bloques: BloqueGenerado[] = [];
+        let contador = 1;
+        (res || []).forEach(diaObj => {
+          const fecha = diaObj.fecha;
+          const diaSemana = diaObj.dia || this.obtenerDiaSemana(new Date(fecha));
+          (diaObj.bloques || []).forEach(b => {
+            bloques.push({
+              id: contador++,
+              fecha: fecha,
+              diaSemana: diaSemana,
+              horaInicio: b.horaInicio ? b.horaInicio.slice(0,5) : '',
+              horaFin: b.horaFin ? b.horaFin.slice(0,5) : '',
+              disponible: true
+            });
+          });
+        });
+
+        this.bloquesGenerados = bloques;
+        this.isLoading = false;
+        this.mostrarBloques = true;
+      },
+      error: (err) => {
+        console.error('Error cargando bloques por día:', err);
+        this.isLoading = false;
+        const status = err?.status;
+        const msg = err?.message || (err?.error && JSON.stringify(err.error)) || 'Error desconocido';
+        alert(`Error al obtener bloques por día. Status: ${status} - ${msg}`);
+      }
+    });
   }
 
   generarVistaPrevia(): void {
     if (!this.horarioActual) return;
+    // Si tenemos un idMedico válido, preferimos pedir los bloques al backend
+    if (this.horarioActual.idMedico && this.horarioActual.idMedico > 0) {
+      this.isLoading = true;
+      const fechaInicio = this.horarioActual.fechaInicio;
+      const fechaFin = this.horarioActual.fechaFin;
+      const urlRango = `${(window as any)['env']?.apiUrl || 'http://localhost:8080'}/horario-bloque/disponibles-rango/${this.horarioActual.idMedico}/${fechaInicio}/${fechaFin}`;
+      console.log('Solicitando (disponibles-rango) ->', urlRango);
+      this.horarioService.getBloquesDisponiblesRango(this.horarioActual.idMedico, fechaInicio, fechaFin).subscribe({
+        next: (bloquesBackend: BloqueHorarioDetallado[]) => {
+          const mapped: BloqueGenerado[] = (bloquesBackend || []).map((b, idx) => ({
+            id: b.idBloque ?? idx + 1,
+            fecha: b.fecha,
+            diaSemana: b.diaSemana ?? this.obtenerDiaSemana(new Date(b.fecha)),
+            horaInicio: b.horaInicio ? b.horaInicio.slice(0,5) : '',
+            horaFin: b.horaFin ? b.horaFin.slice(0,5) : '',
+            disponible: !!b.disponible
+          }));
+          this.bloquesGenerados = mapped;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error obteniendo bloques desde backend, usando fallback en memoria:', err);
+          this.isLoading = false;
+          // fallback a generación en memoria
+          this.generarVistaPreviaMemoria();
+        }
+      });
+      return;
+    }
 
+    // Si no hay idMedico, generar vista previa en memoria
+    this.generarVistaPreviaMemoria();
+  }
+
+  // Extraer la lógica de generación en memoria a un método separado
+  private generarVistaPreviaMemoria(): void {
+    if (!this.horarioActual) return;
     const bloques: BloqueGenerado[] = [];
     const fechaInicio = new Date(this.horarioActual.fechaInicio);
     const fechaFin = new Date(this.horarioActual.fechaFin);
-    
     let fechaActual = new Date(fechaInicio);
     let contador = 1;
 
     while (fechaActual <= fechaFin) {
       const diaSemana = this.obtenerDiaSemana(fechaActual);
-      
-      if (this.horarioActual.diasSemana.includes(diaSemana)) {
+      if (this.horarioActual!.diasSemana.includes(diaSemana)) {
         const bloquesDelDia = this.generarBloquesDia(
           fechaActual,
-          this.horarioActual.horaInicio,
-          this.horarioActual.horaFin,
-          this.horarioActual.duracionBloque
+          this.horarioActual!.horaInicio,
+          this.horarioActual!.horaFin,
+          this.horarioActual!.duracionBloque
         );
-        
+
         bloquesDelDia.forEach(bloque => {
           bloques.push({
             id: contador++,
@@ -278,7 +401,6 @@ export class GestionHorariosComponent implements OnInit {
           });
         });
       }
-      
       fechaActual.setDate(fechaActual.getDate() + 1);
     }
 
@@ -354,25 +476,47 @@ export class GestionHorariosComponent implements OnInit {
   }
 
   cambiarEstado(horario: HorarioVM): void {
-    const nuevoEstado = horario.estado === 'Disponible' ? 'No Disponible' : 'Disponible';
-    const confirmacion = confirm(`¿Cambiar estado del horario de ${horario.nombreMedico} a "${nuevoEstado}"?`);
-    
-    if (confirmacion) {
-      // TODO: Conectar con endpoint PATCH /api/horarios/{id}/estado
-      const payload = {
-        estado: nuevoEstado
-      };
-      
-      console.log('🔄 Cambiar estado horario ID:', horario.id, 'a:', nuevoEstado);
-      
-      // Actualizar localmente
-      const index = this.horarios.findIndex(h => h.id === horario.id);
-      if (index > -1) {
-        this.horarios[index].estado = nuevoEstado;
-      }
-      
-      alert(`✅ Estado cambiado a "${nuevoEstado}"`);
+    // Toggle availability: determine desired boolean based on current state
+    const deseaDisponible = horario.estado !== 'Disponible';
+    const mensaje = deseaDisponible ? `¿Activar bloques del médico ${horario.nombreMedico}?` : `¿Desactivar bloques del médico ${horario.nombreMedico}?`;
+    const confirmacion = confirm(mensaje);
+    if (!confirmacion) return;
+
+    // Determinar idMedico: usar el id de la fila o buscar por nombre en la lista de médicos
+    let idMedico = horario.idMedico && horario.idMedico > 0 ? horario.idMedico : 0;
+    if (!idMedico && this.medicos && this.medicos.length > 0) {
+      const normalize = (s: string) => (s || '').replace(/^(dr\.|dr|dra\.|dra)\s*/i, '').trim().toLowerCase();
+      const nombreResp = normalize(horario.nombreMedico || '');
+      const encontrado = this.medicos.find(m => {
+        const nombreLista = (m.nombre || '').toLowerCase();
+        return nombreLista && (nombreLista.includes(nombreResp) || nombreResp.includes(nombreLista));
+      });
+      if (encontrado) idMedico = encontrado.id;
     }
+
+    if (!idMedico || idMedico === 0) {
+      alert('No se pudo determinar el ID del médico para cambiar disponibilidad.');
+      return;
+    }
+
+    // Llamar al endpoint que acepta query param ?disponible=true|false
+    this.horarioService.setDisponibilidad(idMedico, deseaDisponible).subscribe({
+      next: () => {
+        const index = this.horarios.findIndex(h => h.id === horario.id);
+        if (index > -1) {
+          this.horarios[index].estado = deseaDisponible ? 'Disponible' : 'No Disponible';
+        }
+        alert(`✅ Estado actualizado a "${deseaDisponible ? 'Disponible' : 'No Disponible'}"`);
+      },
+      error: (err) => {
+        console.error('Error cambiando disponibilidad para idMedico', idMedico, err);
+        if (err?.status === 404) {
+          alert('Endpoint no encontrado (404). Revisa la ruta en el backend: /horario-bloque/medico/{id}/disponibilidad');
+        } else {
+          alert('Error al cambiar disponibilidad en el servidor. Revisa la consola para más detalles.');
+        }
+      }
+    });
   }
 
   onTableAction(event: { action: string, item: any }): void {
