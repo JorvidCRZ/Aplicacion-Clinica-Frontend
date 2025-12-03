@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../../core/services/auth/auth.service';
@@ -6,6 +7,7 @@ import { CitaService } from '../../../../../core/services/logic/cita.service';
 import { CitaCompletaFull } from '../../../../../core/models/common/cita';
 // import CitaCompleta removed — backend used directly
 import { MedicosService } from '../../../../../core/services/logic/medico.service';
+import { HistorialMedicoService } from '../../../../../core/services/logic/historial-medico.service';
 
 
 
@@ -53,11 +55,34 @@ export class CitasComponent implements OnInit {
     private authService = inject(AuthService);
     private citasSrv = inject(CitaService);
     private medicosSrv = inject(MedicosService);
+    private historialSrv = inject(HistorialMedicoService);
+    private router = inject(Router);
 
     detalleCita: CitaCompletaFull | null = null; // Almacena la cita completa obtenida del backend
     mostrarModal = false;            // Controla la visibilidad del modal
     showRawDetalle = false;
     showActions = false;
+    // Crear historial (modal interno)
+    crearHistorialVisible = false;
+    crearHistorialLoading = false;
+    crearHistorialError: string | null = null;
+    crearHistorialForm: {
+        idPaciente: number | null;
+        idCita: number | null;
+        idMedico: number | null;
+        diagnostico: string;
+        observaciones: string;
+        receta: string;
+        fecha: string | null;
+    } = {
+        idPaciente: null,
+        idCita: null,
+        idMedico: null,
+        diagnostico: '',
+        observaciones: '',
+        receta: '',
+        fecha: null
+    };
     pacienteInfo: any | null = null;
     medicoInfo: any | null = null;
 
@@ -90,6 +115,20 @@ export class CitasComponent implements OnInit {
 
     // 📋 Solicitudes pendientes
     solicitudesCancelacion: Map<number, boolean> = new Map(); // ID cita -> pendiente
+
+    // Estado de actualización por fila (idCita -> loading)
+    updatingEstado: Map<number, boolean> = new Map();
+
+    // Opciones ordenadas de estados que muestra la UI (label -> valor enviado al backend)
+    estadosOptions: Array<{ value: string; label: string }> = [
+        { value: 'programada', label: 'Programada' },
+        { value: 'completada', label: 'Completada' },
+        { value: 'no-show', label: 'No Show' },
+        { value: 'cancelada', label: 'Cancelada' }
+    ];
+
+    // Valor seleccionado en el select del modal de detalles
+    modalSelectedEstado: string = '';
 
     // 📈 Estadísticas
     citasHoy = 0;
@@ -372,8 +411,302 @@ private mapCitaBackend(c: any, idx: number): Cita {
     }
 
     verHistorial(cita: Cita): void {
-        console.log('Ver historial:', cita);
-        alert(`Ver historial médico de ${cita.paciente.nombre}`);
+        console.log('Navegar a sección Pacientes para ver historial de:', cita);
+        const idPaciente = this.resolvePacienteIdFrom(cita) || (cita && (cita.paciente?.id || (cita as any).paciente?.idPaciente)) || null;
+        if (!idPaciente) {
+            console.warn('No se pudo resolver id de paciente desde la cita:', cita);
+            alert('No se pudo abrir la sección Pacientes: id de paciente no encontrado.');
+            return;
+        }
+
+        // Navegar a la sección de pacientes dentro del panel de médico.
+        // Se pasa `pacienteId` en queryParams para facilitar que la vista Pacientes lo seleccione si se implementa.
+        try {
+            const pacienteName = this.getPacienteNombre(cita) || (cita && (cita.paciente?.nombre || (cita as any).paciente?.nombre)) || '';
+            this.router.navigate(['/medico/pacientes'], { queryParams: { pacienteId: Number(idPaciente), pacienteName } });
+        } catch (e) {
+            console.error('Error navegando a /medico/pacientes:', e);
+            alert('No se pudo navegar a la sección Pacientes. Revisa la consola.');
+        }
+    }
+
+    // Abrir modal inline para crear historial con contexto de cita/medico/paciente
+    abrirCrearHistorialModal(pacienteId: number | null, citaId: number | null, medicoId: number | null): void {
+        // Asegurar que los ids sean números (no objetos vacíos)
+        this.crearHistorialForm.idPaciente = pacienteId != null ? Number(pacienteId) : null;
+        this.crearHistorialForm.idCita = citaId != null ? Number(citaId) : null;
+        this.crearHistorialForm.idMedico = medicoId != null ? Number(medicoId) : null;
+        this.crearHistorialForm.diagnostico = '';
+        this.crearHistorialForm.observaciones = '';
+        this.crearHistorialForm.receta = '';
+        // Default a fecha/horario ahora (ISO local compatible con datetime-local)
+        const now = new Date();
+        const tzOffset = now.getTimezoneOffset() * 60000;
+        const localISO = new Date(now.getTime() - tzOffset).toISOString().slice(0,16);
+        this.crearHistorialForm.fecha = localISO;
+        this.crearHistorialError = null;
+        this.crearHistorialVisible = true;
+        console.log('Abrir crearHistorial modal con ids:', { idPaciente: this.crearHistorialForm.idPaciente, idCita: this.crearHistorialForm.idCita, idMedico: this.crearHistorialForm.idMedico });
+    }
+
+    // Helpers para extraer ids desde diferentes shapes de la API
+    resolvePacienteIdFrom(obj: any): number | null {
+        if (!obj) return null;
+        // intentos comunes
+        const candidates = [
+            obj.idPaciente, obj.id_paciente, obj.pacienteId, obj.id, // top-level
+            obj.paciente?.idPaciente, obj.paciente?.id, obj.paciente?.id_paciente,
+            obj.paciente?.persona?.idPersona, obj.paciente?.persona?.id
+        ];
+        for (const c of candidates) {
+            if (c != null && c !== '' && typeof c !== 'object' && !isNaN(Number(c))) return Number(c);
+        }
+        return null;
+    }
+
+    resolveCitaIdFrom(obj: any): number | null {
+        if (!obj) return null;
+        const candidates = [obj.id, obj.idCita, obj.id_cita, obj.citaId];
+        for (const c of candidates) {
+            if (c != null && c !== '' && typeof c !== 'object' && !isNaN(Number(c))) return Number(c);
+        }
+        return null;
+    }
+
+    private resolveMedicoIdFrom(detalle: any): number | null {
+        if (!detalle) return null;
+        // varias formas posibles
+        const candidates = [
+            detalle.idMedico, detalle.id_medico, detalle.medicoId, detalle.id,
+            detalle.detalleCita?.medicoEspecialidad?.medico?.id,
+            detalle.detalleCita?.medicoEspecialidad?.idMedico,
+            detalle.detalleCita?.medicoEspecialidad?.medico?.idMedico,
+            detalle.medico?.id, detalle.medico?.idMedico
+        ];
+        for (const c of candidates) {
+            if (c != null && c !== '' && typeof c !== 'object' && !isNaN(Number(c))) return Number(c);
+        }
+        return null;
+    }
+
+    // Wrapper usado por el modal de detalles para confirmar y cambiar estado
+    confirmAndChange(obj: any, nuevoEstado: string): void {
+        if (!obj) return;
+        // Para cancelar pedimos confirmación
+        if (nuevoEstado === 'cancelada') {
+            const nombre = this.getPacienteNombre(obj);
+            if (!confirm(`¿Confirma marcar la cita de ${nombre} como CANCELADA?`)) return;
+        }
+
+        // Resolver id robustamente
+        const resolvedId = this.resolveCitaIdFrom(obj) || (obj && (obj.id || obj.idCita)) || null;
+        const id = resolvedId != null ? Number(resolvedId) : NaN;
+        if (isNaN(id) || id <= 0) {
+            console.warn('ID inválido al cambiar estado desde modal:', { obj, resolvedId });
+            alert('No se pudo cambiar el estado: id inválido. Revisa la consola.');
+            return;
+        }
+
+        const estadoAnterior = (obj as any).estado || null;
+        if (!nuevoEstado || nuevoEstado === estadoAnterior) return;
+
+        this.updatingEstado.set(id, true);
+        this.citasSrv.actualizarEstadoCita(id, nuevoEstado).subscribe({
+            next: (res) => {
+                console.log('Estado actualizado (modal):', { id, nuevoEstado, res });
+                // Actualizar detalle si corresponde
+                if (this.detalleCita && (this.resolveCitaIdFrom(this.detalleCita) === id || (this.detalleCita as any).id === id)) {
+                    try { (this.detalleCita as any).estado = nuevoEstado; } catch (e) { /* ignore */ }
+                }
+                // Actualizar lista local
+                const found = this.citasOriginales.find(c => (this.resolveCitaIdFrom(c) === id) || c.id === id);
+                if (found) found.estado = nuevoEstado as any;
+
+                this.updatingEstado.delete(id);
+                this.calcularEstadisticas();
+                this.filtrarCitas();
+            },
+            error: (err) => {
+                console.error('Error actualizando estado (modal):', err);
+                alert('No se pudo actualizar el estado. Intente nuevamente.');
+                // Revertir cambios locales
+                if (this.detalleCita && (this.resolveCitaIdFrom(this.detalleCita) === id || (this.detalleCita as any).id === id)) {
+                    try { (this.detalleCita as any).estado = estadoAnterior; } catch (e) { /* ignore */ }
+                }
+                const found2 = this.citasOriginales.find(c => (this.resolveCitaIdFrom(c) === id) || c.id === id);
+                if (found2) found2.estado = estadoAnterior as any;
+                this.updatingEstado.delete(id);
+            }
+        });
+    }
+
+    // Handler usado por el select en cada fila de la tabla
+    onChangeEstado(cita: Cita, nuevoEstado: string): void {
+        if (!cita) return;
+        const previo = cita.estado;
+        if (!nuevoEstado || nuevoEstado === previo) return;
+
+        // Si es cancelación pedir confirmación
+        if (nuevoEstado === 'cancelada') {
+            const nombre = this.getPacienteNombre(cita);
+            if (!confirm(`¿Confirma marcar la cita de ${nombre} como CANCELADA?`)) {
+                // revertir el modelo a su estado anterior en el próximo tick
+                setTimeout(() => { try { cita.estado = previo as any; } catch (e) { /* ignore */ } }, 0);
+                return;
+            }
+        }
+
+        this.cambiarEstado(cita, nuevoEstado);
+    }
+
+    // Cambiar estado de la cita usando el servicio (reutilizable desde selects y botones)
+    cambiarEstado(cita: any, nuevoEstado: string): void {
+        if (!cita) return;
+        const resolvedId = this.resolveCitaIdFrom(cita as any) || (cita as any).id || (cita as any).idCita || null;
+        const id = resolvedId != null ? Number(resolvedId) : NaN;
+        const estadoAnterior = (cita && (cita.estado)) || null;
+        console.log('cambiarEstado invoked:', { cita, resolvedId, id, nuevoEstado, estadoAnterior });
+
+        if (isNaN(id) || id <= 0) {
+            console.warn('ID de cita inválido al intentar actualizar estado:', { resolvedId, cita });
+            alert('No se pudo actualizar el estado de la cita: id inválido. Verifique la consola para más detalles.');
+            return;
+        }
+
+        if (!nuevoEstado || nuevoEstado === estadoAnterior) return;
+
+        this.updatingEstado.set(id, true);
+        this.citasSrv.actualizarEstadoCita(id, nuevoEstado).subscribe({
+            next: (res) => {
+                console.log('Estado actualizado en backend:', { id, nuevoEstado, res });
+                // Actualizar localmente y recalcular stats
+                try { cita.estado = nuevoEstado; } catch (e) { /* ignore */ }
+                // Actualizar en listado
+                const found = this.citasOriginales.find(c => (this.resolveCitaIdFrom(c) === id) || c.id === id);
+                if (found) found.estado = nuevoEstado as any;
+                this.updatingEstado.delete(id);
+                this.calcularEstadisticas();
+                this.filtrarCitas();
+            },
+            error: (err) => {
+                console.error('Error actualizando estado de la cita:', err);
+                // revertir en UI
+                try { cita.estado = estadoAnterior; } catch (e) { /* ignore */ }
+                const found2 = this.citasOriginales.find(c => (this.resolveCitaIdFrom(c) === id) || c.id === id);
+                if (found2) found2.estado = estadoAnterior as any;
+                this.updatingEstado.delete(id);
+                alert('No se pudo actualizar el estado de la cita. Intente nuevamente.');
+            }
+        });
+    }
+
+    // Handler usado por el select dentro del modal de detalle
+    onChangeEstadoModal(nuevoEstado: string): void {
+        if (!this.detalleCita) return;
+        if (!nuevoEstado || nuevoEstado === (this.detalleCita as any).estado) return;
+        // confirmAndChange ya incluye confirmación para 'cancelada'
+        this.confirmAndChange(this.detalleCita, nuevoEstado);
+    }
+
+    // Indica si la fila está actualizando el estado
+    isUpdatingEstado(idCita: number | null | undefined): boolean {
+        if (!idCita) return false;
+        return !!this.updatingEstado.get(Number(idCita));
+    }
+
+    cancelarCrearHistorial(): void {
+        this.crearHistorialVisible = false;
+        this.crearHistorialLoading = false;
+        this.crearHistorialError = null;
+    }
+
+    enviarCrearHistorial(): void {
+        if (this.crearHistorialLoading) return;
+        // Debug: mostrar el estado actual del formulario antes de normalizar
+        console.log('DEBUG crearHistorialForm raw:', this.crearHistorialForm);
+        console.log('DEBUG tipos:', {
+            idPaciente_type: typeof this.crearHistorialForm.idPaciente,
+            idCita_type: typeof this.crearHistorialForm.idCita,
+            idMedico_type: typeof this.crearHistorialForm.idMedico,
+            fecha_type: typeof this.crearHistorialForm.fecha
+        });
+        // Normalizar ids a número cuando sea posible
+        const idPacienteNum = this.crearHistorialForm.idPaciente != null ? Number(this.crearHistorialForm.idPaciente) : null;
+        const idCitaNum = this.crearHistorialForm.idCita != null ? Number(this.crearHistorialForm.idCita) : null;
+        const idMedicoNum = this.crearHistorialForm.idMedico != null ? Number(this.crearHistorialForm.idMedico) : null;
+
+        // Validación mínima local antes de enviar
+        if (!idPacienteNum || !idCitaNum || !idMedicoNum) {
+            this.crearHistorialError = 'Faltan identificadores (paciente/cita/medico). No se puede crear el historial.';
+            return;
+        }
+
+        // Procesar fecha: convertir la entrada de datetime-local a formato sin zona
+        let fechaProcesada: string | undefined = undefined;
+        if (this.crearHistorialForm.fecha) {
+            const raw = String(this.crearHistorialForm.fecha);
+            // Si viene con segundos, mantenerlos; si viene sin segundos (YYYY-MM-DDTHH:mm), añadir :00
+            const match = raw.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})(:?\d{2})?$/);
+            if (match) {
+                fechaProcesada = match[2] ? `${match[1]}${match[2]}` : `${match[1]}:00`;
+            } else {
+                // Fallback: tomar la porción inicial y formatear
+                try {
+                    const parts = raw.split('T');
+                    if (parts.length >= 2) {
+                        const timePart = parts[1].slice(0,8); // HH:MM:SS
+                        fechaProcesada = `${parts[0]}T${timePart}`;
+                    } else {
+                        // no es válido, dejar undefined para usar default del servidor
+                        fechaProcesada = undefined;
+                    }
+                } catch (e) {
+                    fechaProcesada = undefined;
+                }
+            }
+        }
+
+        const payload: any = {
+            idPaciente: idPacienteNum,
+            idCita: idCitaNum,
+            idMedico: idMedicoNum,
+            diagnostico: this.crearHistorialForm.diagnostico || '',
+            observaciones: this.crearHistorialForm.observaciones || '',
+            receta: this.crearHistorialForm.receta || ''
+        };
+
+        if (fechaProcesada) {
+            payload.fecha = fechaProcesada; // formato: YYYY-MM-DDTHH:MM:SS (sin zona)
+        }
+
+        console.log('Fecha procesada para enviar:', fechaProcesada);
+
+        console.log('Enviando payload crearHistorial:', payload, 'payload(json):', JSON.stringify(payload));
+
+        this.crearHistorialLoading = true;
+        this.historialSrv.crearHistorial(payload).subscribe({
+            next: (res) => {
+                this.crearHistorialLoading = false;
+                this.crearHistorialVisible = false;
+                alert('Historial médico creado correctamente.');
+            },
+            error: (err) => {
+                console.error('Error creando historial:', err);
+                try { console.error('Error detalle (err.error):', err.error); } catch(e) { /* ignore */ }
+                this.crearHistorialLoading = false;
+                // Mostrar mensaje detallado si el backend devuelve objeto de error
+                if (err && err.error) {
+                    try {
+                        const serverMsg = typeof err.error === 'string' ? err.error : (err.error.message || JSON.stringify(err.error));
+                        this.crearHistorialError = `Servidor: ${serverMsg}`;
+                    } catch (e) {
+                        this.crearHistorialError = 'No se pudo crear el historial. Error del servidor.';
+                    }
+                } else {
+                    this.crearHistorialError = 'No se pudo crear el historial. Intente nuevamente.';
+                }
+            }
+        });
     }
 
     verDetalles(cita: Cita): void {
@@ -383,6 +716,8 @@ private mapCitaBackend(c: any, idx: number): Cita {
             next: (data: CitaCompletaFull) => {
                 console.log('Detalles completos de la cita:', data);
                 this.detalleCita = data;
+                // Inicializar el select del modal con el estado actual
+                try { this.modalSelectedEstado = (data as any).estado || ''; } catch(e) { this.modalSelectedEstado = ''; }
                 this.computePacienteInfo();
                 this.computeMedicoInfo();
                 this.mostrarModal = true;
@@ -543,6 +878,22 @@ private mapCitaBackend(c: any, idx: number): Cita {
     getBadgeClass(estado: string | null | undefined): string {
         if (!estado) return 'badge-unknown';
         return `badge-${estado.toString().toLowerCase()}`;
+    }
+
+    // Abrir el modal inline para crear un historial (usa el contexto de la cita ya cargada)
+    registrarHistorial(): void {
+        if (!this.detalleCita) {
+            alert('No hay una cita seleccionada para registrar el historial.');
+            return;
+        }
+
+        // Resolver ids robustamente desde el objeto detalleCita
+        const citaId = this.resolveCitaIdFrom(this.detalleCita) || (this.detalleCita as any).id || (this.detalleCita as any).idCita || null;
+        const pacienteId = this.resolvePacienteIdFrom(this.detalleCita) || (this.detalleCita as any).paciente?.id || null;
+        const medicoId = this.resolveMedicoIdFrom(this.detalleCita) || this.doctorActual?.id || (this.medicoInfo && (this.medicoInfo as any).id) || null;
+
+        // Abrir modal con ids ya normalizados
+        this.abrirCrearHistorialModal(pacienteId, citaId, medicoId);
     }
 
     formatDateTime(fecha: string | undefined, hora?: string | undefined): string {

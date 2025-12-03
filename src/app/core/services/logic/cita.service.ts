@@ -65,6 +65,16 @@ export class CitaService {
     obtenerCitasDashboardPorMedico(idMedico: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiBase}/dashboard/medico/${idMedico}`);
     }
+    
+    /**
+     * Actualiza el estado de una cita por id.
+     * Endpoint esperado: PATCH /citas/{idCita}/estado
+     * Payload: { estado: string }
+     */
+    actualizarEstadoCita(idCita: number, estado: string): Observable<any> {
+        const payload = { estado };
+        return this.http.patch<any>(`${this.apiBase}/${idCita}/estado`, payload);
+    }
      // Obtener horas totales y promedio de minutos por médico (stats)
     obtenerHorasPromedioPorMedico(idMedico: number): Observable<{ horasTotales: number; promedioMinutos: number }> {
         return this.http.get<{ horasTotales: number; promedioMinutos: number }>(`${this.apiBase}/dashboard/medico/${idMedico}/horas-promedio`);

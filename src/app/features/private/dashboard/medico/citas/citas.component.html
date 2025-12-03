@@ -48,16 +48,7 @@
                 <label>Fecha:</label>
                 <input type="date" [(ngModel)]="filtroFecha" (change)="filtrarCitas()" class="form-control">
             </div>
-            <div class="filtro-estado">
-                <label>Estado:</label>
-                <select [(ngModel)]="filtroEstado" (change)="filtrarCitas()" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="programada">Programadas</option>
-                    <option value="completada">Completadas</option>
-                    <option value="cancelada">Canceladas</option>
-                    <option value="no-show">No Show</option>
-                </select>
-            </div>
+            <!-- Estado filter removed as requested -->
             <div class="filtro-busqueda">
                 <label>Buscar paciente:</label>
                 <input type="text" [(ngModel)]="busquedaPaciente" (input)="filtrarCitas()"
@@ -116,10 +107,7 @@
                             <span>Tipo Consulta</span>
                             <i class="fas fa-sort"></i>
                         </th>
-                        <th class="sortable">
-                            <span>Estado</span>
-                            <i class="fas fa-sort"></i>
-                        </th>
+                        <!-- Estado column removed -->
                         <th class="acciones-header">Acciones</th>
                     </tr>
                 </thead>
@@ -145,19 +133,10 @@
                                 <small class="motivo">{{ cita.motivo }}</small>
                                 }
                             </div>
+                            <!-- estado visual removed -->
                         </td>
 
-                        <td>
-                            <span class="estado-pill" [class]="'estado-' + cita.estado">
-                                @switch (cita.estado) {
-                                @case ('programada') { Programada }
-                                @case ('completada') { Completada }
-                                @case ('cancelada') { Cancelada }
-                                @case ('no-show') { No Show }
-                                @default { {{ cita.estado }} }
-                                }
-                            </span>
-                        </td>
+                        <!-- Estado cell removed -->
 
                         <td class="acciones-celda">
                             <div class="botones-accion">
@@ -214,7 +193,9 @@
             </div>
         </div>
         }
+        
 
+        
         @if (totalRegistros > 5) {
         <div class="paginacion-container">
             <div class="paginacion-info">
@@ -294,7 +275,7 @@
                             <h5>Consulta</h5>
                             <div class="consulta-line"><strong>Especialidad:</strong> {{ display(medicoInfo?.especialidad) }}</div>
                             <div class="consulta-line"><strong>Motivo:</strong> {{ display(detalleCita?.motivoConsulta) }}</div>
-                            <div class="estado-badge"> <span [ngClass]="['badge', getBadgeClass(detalleCita?.estado)]">{{ getEstadoLabel(detalleCita?.estado) }}</span> </div>
+                            <!-- Estado badge removed from modal -->
                         </section>
 
                         <section class="section medico-section" *ngIf="medicoInfo">
@@ -323,10 +304,31 @@
             </div>
 
             <div class="modal-footer">
+                <div class="footer-left" style="display:flex; align-items:center; gap:0.6rem;">
+                    <button class="btn btn-primary" (click)="registrarHistorial()" *ngIf="detalleCita">
+                        <i class="fas fa-notes-medical"></i> Registrar historial médico
+                    </button>
+
+                    <!-- Control de estado: select compacto junto al botón de registrar historial -->
+                    <div class="estado-modal-control" *ngIf="detalleCita" style="display:flex; align-items:center; gap:0.4rem;">
+                        <select [(ngModel)]="modalSelectedEstado" (change)="onChangeEstadoModal(modalSelectedEstado)"
+                            class="form-control estado-select-modal" [disabled]="isUpdatingEstado(resolveCitaIdFrom(detalleCita))"
+                            title="Cambiar estado de la cita">
+                            <option *ngFor="let e of estadosOptions" [value]="e.value">{{ e.label }}</option>
+                        </select>
+
+                        <button class="btn btn-outline-secondary" (click)="onChangeEstadoModal(modalSelectedEstado)"
+                            [disabled]="isUpdatingEstado(resolveCitaIdFrom(detalleCita))" title="Aplicar estado">
+                            <i *ngIf="isUpdatingEstado(resolveCitaIdFrom(detalleCita))" class="fas fa-spinner fa-spin"></i>
+                            <i *ngIf="!isUpdatingEstado(resolveCitaIdFrom(detalleCita))" class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="footer-right">
                     <!-- Solo el botón X cierra la modal por diseño -->
                 </div>
             </div>
+            <!-- (el modal de creación se muestra en un overlay separado) -->
             <div class="modal-body debug" *ngIf="showRawDetalle">
                 <pre style="white-space:pre-wrap; font-size:12px; max-height:300px; overflow:auto">{{ detalleCita | json }}</pre>
             </div>
@@ -334,4 +336,44 @@
     </div>
     }
 
+</div>
+
+<!-- Modal global para crear historial (fuera de la modal de detalles) -->
+<div *ngIf="crearHistorialVisible" class="crear-historial-global-overlay">
+    <div class="crear-historial-card">
+        <div class="card-header">
+            <h5>Registrar historial médico</h5>
+            <button type="button" class="close-btn" (click)="cancelarCrearHistorial()">×</button>
+        </div>
+        <div class="card-body">
+            <div class="meta-ids">
+                <small>Paciente ID:</small> {{ crearHistorialForm.idPaciente }} •
+                <small>Cita ID:</small> {{ crearHistorialForm.idCita }} •
+                <small>Medico ID:</small> {{ crearHistorialForm.idMedico }}
+            </div>
+            <div class="form-group">
+                <label>Fecha</label>
+                <input type="datetime-local" class="form-control" [(ngModel)]="crearHistorialForm.fecha" />
+            </div>
+            <div class="form-group">
+                <label>Diagnóstico</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="crearHistorialForm.diagnostico"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Observaciones</label>
+                <textarea class="form-control" rows="3" [(ngModel)]="crearHistorialForm.observaciones"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Receta</label>
+                <textarea class="form-control" rows="2" [(ngModel)]="crearHistorialForm.receta"></textarea>
+            </div>
+            <div *ngIf="crearHistorialError" class="text-danger">{{ crearHistorialError }}</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-secondary" (click)="cancelarCrearHistorial()">Cancelar</button>
+            <button class="btn btn-primary" [disabled]="crearHistorialLoading" (click)="enviarCrearHistorial()">
+                <i *ngIf="crearHistorialLoading" class="fas fa-spinner fa-spin"></i> Crear
+            </button>
+        </div>
+    </div>
 </div>
