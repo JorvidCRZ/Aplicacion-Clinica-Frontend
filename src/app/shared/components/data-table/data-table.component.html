@@ -46,8 +46,8 @@
                 <tr class="table-row">
                     @for (column of columns; track column.key) {
                     <td [attr.data-label]="column.label">
-                        @if (column.type === 'status') {
-                        <span class="status-badge" [class]="'status-' + item[column.key]?.toLowerCase()">
+                        @if (column.type === 'status' || isEstadoColumn(column.key)) {
+                        <span class="status-badge" [ngClass]="getEstadoClass(item[column.key])">
                             {{ getColumnValue(item, column) }}
                         </span>
                         } @else {

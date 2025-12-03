@@ -137,9 +137,17 @@ export class CitasComponent implements OnInit {
     this.horarioService.getHorariosPorMedico(idMedico).subscribe({
       next: (resp: HorariosMedicoResponse) => {
         this.horariosMedico[idMedico] = resp;
-        // Seleccionar el primer día disponible por defecto
+        
+        // Seleccionar automáticamente el primer día disponible futuro
         if (resp.dias && resp.dias.length > 0) {
-          this.diaSeleccionadoPorMedico[idMedico] = resp.dias[0].fecha;
+          const hoy = new Date().toISOString().split('T')[0];
+          const diasFuturos = resp.dias.filter(dia => dia.fecha >= hoy);
+          
+          if (diasFuturos.length > 0) {
+            // Ordenar por fecha y seleccionar el primero
+            diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+            this.diaSeleccionadoPorMedico[idMedico] = diasFuturos[0].fecha;
+          }
         }
       },
       error: (err) => {
@@ -164,7 +172,7 @@ export class CitasComponent implements OnInit {
   
   // Formatear fecha con día y mes corto (ej: "15 nov")
   formatearFechaCorta(fecha: string): string {
-    const fechaObj = new Date(fecha);
+    const fechaObj = this.parsearFechaLocal(fecha);
     const dia = fechaObj.getDate();
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 
                    'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -174,54 +182,52 @@ export class CitasComponent implements OnInit {
 
   // Formatear día de la semana corto (ej: "Lun", "Mar")
   formatearDiaSemana(fecha: string): string {
-    const fechaObj = new Date(fecha);
+    const fechaObj = this.parsearFechaLocal(fecha);
     const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     return dias[fechaObj.getDay()];
   }
 
-  // Obtener fechas de la semana actual (lunes a domingo)
-  private obtenerSemanaActual(): string[] {
+  // Obtener fechas próximas (desde hoy hacia adelante)
+  private obtenerProximosDias(diasAMostrar: number = 14): string[] {
     const hoy = new Date();
-    const diaDeLaSemana = hoy.getDay(); // 0 = domingo, 1 = lunes, etc.
-    const diasHastaLunes = diaDeLaSemana === 0 ? -6 : 1 - diaDeLaSemana;
+    const fechasProximas: string[] = [];
     
-    const lunes = new Date(hoy);
-    lunes.setDate(hoy.getDate() + diasHastaLunes);
-    
-    const fechasSemana: string[] = [];
-    for (let i = 0; i < 7; i++) {
-      const dia = new Date(lunes);
-      dia.setDate(lunes.getDate() + i);
-      fechasSemana.push(dia.toISOString().split('T')[0]);
+    for (let i = 0; i < diasAMostrar; i++) {
+      const dia = new Date(hoy);
+      dia.setDate(hoy.getDate() + i);
+      fechasProximas.push(dia.toLocaleDateString('en-CA'));
     }
     
-    return fechasSemana;
+    return fechasProximas;
   }
 
-  // Obtener días disponibles filtrados por semana actual
+  // Mantener método original para compatibilidad
+  private obtenerSemanaActual(): string[] {
+    return this.obtenerProximosDias(7);
+  }
+
+  // Obtener días disponibles próximos (no limitado a semana actual)
   getDiasDisponiblesSemana(cita: any): any[] {
     const idMedico = cita.medico?.idMedico;
     if (!idMedico) return [];
-    
+
     const diasMedico = this.getDiasDelMedico(idMedico);
-    const fechasSemanaActual = this.obtenerSemanaActual();
-    
-    // Filtrar solo los días que están en la semana actual
-    const diasFiltrados = diasMedico.filter(dia => 
-      fechasSemanaActual.includes(dia.fecha)
-    );
-    
-    // Mapear con formato mejorado
-    return diasFiltrados.map(dia => ({
+
+    // Ordenar siempre por fecha
+    diasMedico.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    // Mapear para UI
+    return diasMedico.map(dia => ({
       fecha: dia.fecha,
       diaSemana: this.formatearDiaSemana(dia.fecha),
       fechaCorta: this.formatearFechaCorta(dia.fecha),
-      horarios: dia.horarios,
-      esSeleccionado: this.diaSeleccionadoPorMedico[idMedico] === dia.fecha
+      horarios: this.filtrarHorariosDelDia(idMedico, dia.fecha, dia.horarios),
+      esSeleccionado: this.diaSeleccionadoPorMedico[idMedico] === dia.fecha,
+      bloqueado: this.esFechaPasada(dia.fecha) // ⭐ AQUÍ marco si se bloquea
     }));
   }
 
-  // Verificar si hay horarios en la semana actual
+  // Verificar si hay horarios próximos disponibles
   tieneHorariosSemanaActual(cita: any): boolean {
     return this.getDiasDisponiblesSemana(cita).length > 0;
   }
@@ -262,6 +268,53 @@ export class CitasComponent implements OnInit {
     }
   }
 
+  // ===================================================
+  // UTILS DE FECHAS
+  // ===================================================
+  
+  // Parsear fecha en zona local (evita desfase por UTC)
+  private parsearFechaLocal(fecha: string): Date {
+    const [year, month, day] = fecha.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  
+  // Saber si una fecha ya pasó
+  private esFechaPasada(fecha: string): boolean {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const d = this.parsearFechaLocal(fecha);
+    d.setHours(0, 0, 0, 0);
+
+    return d < hoy;
+  }
+
+  // Saber si la fecha es hoy
+  private esHoy(fecha: string): boolean {
+    const hoy = new Date().toISOString().split('T')[0];
+    return fecha === hoy;
+  }
+
+  // Filtrar horarios válidos:
+  private filtrarHorariosDelDia(idMedico: number, fecha: string, horarios: string[]): string[] {
+    
+    // 1) Si el día ya pasó → no mostrar ninguno
+    if (this.esFechaPasada(fecha)) {
+      return []; // día bloqueado
+    }
+
+    // 2) Si es hoy → remover horarios pasados
+    if (this.esHoy(fecha)) {
+      const ahora = new Date();
+      const horaActual = ahora.toTimeString().substring(0, 5); // HH:mm
+
+      horarios = horarios.filter(h => h > horaActual);
+    }
+
+    // 3) Remover horarios ocupados del localStorage
+    return this.filtrarHorariosDisponibles(idMedico, fecha, horarios);
+  }
+
   // Filtrar horarios disponibles (excluir ocupados)
   private filtrarHorariosDisponibles(idMedico: number, fecha: string, horarios: string[]): string[] {
     return horarios.filter(horario => !this.esHorarioOcupado(idMedico, fecha, horario));
@@ -274,12 +327,38 @@ export class CitasComponent implements OnInit {
   }
 
   seleccionarDiaCard(idMedico: number, fecha: string) {
+    if (this.esFechaPasada(fecha)) {
+      console.log("Día pasado → no se puede seleccionar");
+      return; // bloqueado
+    }
+
     this.diaSeleccionadoPorMedico[idMedico] = fecha;
     this.horarioSeleccionadoPorMedico[idMedico] = ''; // Reset horario al cambiar día
+    
+    // Debug: verificar que los datos estén sincronizados
+    console.log(`Día seleccionado para médico ${idMedico}:`, fecha);
+    console.log(`Horarios disponibles:`, this.getHorariosDelDiaInterno(idMedico, fecha));
   }
 
   seleccionarHorarioCard(idMedico: number, horario: string) {
     this.horarioSeleccionadoPorMedico[idMedico] = horario;
+    
+    // Debug: verificar selección de horario
+    console.log(`Horario seleccionado para médico ${idMedico}:`, horario);
+  }
+
+  // Método para forzar actualización de vista si es necesario
+  actualizarVistaMedico(idMedico: number) {
+    const diasDisponibles = this.getDiasDelMedico(idMedico);
+    if (diasDisponibles.length > 0 && !this.diaSeleccionadoPorMedico[idMedico]) {
+      const hoy = new Date().toISOString().split('T')[0];
+      const diasFuturos = diasDisponibles.filter(dia => dia.fecha >= hoy);
+      
+      if (diasFuturos.length > 0) {
+        diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+        this.diaSeleccionadoPorMedico[idMedico] = diasFuturos[0].fecha;
+      }
+    }
   }
 
   getHorariosDelDiaSeleccionado(idMedico: number): string[] {
@@ -324,20 +403,34 @@ export class CitasComponent implements OnInit {
     const idMedico = cita.medico?.idMedico;
     if (!idMedico) return { diaSeleccionado: '', horarioSeleccionado: '' };
     
+    // Asegurar que hay un día seleccionado si hay días disponibles
+    const diasDisponibles = this.getDiasDisponiblesSemana(cita);
+    if (diasDisponibles.length > 0 && !this.diaSeleccionadoPorMedico[idMedico]) {
+      this.diaSeleccionadoPorMedico[idMedico] = diasDisponibles[0].fecha;
+    }
+    
     return {
       diaSeleccionado: this.diaSeleccionadoPorMedico[idMedico] || '',
       horarioSeleccionado: this.horarioSeleccionadoPorMedico[idMedico] || ''
     };
-  }  getHorariosDelDia(cita: any): string[] {
+  }
+
+  getHorariosDelDia(cita: any): string[] {
     const idMedico = cita.medico?.idMedico;
     if (!idMedico) return [];
-    
+
     const fechaSeleccionada = this.diaSeleccionadoPorMedico[idMedico];
     if (!fechaSeleccionada) return [];
-    
-    const horariosCompletos = this.getHorariosDelDiaInterno(idMedico, fechaSeleccionada);
-    // Filtrar horarios ocupados
-    return this.filtrarHorariosDisponibles(idMedico, fechaSeleccionada, horariosCompletos);
+
+    const dias = this.getDiasDisponiblesSemana(cita);
+
+    const dia = dias.find(d => d.fecha === fechaSeleccionada);
+    if (!dia) return [];
+
+    // Si el día está bloqueado → no mostrar horarios
+    if (dia.bloqueado) return [];
+
+    return dia.horarios;
   }
 
   getDiaActual(cita: any) {

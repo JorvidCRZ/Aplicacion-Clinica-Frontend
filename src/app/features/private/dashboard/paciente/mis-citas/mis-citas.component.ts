@@ -42,6 +42,10 @@ export class MisCitasComponent implements OnInit {
   // Datos del paciente
   pacienteActual: any = null;
 
+  // Estados de carga
+  cargandoCitas = false;
+  errorCitas: string | null = null;
+
   // Citas
   citas: Cita[] = [];
   citasFiltradas: Cita[] = [];
@@ -77,108 +81,192 @@ export class MisCitasComponent implements OnInit {
   }
 
   cargarCitas() {
-    // Base mock de ejemplo
-    this.citas = [
-      {
-        id: 1,
-        fecha: '2025-10-05',
-        hora: '09:00',
-        doctor: {
-          nombre: 'Dr. Carlos',
-          apellido: 'Mendoza',
-          especialidad: 'Cardiología',
-          avatar: 'assets/doctores/cardiologo.webp'
-        },
-        tipo: 'Consulta General',
-        motivo: 'Control cardiológico rutinario',
-        estado: 'programada',
-        precio: 150,
-        instrucciones: 'Traer estudios previos y venir en ayunas',
-        consultorio: 'Consultorio 201',
-        duracion: 30,
-        puedeReagendar: true,
-        puedeCancelar: true
-      },
-      {
-        id: 2,
-        fecha: '2025-09-20',
-        hora: '14:30',
-        doctor: {
-          nombre: 'Dra. Ana',
-          apellido: 'García',
-          especialidad: 'Dermatología',
-          avatar: 'assets/doctores/dermatologo.webp'
-        },
-        tipo: 'Consulta Especializada',
-        motivo: 'Revisión de lunares',
-        estado: 'completada',
-        precio: 120,
-        consultorio: 'Consultorio 105',
-        duracion: 45,
-        puedeReagendar: false,
-        puedeCancelar: false
-      },
-      {
-        id: 3,
-        fecha: '2025-10-12',
-        hora: '16:00',
-        doctor: {
-          nombre: 'Dr. Luis',
-          apellido: 'Rodríguez',
-          especialidad: 'Pediatría',
-          avatar: 'assets/doctores/pediatra.webp'
-        },
-        tipo: 'Control Pediátrico',
-        motivo: 'Control de crecimiento y desarrollo',
-        estado: 'programada',
-        precio: 100,
-        instrucciones: 'Traer carnet de vacunas',
-        consultorio: 'Consultorio 301',
-        duracion: 30,
-        puedeReagendar: true,
-        puedeCancelar: true
-      }
-    ];
+    this.cargandoCitas = true;
+    this.errorCitas = null;
+    
+    const usuario = this.pacienteActual;
+    if (!usuario?.idUsuario) {
+      this.errorCitas = 'No se pudo identificar al usuario';
+      this.cargandoCitas = false;
+      return;
+    }
 
-    // Mezclar con citas guardadas localmente (por email del paciente actual)
-    this.cargarCreadasPorPaciente();
-
-    this.calcularEstadisticas();
-    this.separarCitas();
-    this.aplicarFiltros();
+    // Intentar cargar desde el backend primero
+    this.cargarCitasDesdeBackend(usuario.idUsuario);
   }
 
-  private cargarCreadasPorPaciente() {
+  private cargarCitasDesdeBackend(idUsuario: number) {
+    // Primero intentar con el endpoint específico por paciente
+    this.citaService.obtenerCitasPorPaciente(idUsuario).subscribe({
+      next: (citasPaciente) => {
+        console.log('✅ Citas del paciente cargadas desde backend:', citasPaciente);
+        
+        // Mapear citas del backend al formato del componente
+        this.citas = this.mapearCitasBackend(citasPaciente);
+        
+        // Mezclar con citas de localStorage como respaldo
+        this.agregarCitasLocalStorage();
+        
+        this.finalizarCargaCitas();
+      },
+      error: (error) => {
+        console.error('❌ Endpoint específico no disponible, probando endpoint general:', error);
+        
+        // Fallback: usar endpoint general y filtrar
+        this.cargarDesdeEndpointGeneral();
+      }
+    });
+  }
+
+  private cargarDesdeEndpointGeneral() {
+    this.citaService.listarTodasLasCitas().subscribe({
+      next: (todasLasCitas) => {
+        console.log('✅ Todas las citas cargadas, filtrando por usuario...');
+        
+        // TODO: Filtrar por paciente cuando tengas la lógica de identificación
+        // Por ahora mostrar todas como ejemplo
+        const citasFiltradas = todasLasCitas; // Aquí deberías filtrar por idPaciente
+        
+        // Mapear citas del backend al formato del componente
+        this.citas = this.mapearCitasBackend(citasFiltradas);
+        
+        // Mezclar con citas de localStorage como respaldo
+        this.agregarCitasLocalStorage();
+        
+        this.finalizarCargaCitas();
+      },
+      error: (error) => {
+        console.error('❌ Error cargando desde endpoint general:', error);
+        console.log('🔄 Fallback: cargando desde localStorage...');
+        
+        // Fallback final: cargar solo desde localStorage
+        this.cargarSoloDesdeLocalStorage();
+      }
+    });
+  }
+
+  private mapearCitasBackend(citasBackend: any[]): Cita[] {
+    return citasBackend.map(cita => ({
+      id: cita.idCita,
+      fecha: cita.fecha, // Ya viene como string (LocalDate serializado)
+      hora: cita.hora,   // Ya viene como string (LocalTime serializado)
+      doctor: {
+        nombre: this.extraerPrimerNombre(cita.medicoNombre),
+        apellido: this.extraerApellidos(cita.medicoNombre),
+        especialidad: cita.especialidad,
+        avatar: this.obtenerAvatarPorEspecialidad(cita.especialidad)
+      },
+      tipo: cita.subEspecialidad || 'Consulta General',
+      motivo: 'Consulta médica', // El backend no devuelve motivo en este DTO
+      estado: this.mapearEstadoCita(cita.estado),
+      precio: cita.precio,
+      consultorio: 'Por asignar', // El backend no devuelve consultorio en este DTO
+      duracion: 30, // Valor por defecto
+      puedeReagendar: this.puedeReagendar(cita.estado, cita.fecha),
+      puedeCancelar: this.puedeCancelar(cita.estado, cita.fecha)
+    }));
+  }
+
+  private agregarCitasLocalStorage() {
     const correo = this.pacienteActual?.correo;
     if (!correo) return;
+    
     const todas: CitaCompleta[] = this.citaService.obtenerCitas();
     const mias = todas.filter(c => (c.pacienteEmail || '').toLowerCase() === correo.toLowerCase());
-    const mapeadas: Cita[] = mias.map(c => ({
-      id: c.id,
+    
+    const citasLocal: Cita[] = mias.map(c => ({
+      id: c.id + 10000, // Offset para evitar conflictos con IDs del backend
       fecha: c.fecha,
       hora: c.hora,
       doctor: {
-        nombre: c.doctorNombre.split(' ')[0] || c.doctorNombre,
-        apellido: c.doctorNombre.split(' ').slice(1).join(' '),
-        especialidad: c.especialidad
+        nombre: this.extraerPrimerNombre(c.doctorNombre),
+        apellido: this.extraerApellidos(c.doctorNombre),
+        especialidad: c.especialidad,
+        avatar: this.obtenerAvatarPorEspecialidad(c.especialidad)
       },
       tipo: c.tipoConsulta,
       motivo: c.motivoConsulta,
-      estado: (c.estado === 'confirmada' ? 'programada' : (c.estado as any)),
-      // Usar el precio guardado en la cita (desde checkout). Si no existe, hacer fallback por especialidad.
+      estado: this.mapearEstadoCita(c.estado),
       precio: (c as any).precio ?? this.obtenerPrecioPorEspecialidad(c.especialidad),
       consultorio: 'Por asignar',
       duracion: c.duracionEstimada || 30,
-      puedeReagendar: true,
-      puedeCancelar: true
+      puedeReagendar: this.puedeReagendar(c.estado, c.fecha),
+      puedeCancelar: this.puedeCancelar(c.estado, c.fecha)
     }));
 
-    const idsExistentes = new Set(this.citas.map(ci => ci.id));
-    for (const ci of mapeadas) {
-      if (!idsExistentes.has(ci.id)) {
-        this.citas.unshift(ci);
-      }
-    }
+    // Agregar citas locales que no estén ya en el backend
+    const idsBackend = new Set(this.citas.map(c => c.id));
+    const citasNuevas = citasLocal.filter(c => !idsBackend.has(c.id - 10000));
+    
+    this.citas.push(...citasNuevas);
+  }
+
+  private cargarSoloDesdeLocalStorage() {
+    this.citas = [];
+    this.agregarCitasLocalStorage();
+    this.finalizarCargaCitas();
+  }
+
+  private finalizarCargaCitas() {
+    this.calcularEstadisticas();
+    this.separarCitas();
+    this.aplicarFiltros();
+    this.cargandoCitas = false;
+  }
+
+  // Métodos auxiliares para mapeo
+  private extraerPrimerNombre(nombreCompleto: string): string {
+    return nombreCompleto.split(' ')[0] || nombreCompleto;
+  }
+
+  private extraerApellidos(nombreCompleto: string): string {
+    const partes = nombreCompleto.split(' ');
+    return partes.length > 1 ? partes.slice(1).join(' ') : '';
+  }
+
+  private mapearEstadoCita(estadoBackend: string): 'programada' | 'completada' | 'cancelada' | 'no-show' {
+    const mapeo: Record<string, any> = {
+      'confirmada': 'programada',
+      'pendiente': 'programada',
+      'completada': 'completada',
+      'cancelada': 'cancelada',
+      'no-show': 'no-show'
+    };
+    return mapeo[estadoBackend.toLowerCase()] || 'programada';
+  }
+
+  private obtenerAvatarPorEspecialidad(especialidad: string): string {
+    const avatares: Record<string, string> = {
+      'Cardiología': 'assets/doctores/cardiologo.webp',
+      'Dermatología': 'assets/doctores/dermatologo.webp',
+      'Pediatría': 'assets/doctores/pediatra.webp',
+      'Ginecología': 'assets/doctores/ginecologo.webp',
+      'Medicina General': 'assets/doctores/general.webp',
+      'Traumatología': 'assets/doctores/traumatologo.webp',
+      'Psicología': 'assets/doctores/psicologo.webp',
+      'Odontología': 'assets/doctores/odontologo.webp'
+    };
+    return avatares[especialidad] || 'assets/doctores/general.webp';
+  }
+
+  private puedeReagendar(estado: string, fecha: string): boolean {
+    const estadosReagendables = ['confirmada', 'pendiente'];
+    const fechaCita = new Date(fecha);
+    const hoy = new Date();
+    
+    return estadosReagendables.includes(estado.toLowerCase()) && fechaCita > hoy;
+  }
+
+  private puedeCancelar(estado: string, fecha: string): boolean {
+    const estadosCancelables = ['confirmada', 'pendiente'];
+    const fechaCita = new Date(fecha);
+    const hoy = new Date();
+    
+    // Puede cancelar si falta más de 24 horas
+    const diferenciaMilisegundos = fechaCita.getTime() - hoy.getTime();
+    const diferenciaHoras = diferenciaMilisegundos / (1000 * 60 * 60);
+    
+    return estadosCancelables.includes(estado.toLowerCase()) && diferenciaHoras > 24;
   }
 
   private obtenerPrecioPorEspecialidad(especialidad: string): number {
@@ -289,16 +377,58 @@ export class MisCitasComponent implements OnInit {
 
   cancelarCita(cita: Cita) {
     if (confirm(`¿Estás seguro de cancelar la cita del ${this.formatearFecha(cita.fecha)} a las ${cita.hora}?`)) {
-      cita.estado = 'cancelada';
+      
+      // Si la cita viene del backend (ID < 10000), intentar cancelar en el backend
+      if (cita.id < 10000) {
+        this.citaService.actualizarEstadoCita(cita.id, 'cancelada').subscribe({
+          next: () => {
+            console.log('✅ Cita cancelada en backend');
+            this.actualizarCitaLocal(cita.id, 'cancelada');
+            alert('Cita cancelada exitosamente');
+          },
+          error: (error) => {
+            console.error('❌ Error cancelando en backend:', error);
+            // Fallback: actualizar solo localmente
+            this.actualizarCitaLocal(cita.id, 'cancelada');
+            alert('Cita cancelada localmente (error de conexión)');
+          }
+        });
+      } else {
+        // Cita local: actualizar solo en localStorage
+        this.actualizarCitaLocal(cita.id, 'cancelada');
+        alert('Cita cancelada exitosamente');
+      }
+    }
+  }
+
+  private actualizarCitaLocal(idCita: number, nuevoEstado: 'cancelada' | 'completada') {
+    // Actualizar en la lista local
+    const cita = this.citas.find(c => c.id === idCita);
+    if (cita) {
+      cita.estado = nuevoEstado;
       cita.puedeCancelar = false;
       cita.puedeReagendar = false;
-      
-      this.calcularEstadisticas();
-      this.separarCitas();
-      this.aplicarFiltros();
-      
-      alert('Cita cancelada exitosamente');
     }
+    
+    // Si es una cita de localStorage (ID >= 10000), actualizarla también ahí
+    if (idCita >= 10000) {
+      const idReal = idCita - 10000;
+      const citasStorage = this.citaService.obtenerCitas();
+      const citaStorage = citasStorage.find(c => c.id === idReal);
+      if (citaStorage) {
+        citaStorage.estado = nuevoEstado as any;
+        this.citaService.guardarCita(citaStorage);
+      }
+    }
+    
+    this.calcularEstadisticas();
+    this.separarCitas();
+    this.aplicarFiltros();
+  }
+
+  // Método para recargar citas manualmente
+  recargarCitas() {
+    this.cargarCitas();
   }
 
   reagendarCita(cita: Cita) {

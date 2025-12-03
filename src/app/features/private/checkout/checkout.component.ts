@@ -5,8 +5,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService, AuthState } from '../../../core/services/auth/auth.service';
 import { Usuario } from '../../../core/models/users/usuario';
-import { CitaService } from '../../../core/services/logic/cita.service';
-import { CitaCompleta } from '../../../core/models/common/cita';
+import { CitaService} from '../../../core/services/logic/cita.service';
+import { CitaCompleta, DatosCitaBasicos } from '../../../core/models/common/cita';
 import { PagosService } from '../../../core/services/logic/pagos.service';
 import { SubespecialidadService, Subespecialidad } from '../../../core/services/pages/subespecialidad.service';
 import { EspecialidadService, Especialidad } from '../../../core/services/pages/especialidad.service';
@@ -266,17 +266,109 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         }
 
         this.procesandoPago = true;
-            setTimeout(() => {
-                // Simular pago OK y guardar cita + factura
-                        const cita = this.guardarCitaConfirmada();
-                if (cita && this.usuarioActual) {
-                            // Usar el precio mostrado en checkout (sin IGV) como base
-                            const precioBase = this.citaSeleccionada?.precio;
-                            this.pagosService.addFacturaFromCita(cita, this.usuarioActual.correo, this.metodoPagoSeleccionado!.nombre, precioBase);
+        
+        // Usar el nuevo método que resuelve IDs automáticamente
+        try {
+            const datosBasicos = this.construirDatosCitaBasicos();
+            
+            this.citaService.crearCitaCompleta(datosBasicos).subscribe({
+                next: (citaCreada) => {
+                    console.log('✅ Cita creada exitosamente:', citaCreada);
+                    
+                    // Guardar también en localStorage como respaldo
+                    const citaLocal = this.mapearCitaBackendALocal(citaCreada);
+                    this.citaService.guardarCita(citaLocal);
+                    
+                    // Crear factura
+                    if (this.usuarioActual) {
+                        const precioBase = this.citaSeleccionada?.precio;
+                        this.pagosService.addFacturaFromCita(citaLocal, this.usuarioActual.correo, this.metodoPagoSeleccionado!.nombre, precioBase);
+                    }
+                    
+                    this.pagoExitoso = true;
+                    this.procesandoPago = false;
+                },
+                error: (error) => {
+                    console.error('❌ Error creando cita:', error);
+                    this.manejarErrorCreacionCita();
                 }
-                this.pagoExitoso = true;
-            this.procesandoPago = false;
-        }, 1500);
+            });
+        } catch (error) {
+            console.error('❌ Error preparando datos:', error);
+            this.manejarErrorCreacionCita();
+        }
+    }
+
+    private construirDatosCitaBasicos(): DatosCitaBasicos {
+        if (!this.citaSeleccionada || !this.usuarioActual) {
+            throw new Error('Datos incompletos para crear la cita');
+        }
+
+        const formValues = this.checkoutForm.value;
+
+        return {
+            idPaciente: this.usuarioActual.idUsuario!,
+            idMedico: 1, // ⚠️ Necesitas resolver el ID del médico desde el nombre
+            doctorNombre: this.citaSeleccionada.doctor,
+            especialidad: this.citaSeleccionada.especialidad,
+            idSubEspecialidad: undefined, // Opcional
+            fecha: this.citaSeleccionada.fecha,
+            hora: this.citaSeleccionada.hora,
+            motivoConsulta: formValues.observaciones || 'Consulta vía checkout'
+        };
+    }
+
+    private manejarErrorCreacionCita(): void {
+        // Fallback: guardar solo en localStorage
+        const citaLocal = this.guardarCitaConfirmada();
+        if (citaLocal && this.usuarioActual) {
+            const precioBase = this.citaSeleccionada?.precio;
+            this.pagosService.addFacturaFromCita(citaLocal, this.usuarioActual.correo, this.metodoPagoSeleccionado!.nombre, precioBase);
+        }
+        
+        this.pagoExitoso = true;
+        this.procesandoPago = false;
+        console.log('⚠️ Cita guardada solo en localStorage como fallback');
+    }
+
+    private construirCitaParaBackend(): any {
+        if (!this.citaSeleccionada || !this.usuarioActual) {
+            throw new Error('Datos incompletos para crear la cita');
+        }
+
+        const formValues = this.checkoutForm.value;
+
+        // NOTA: Necesitarás resolver estos IDs desde tu frontend o backend
+        // Por ejemplo, obtener idMedicoEspecialidad desde el nombre del doctor + especialidad
+        const requestData = {
+            idPaciente: this.usuarioActual.idUsuario!, // Asumiendo que tienes este ID
+            idMedicoEspecialidad: 1, // ⚠️ DEBES RESOLVER ESTE ID
+            idSubEspecialidad: undefined, // Opcional, resolver si existe
+            idBloque: 1, // ⚠️ DEBES RESOLVER ESTE ID desde fecha/hora seleccionada
+            motivoConsulta: formValues.observaciones || 'Consulta vía checkout'
+        };
+
+        return requestData;
+    }
+
+    private mapearCitaBackendALocal(citaBackend: any): CitaCompleta {
+        return {
+            id: citaBackend.idCita,
+            pacienteNombre: citaBackend.pacienteNombre,
+            doctorNombre: citaBackend.medicoNombre,
+            especialidad: citaBackend.especialidad,
+            subespecialidad: citaBackend.subEspecialidad,
+            fecha: citaBackend.fecha,
+            hora: citaBackend.hora,
+            estado: citaBackend.estado as any,
+            pacienteEmail: this.usuarioActual?.correo || '',
+            pacienteTelefono: this.checkoutForm.get('telefono')?.value || '',
+            tipoConsulta: 'consulta-general',
+            motivoConsulta: this.checkoutForm.get('observaciones')?.value || 'Consulta vía checkout',
+            precio: citaBackend.precio,
+            fechaCreacion: new Date().toISOString(),
+            duracionEstimada: 30
+        } as CitaCompleta;
     }
 
         private guardarCitaConfirmada(): CitaCompleta | null {

@@ -76,6 +76,8 @@
                             @for (dia of getDiasDisponiblesSemana(cita); track dia.fecha) {
                             <button class="dia-btn-clean" 
                                 [class.active]="getCardState(cita).diaSeleccionado === dia.fecha"
+                                [class.bloqueado]="dia.bloqueado"
+                                [disabled]="dia.bloqueado"
                                 (click)="seleccionarDiaCard(cita.medico.idMedico, dia.fecha)">
                                 <div class="dia-info">
                                     <span class="dia-nombre-clean">{{ dia.diaSemana }}</span>
@@ -103,7 +105,7 @@
                         } @else {
                         <div class="no-horarios-disponibles">
                             <i class="fas fa-calendar-times"></i>
-                            <p>No hay horarios disponibles esta semana</p>
+                            <p>No hay horarios disponibles próximamente</p>
                         </div>
                         }
 
@@ -255,12 +257,11 @@
 
                         <div class="perfil-fields">
                             <p class="perfil-row"><span class="perfil-label">CMP:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.colegiatura }}</span></p>
-                            <p class="perfil-row"><span class="perfil-label">Email:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.email }}</span></p>
-                              <p class="perfil-row"><span class="perfil-label">Genero:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.genero }} </span></p>
-                               <p class="perfil-row"><span class="perfil-label">Pais:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.pais }} </span></p>
-                                <p class="perfil-row"><span class="perfil-label">Depart. :</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.departamento }} </span></p>
-                            <p class="perfil-row"><span class="perfil-label">Dirección:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.direccion }}</span></p>
                             <p class="perfil-row"><span class="perfil-label">Experiencia:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.experienciaAnios }} años</span></p>
+                            <p class="perfil-row"><span class="perfil-label">Especialidad:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.especialidad }}</span></p>
+                            @if (perfilMedicoSeleccionado?.persona?.departamento) {
+                            <p class="perfil-row"><span class="perfil-label">Ubicación:</span> <span class="perfil-value">{{ perfilMedicoSeleccionado?.persona?.departamento }}</span></p>
+                            }
                         </div>
                     </div>
                 </div>

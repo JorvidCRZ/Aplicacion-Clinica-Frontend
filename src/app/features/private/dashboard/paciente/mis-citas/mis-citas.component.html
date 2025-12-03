@@ -14,6 +14,13 @@
             </p>
         </div>
 
+        <div class="header-actions">
+            <button class="btn btn-reload" (click)="recargarCitas()" [disabled]="cargandoCitas">
+                <i class="fas fa-sync" [class.fa-spin]="cargandoCitas"></i>
+                {{ cargandoCitas ? 'Cargando...' : 'Actualizar' }}
+            </button>
+        </div>
+
         <div class="stats-quick">
             <div class="stat-card programadas">
                 <div class="stat-icon">
@@ -129,7 +136,26 @@
     </div>
 
     <!-- 📋 Lista de citas -->
-    @if (citasPaginadas.length > 0) {
+    @if (cargandoCitas) {
+        <div class="loading-container">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p>Cargando tus citas médicas...</p>
+        </div>
+    } @else if (errorCitas) {
+        <div class="error-container">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Error al cargar citas</h3>
+            <p>{{ errorCitas }}</p>
+            <button class="btn btn-primary" (click)="recargarCitas()">
+                <i class="fas fa-retry"></i>
+                Reintentar
+            </button>
+        </div>
+    } @else if (citasPaginadas.length > 0) {
         <div class="citas-grid">
             @for (cita of citasPaginadas; track cita.id) {
                 <div class="cita-card" [class]="'estado-' + cita.estado">

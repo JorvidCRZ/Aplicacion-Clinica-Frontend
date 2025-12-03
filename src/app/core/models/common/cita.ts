@@ -173,3 +173,38 @@ export interface DiaHorario {
   diaSemana: string;    
   horarios: string[];   
 }
+
+
+
+// Interfaces para tus DTOs del backend
+export interface CrearCitaRequestDTO {
+    idPaciente: number;
+    idMedicoEspecialidad: number;
+    idSubEspecialidad?: number;
+    idBloque: number;
+    motivoConsulta: string;
+}
+
+export interface CrearCitaResponoseDTO {
+    idCita: number;
+    pacienteNombre: string;
+    medicoNombre: string;
+    especialidad: string;
+    subEspecialidad?: string;
+    fecha: string; // LocalDate se serializa como string
+    hora: string;  // LocalTime se serializa como string
+    precio: number;
+    estado: string;
+}
+
+// Interface para datos básicos de creación de cita
+export interface DatosCitaBasicos {
+    idPaciente: number;
+    idMedico: number;
+    doctorNombre: string;
+    especialidad: string;
+    idSubEspecialidad?: number;
+    fecha: string;
+    hora: string;
+    motivoConsulta: string;
+}
