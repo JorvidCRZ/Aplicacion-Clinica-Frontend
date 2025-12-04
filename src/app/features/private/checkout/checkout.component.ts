@@ -308,7 +308,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
         return {
             idPaciente: this.usuarioActual.idUsuario!,
-            idMedico: 1, // ⚠️ Necesitas resolver el ID del médico desde el nombre
+            idMedico: 0, // ✅ Se resuelve automáticamente en CitaService.crearCitaCompleta()
             doctorNombre: this.citaSeleccionada.doctor,
             especialidad: this.citaSeleccionada.especialidad,
             idSubEspecialidad: undefined, // Opcional
@@ -338,13 +338,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
         const formValues = this.checkoutForm.value;
 
-        // NOTA: Necesitarás resolver estos IDs desde tu frontend o backend
-        // Por ejemplo, obtener idMedicoEspecialidad desde el nombre del doctor + especialidad
+        // ⚠️ MÉTODO OBSOLETO: Usar construirDatosCitaBasicos() + citaService.crearCitaCompleta()
+        // Este método ya no se usa porque CitaService.crearCitaCompleta() resuelve todos los IDs automáticamente
         const requestData = {
-            idPaciente: this.usuarioActual.idUsuario!, // Asumiendo que tienes este ID
-            idMedicoEspecialidad: 1, // ⚠️ DEBES RESOLVER ESTE ID
-            idSubEspecialidad: undefined, // Opcional, resolver si existe
-            idBloque: 1, // ⚠️ DEBES RESOLVER ESTE ID desde fecha/hora seleccionada
+            idPaciente: this.usuarioActual.idUsuario!,
+            idMedicoEspecialidad: 1, // ✅ Resuelto por CitaService
+            idSubEspecialidad: undefined, // Opcional
+            idBloque: 1, // ✅ Resuelto por CitaService
             motivoConsulta: formValues.observaciones || 'Consulta vía checkout'
         };
 

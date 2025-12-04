@@ -76,6 +76,44 @@
   background: var(--blanco);
 }
 
+/* ===== CAMPO DE FECHA ESPECÍFICA ===== */
+.fancy-date {
+  margin-bottom: 1.25rem;
+}
+
+.date-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--plomo);
+  background: var(--gris-claro);
+}
+
+.date-input-wrapper .icon {
+  font-size: 1rem;
+}
+
+.date-input-wrapper input[type="date"] {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.2rem;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.date-input-wrapper input[type="date"]:focus {
+  outline: none;
+}
+
+.fancy-date small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--gris-oscuro);
+}
+
 .field select:focus,
 .field input[type="time"]:focus {
   outline: none;
@@ -375,6 +413,17 @@
   color: var(--gris-oscuro);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.duration {
+  font-size: 0.7rem;
+  color: var(--azul);
+  font-weight: 500;
+  background: rgba(33, 150, 243, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .delete-btn {

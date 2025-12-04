@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root',
 })
 export class HorarioService {
-    private baseUrl =`${environment.apiUrl}/horario-bloque`;
+  private baseUrl = `${environment.apiUrl}/horario-bloque`;
 
   constructor(private http: HttpClient) {}
 
@@ -24,8 +24,14 @@ export class HorarioService {
   }
 
   // Nuevo: Buscar bloque específico por médico, fecha y hora
+  // Endpoint: GET /api/horarios/buscar?idMedico=X&fecha=YYYY-MM-DD&hora=HH:MM
   buscarBloqueEspecifico(idMedico: number, fecha: string, hora: string): Observable<BloqueHorario> {
-    return this.http.get<BloqueHorario>(`${this.baseUrl}/buscar-bloque/${idMedico}/${fecha}/${hora}`);
+    const params = {
+      idMedico: idMedico.toString(),
+      fecha: fecha,
+      hora: hora
+    };
+    return this.http.get<BloqueHorario>(`${environment.apiUrl}/horarios/buscar`, { params });
   }
 
   // Nuevo: Obtener todos los bloques disponibles de un médico para varios días

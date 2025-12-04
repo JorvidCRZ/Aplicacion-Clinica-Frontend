@@ -10,6 +10,7 @@ interface HorarioBloque {
   horaFin: string;
   tipo: 'consulta' | 'urgencias' | 'procedimiento' | 'descanso';
   activo: boolean;
+  duracionMinutos: number; // Duración promedio de cada consulta
 }
 
 interface DiaSemana {
@@ -50,18 +51,53 @@ private medicosService = inject(MedicosService);
     { value: 'descanso', label: 'Descanso', color: 'secondary' },
   ];
 
+  opcionesDuracion = [
+    { value: 15, label: '15 minutos' },
+    { value: 20, label: '20 minutos' },
+    { value: 25, label: '25 minutos' },
+    { value: 30, label: '30 minutos' },
+    { value: 35, label: '35 minutos' },
+    { value: 40, label: '40 minutos' },
+    { value: 45, label: '45 minutos' },
+    { value: 60, label: '60 minutos' },
+  ];
+
   nuevoHorario: HorarioBloque = {
     id: 0,
     horaInicio: '08:00',
     horaFin: '09:00',
     tipo: 'consulta',
     activo: true,
+    duracionMinutos: 30,
   };
 
   diaSeleccionado: number = 1;
+  // Fecha específica para seleccionar automáticamente el día de la semana
+  fechaSeleccionada: string | null = null; // YYYY-MM-DD
+  hoy: string = '';
 
   ngOnInit() {
+    const ahora = new Date();
+    this.hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
     this.cargarDoctorActual();
+  }
+
+  onFechaChange() {
+    if (!this.fechaSeleccionada) return;
+    const [year, month, day] = this.fechaSeleccionada.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    // En JS: 0=Domingo ... 6=Sábado; nuestro modelo usa 1=Lunes ... 7=Domingo
+    const jsDay = d.getDay();
+    const mapa: Record<number, number> = {
+      1: 1, // Lunes
+      2: 2, // Martes
+      3: 3, // Miércoles
+      4: 4, // Jueves
+      5: 5, // Viernes
+      6: 6, // Sábado
+      0: 7, // Domingo
+    };
+    this.diaSeleccionado = mapa[jsDay];
   }
 
  cargarDoctorActual() {
@@ -132,7 +168,8 @@ private medicosService = inject(MedicosService);
             horaInicio: h.horaInicio,
             horaFin: h.horaFin,
             tipo: h.nombreTurno as 'consulta' | 'urgencias' | 'procedimiento' | 'descanso',
-            activo: h.diaActivo ?? true
+            activo: h.diaActivo ?? true,
+            duracionMinutos: h.duracionMinutos || 30  // ✅ capturamos duracionMinutos del backend
           }));
 
         if (horariosDelDia.length > 0) {
@@ -181,7 +218,7 @@ private medicosService = inject(MedicosService);
     nombreTurno: horario.tipo,
     vigencia: true,
     diaActivo: true,
-    duracionMinutos: 30
+    duracionMinutos: horario.duracionMinutos  // ✅ usamos el valor seleccionado por el médico
   };
 
   this.medicosService.crearDisponibilidad(payload).subscribe({
@@ -192,7 +229,8 @@ private medicosService = inject(MedicosService);
         horaInicio: horario.horaInicio,
         horaFin: horario.horaFin,
         tipo: horario.tipo,
-        activo: true
+        activo: true,
+        duracionMinutos: horario.duracionMinutos  // ✅ guardamos duracionMinutos
       });
 
       // Ordenar horarios por horaInicio
@@ -208,9 +246,6 @@ private medicosService = inject(MedicosService);
     }
   });
 }
-
-
-
 
 
 
@@ -267,15 +302,50 @@ eliminarHorario(diaId: number, horarioId: number) {
   }
 
   guardarHorarios() {
-    if (this.doctorActual) {
-      this.guardandoHorarios = true;
-
-      setTimeout(() => {
-        localStorage.setItem(this.getHorariosKey(), JSON.stringify(this.diasSemana));
-        this.guardandoHorarios = false;
-        alert('Horarios guardados exitosamente');
-      }, 1000);
+    if (!this.doctorActual) {
+      alert('No se pudo identificar al médico');
+      return;
     }
+
+    // Validar que haya al menos un horario activo
+    const tieneHorarios = this.diasSemana.some(dia => dia.activo && dia.horarios.length > 0);
+    if (!tieneHorarios) {
+      alert('Debes agregar al menos un horario antes de guardar');
+      return;
+    }
+
+    this.guardandoHorarios = true;
+
+    // Los horarios ya se guardan individualmente cuando se agregan
+    // Este botón solo actualiza el estado global de días activos/inactivos
+    const diasActualizados = this.diasSemana
+      .filter(dia => dia.horarios.length > 0)
+      .map(dia => ({
+        diaSemana: dia.nombre,
+        activo: dia.activo
+      }));
+
+    // Si necesitas un endpoint para actualizar el estado de días completos:
+    // this.medicosService.actualizarEstadoDias(this.doctorActual.id, diasActualizados).subscribe(...)
+
+    // Por ahora, guardamos en localStorage y mostramos confirmación
+    setTimeout(() => {
+      localStorage.setItem(this.getHorariosKey(), JSON.stringify(this.diasSemana));
+      this.guardandoHorarios = false;
+      
+      const diasActivosCount = this.getDiasActivos();
+      const horariosCount = this.getTotalHorarios();
+      
+      alert(`✅ Horarios guardados exitosamente\n\n📅 Días activos: ${diasActivosCount}\n🕒 Bloques horarios: ${horariosCount}\n⏰ Horas semanales: ${this.formatearHoras(this.obtenerHorasSemanalesTotales())}`);
+    }, 800);
+  }
+
+  private getDiasActivos(): number {
+    return this.diasSemana.filter(d => d.activo && d.horarios.length > 0).length;
+  }
+
+  private getTotalHorarios(): number {
+    return this.diasSemana.reduce((total, dia) => total + dia.horarios.length, 0);
   }
 
   resetearFormulario() {
@@ -285,6 +355,7 @@ eliminarHorario(diaId: number, horarioId: number) {
       horaFin: '09:00',
       tipo: 'consulta',
       activo: true,
+      duracionMinutos: 30,
     };
   }
  copiarHorario(diaOrigen: number, diaDestino: number) {
@@ -298,7 +369,8 @@ eliminarHorario(diaId: number, horarioId: number) {
 
             destino.horarios = origen.horarios.map((h, index) => ({
                 ...h,
-                id: maxIdDestino + index + 1
+                id: maxIdDestino + index + 1,
+                duracionMinutos: h.duracionMinutos || 30  // ✅ copiar también la duración
             }));
             destino.activo = true;
         }

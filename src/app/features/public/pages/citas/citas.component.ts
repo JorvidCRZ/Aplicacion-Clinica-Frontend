@@ -101,12 +101,11 @@ export class CitasComponent implements OnInit {
     this.errorMedicos = null;
     this.medicoService.getMedicos().subscribe({
       next: (lista: any[]) => {
-        // Mapear la respuesta del API a la estructura Cita usada en la UI
+
         this.citas = (lista || []).map(m => {
           const persona = m.persona || {};
           const nombre = [persona.nombre1, persona.apellidoPaterno].filter(Boolean).join(' ') || persona.nombre1 || persona.apellidoPaterno || m.colegiatura || 'Dr.';
           
-          // Cargar horarios reales para cada médico
           if (m.idMedico) {
             this.cargarHorariosMedico(m.idMedico);
           }
@@ -140,9 +139,9 @@ export class CitasComponent implements OnInit {
         
         // Seleccionar automáticamente el primer día disponible futuro
         if (resp.dias && resp.dias.length > 0) {
-          const hoy = new Date().toISOString().split('T')[0];
-          const diasFuturos = resp.dias.filter(dia => dia.fecha >= hoy);
-          
+          // Filtrar usando lógica local para evitar problemas de zona horaria
+          const diasFuturos = resp.dias.filter(dia => !this.esFechaPasada(dia.fecha));
+
           if (diasFuturos.length > 0) {
             // Ordenar por fecha y seleccionar el primero
             diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));
@@ -223,7 +222,7 @@ export class CitasComponent implements OnInit {
       fechaCorta: this.formatearFechaCorta(dia.fecha),
       horarios: this.filtrarHorariosDelDia(idMedico, dia.fecha, dia.horarios),
       esSeleccionado: this.diaSeleccionadoPorMedico[idMedico] === dia.fecha,
-      bloqueado: this.esFechaPasada(dia.fecha) // ⭐ AQUÍ marco si se bloquea
+      bloqueado: this.esFechaPasada(dia.fecha)
     }));
   }
 
@@ -280,19 +279,24 @@ export class CitasComponent implements OnInit {
   
   // Saber si una fecha ya pasó
   private esFechaPasada(fecha: string): boolean {
-    const hoy = new Date();
+    // Obtener fecha actual en formato YYYY-MM-DD local
+    const ahora = new Date();
+    const hoyString = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+    
+    const hoy = this.parsearFechaLocal(hoyString);
     hoy.setHours(0, 0, 0, 0);
 
-    const d = this.parsearFechaLocal(fecha);
-    d.setHours(0, 0, 0, 0);
+    const fechaAComparar = this.parsearFechaLocal(fecha);
+    fechaAComparar.setHours(0, 0, 0, 0);
 
-    return d < hoy;
+    return fechaAComparar < hoy;
   }
 
   // Saber si la fecha es hoy
   private esHoy(fecha: string): boolean {
-    const hoy = new Date().toISOString().split('T')[0];
-    return fecha === hoy;
+    const ahora = new Date();
+    const hoyString = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+    return fecha === hoyString;
   }
 
   // Filtrar horarios válidos:
@@ -351,8 +355,8 @@ export class CitasComponent implements OnInit {
   actualizarVistaMedico(idMedico: number) {
     const diasDisponibles = this.getDiasDelMedico(idMedico);
     if (diasDisponibles.length > 0 && !this.diaSeleccionadoPorMedico[idMedico]) {
-      const hoy = new Date().toISOString().split('T')[0];
-      const diasFuturos = diasDisponibles.filter(dia => dia.fecha >= hoy);
+      // Usar comparación local segura para seleccionar el primer día futuro
+      const diasFuturos = diasDisponibles.filter(dia => !this.esFechaPasada(dia.fecha));
       
       if (diasFuturos.length > 0) {
         diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));

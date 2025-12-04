@@ -127,6 +127,16 @@ export class CitaService {
 
     // ======== MÉTODOS DE RESOLUCIÓN DE IDS =========
     
+    // Resolver ID del médico desde el nombre completo
+    resolverIdMedico(nombreCompleto: string): Observable<number> {
+        // Endpoint: GET /api/medicos/buscar-por-nombre?nombre={nombre}
+        const params = { nombre: nombreCompleto.trim() };
+        return this.http.get<{idMedico: number}>(`${environment.apiUrl}/medicos/buscar-por-nombre`, { params })
+            .pipe(
+                map(response => response.idMedico)
+            );
+    }
+    
     // Resolver ID de bloque basado en médico, fecha y hora
     resolverIdBloque(idMedico: number, fecha: string, hora: string): Observable<number> {
         return new Observable(observer => {
@@ -153,40 +163,158 @@ export class CitaService {
             );
     }
 
-    // Crear cita completa con resolución automática de IDs
+
+    
     crearCitaCompleta(datosBasicos: DatosCitaBasicos): Observable<CrearCitaResponoseDTO> {
         return new Observable(observer => {
-            // Paso 1: Resolver ID de médico-especialidad
-            this.resolverMedicoEspecialidad(datosBasicos.doctorNombre, datosBasicos.especialidad).subscribe({
-                next: (idMedicoEspecialidad) => {
-                    // Paso 2: Resolver ID de bloque
-                    this.resolverIdBloque(datosBasicos.idMedico, datosBasicos.fecha, datosBasicos.hora).subscribe({
-                        next: (idBloque) => {
-                            // Paso 3: Crear cita con IDs resueltos
-                            const request: CrearCitaRequestDTO = {
-                                idPaciente: datosBasicos.idPaciente,
-                                idMedicoEspecialidad: idMedicoEspecialidad,
-                                idSubEspecialidad: datosBasicos.idSubEspecialidad,
-                                idBloque: idBloque,
-                                motivoConsulta: datosBasicos.motivoConsulta
-                            };
+            // PASO 1: Resolver ID del médico desde el nombre
+            this.resolverIdMedico(datosBasicos.doctorNombre).subscribe({
+                next: (idMedico) => {
+                    console.log('✅ ID Médico resuelto:', idMedico);
+                    
+                    // PASO 2: Resolver médico-especialidad
+                    this.resolverMedicoEspecialidad(datosBasicos.doctorNombre, datosBasicos.especialidad).subscribe({
+                        next: (idMedicoEspecialidad) => {
+                            console.log('✅ ID Médico-Especialidad resuelto:', idMedicoEspecialidad);
+                            
+                            // PASO 3: Resolver bloque horario usando el ID del médico resuelto
+                            this.resolverIdBloque(idMedico, datosBasicos.fecha, datosBasicos.hora).subscribe({
+                                next: (idBloque) => {
+                                    console.log('✅ ID Bloque resuelto:', idBloque);
+                                    
+                                    // PASO 4: Crear la cita con todos los IDs resueltos
+                                    const request: CrearCitaRequestDTO = {
+                                        idPaciente: datosBasicos.idPaciente,
+                                        idMedicoEspecialidad: idMedicoEspecialidad,
+                                        idSubEspecialidad: datosBasicos.idSubEspecialidad,
+                                        idBloque: idBloque,
+                                        motivoConsulta: datosBasicos.motivoConsulta
+                                    };
 
-                            this.crearCitaBackend(request).subscribe({
-                                next: (citaCreada) => {
-                                    observer.next(citaCreada);
-                                    observer.complete();
+                                    console.log('📤 Enviando request al backend:', request);
+
+                                    this.crearCitaBackend(request).subscribe({
+                                        next: (citaCreada) => {
+                                            console.log('✅ Cita creada exitosamente:', citaCreada);
+                                            observer.next(citaCreada);
+                                            observer.complete();
+                                        },
+                                        error: (err) => {
+                                            console.error('❌ Error creando cita en backend:', err);
+                                            observer.error(err);
+                                        }
+                                    });
                                 },
-                                error: (err) => observer.error(err)
+                                error: (err) => {
+                                    console.error('❌ Error resolviendo ID de bloque:', err);
+                                    observer.error(err);
+                                }
                             });
                         },
-                        error: (err) => observer.error(err)
+                        error: (err) => {
+                            console.error('❌ Error resolviendo médico-especialidad:', err);
+                            observer.error(err);
+                        }
                     });
                 },
-                error: (err) => observer.error(err)
+                error: (err) => {
+                    console.error('❌ Error resolviendo ID del médico:', err);
+                    observer.error(err);
+                }
             });
         });
     }
     
+
+
+
+
+
+
+
+
+// Crear cita completa usando el endpoint /citas/reservar (alternativa al /agregar)
+crearCitaReservar(datosBasicos: DatosCitaBasicos): Observable<CrearCitaResponoseDTO> {
+    return new Observable(observer => {
+        // PASO 1: Resolver ID del médico desde el nombre
+        this.resolverIdMedico(datosBasicos.doctorNombre).subscribe({
+            next: (idMedico) => {
+                console.log('✅ ID Médico resuelto:', idMedico);
+                
+                // PASO 2: Resolver ID de médico-especialidad
+                this.resolverMedicoEspecialidad(datosBasicos.doctorNombre, datosBasicos.especialidad).subscribe({
+                    next: (idMedicoEspecialidad) => {
+                        console.log('✅ ID Médico-Especialidad resuelto:', idMedicoEspecialidad);
+                        
+                        // PASO 3: Resolver ID de bloque usando el ID resuelto
+                        this.resolverIdBloque(idMedico, datosBasicos.fecha, datosBasicos.hora).subscribe({
+                            next: (idBloque) => {
+                                console.log('✅ ID Bloque resuelto:', idBloque);
+                                
+                                // PASO 4: Construir request completo
+                                const request: CrearCitaRequestDTO = {
+                                    idPaciente: datosBasicos.idPaciente,
+                                    idMedicoEspecialidad: idMedicoEspecialidad,
+                                    idSubEspecialidad: datosBasicos.idSubEspecialidad,
+                                    idBloque: idBloque,
+                                    motivoConsulta: datosBasicos.motivoConsulta
+                                };
+
+                                console.log('📤 Enviando request al endpoint /reservar:', request);
+
+                                // PASO 5: Llamar al endpoint POST /citas/reservar
+                                this.http.post<CrearCitaResponoseDTO>(`${this.apiBase}/reservar`, request)
+                                    .subscribe({
+                                        next: (citaCreada) => {
+                                            console.log('✅ Cita reservada exitosamente:', citaCreada);
+                                            observer.next(citaCreada);
+                                            observer.complete();
+                                        },
+                                        error: (err) => {
+                                            console.error('❌ Error reservando cita:', err);
+                                            observer.error(err);
+                                        }
+                                    });
+                            },
+                            error: (err) => {
+                                console.error('❌ Error resolviendo ID de bloque:', err);
+                                observer.error(err);
+                            }
+                        });
+                    },
+                    error: (err) => {
+                        console.error('❌ Error resolviendo médico-especialidad:', err);
+                        observer.error(err);
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('❌ Error resolviendo ID del médico:', err);
+                observer.error(err);
+            }
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 }
 

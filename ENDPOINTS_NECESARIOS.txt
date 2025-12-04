@@ -2,26 +2,35 @@
     ENDPOINTS NECESARIOS PARA EL FLUJO COMPLETO DE CITAS Y PAGOS
 ================================================================================
 
---------------------------------------------------------------------------------
 1. RESOLVER MÉDICO-ESPECIALIDAD
---------------------------------------------------------------------------------
-
 Endpoint:
-GET /api/medico-especialidad/buscar?medicoNombre={nombre}&especialidad={especialidad}
 
 Query SQL:
 SELECT me.id_medico_especialidad 
 FROM medico_especialidad me
-JOIN medico m ON me.id_medico = m.id_medico
+
+NOTAS CLAVE (alineadas al frontend actual)
+--------------------------------------------------------------------------------
+Desde el modal "Reservar Cita" en el frontend ya se recoge: médico, especialidad,
+fecha, hora, subespecialidad, precio, motivo, tipo de consulta y observaciones.
+Para cerrar el flujo end‑to‑end se requiere:
+1) Resolver `idMedicoEspecialidad` y `idBloque` en el backend.
+2) Crear la cita (detalle + cita + marcar bloque + resumen).
+3) Crear el pago (o disparar checkout externo y registrar pago vía webhook).
+4) Exponer listados para el dashboard del paciente (citas y pagos).
 JOIN persona p ON m.id_persona = p.id_persona
-JOIN especialidad e ON me.id_especialidad = e.id_especialidad
 WHERE CONCAT(p.nombre1, ' ', p.apellido_paterno) = ? 
   AND e.nombre = ?
 
 Response esperado:
+
+Sugerencia de respuesta ampliada (útil para siguientes pasos):
 {
-  "idMedicoEspecialidad": 5
+  "idMedicoEspecialidad": 5,
+  "idMedico": 123,
+  "idEspecialidad": 3
 }
+  "idMedicoEspecialidad": 5
 
 --------------------------------------------------------------------------------
 2. RESOLVER ID DE BLOQUE HORARIO
@@ -30,8 +39,10 @@ Response esperado:
 Endpoint:
 GET /api/horarios/bloque?idMedico={id}&fecha={YYYY-MM-DD}&hora={HH:mm}
 
+Índices recomendados:
+- CREATE UNIQUE INDEX ux_horario_bloque_disp_fecha_hora ON horario_bloque(id_disponibilidad, fecha, hora_inicio);
+- CREATE INDEX ix_horario_bloque_fecha ON horario_bloque(fecha);
 Query SQL:
-SELECT hb.id_bloque
 FROM horario_bloque hb
 JOIN disponibilidad_medico dm ON hb.id_disponibilidad = dm.id_disponibilidad
 WHERE dm.id_medico = ?
@@ -45,9 +56,12 @@ Response esperado:
   "idBloque": 123,
   "horaInicio": "10:00",
   "horaFin": "10:30",
-  "disponible": true
-}
 
+Validaciones recomendadas:
+- Verificar que el bloque sigue `disponible = TRUE` antes de marcarlo.
+- Usar transacción para asegurar atomicidad de los 4 pasos.
+- Si se integrará checkout externo, permitir estado `pendiente_pago` y confirmar luego.
+}
 --------------------------------------------------------------------------------
 3. CREAR CITA (Ajustar el existente)
 --------------------------------------------------------------------------------
@@ -62,9 +76,10 @@ Request Body:
   "idSubEspecialidad": null,
   "idBloque": 123,
   "motivoConsulta": "Dolor de pecho"
-}
 
-Proceso SQL (4 pasos):
+Nota:
+- El mapeo `usuario → persona → paciente` está contemplado; mantener consistencia.
+
 
 --- Paso 1: Insertar detalle_cita ---
 INSERT INTO detalle_cita (id_medico_especialidad, id_subespecialidad, precio_consulta, precio_total)
@@ -74,9 +89,11 @@ RETURNING id_detalle_cita;
 --- Paso 2: Insertar cita ---
 INSERT INTO cita (id_paciente, id_detalle_cita, id_disponibilidad, fecha_cita, hora_cita, estado, motivo_consulta)
 VALUES (?, ?, (SELECT id_disponibilidad FROM horario_bloque WHERE id_bloque = ?), ?, ?, 'confirmada', ?)
-RETURNING id_cita;
 
---- Paso 3: Actualizar bloque horario ---
+Alternativa con pasarela externa:
+- Usar `POST /api/pagos/crear-checkout` que genere `urlCheckout` o `sessionId`.
+- Registrar pago solo cuando el webhook confirme (estado `completado`).
+
 UPDATE horario_bloque 
 SET disponible = FALSE, id_cita = ? 
 WHERE id_bloque = ?;
@@ -101,6 +118,10 @@ JOIN medico m ON me.id_medico = m.id_medico
 JOIN especialidad e ON me.id_especialidad = e.id_especialidad
 LEFT JOIN sub_especialidad se ON dc.id_subespecialidad = se.id_subespecialidad
 JOIN horario_bloque hb ON c.id_disponibilidad = (SELECT id_disponibilidad FROM horario_bloque WHERE id_bloque = ?)
+
+Opcional (pasarela externa):
+  5. POST /api/pagos/crear-checkout
+  6. POST /api/pagos/webhook
 JOIN disponibilidad_medico dm ON hb.id_disponibilidad = dm.id_disponibilidad
 WHERE c.id_cita = ?;
 
@@ -108,11 +129,16 @@ Response esperado:
 {
   "idCita": 15,
   "fecha": "2025-12-03",
-  "hora": "10:00",
-  "medicoNombre": "Carla Méndez",
+5. Frontend llama a POST /api/citas/agregar (con los IDs resueltos)
+6. Frontend llama a POST /api/pagos/crear
   "especialidad": "Cardiología",
   "subEspecialidad": null,
   "motivoConsulta": "Dolor de pecho",
+
+Variación con checkout externo:
+- 6. Frontend llama a POST /api/pagos/crear-checkout y redirige a `urlCheckout`.
+- 7. Pasarela llama a POST /api/pagos/webhook → backend marca `pago` y `cita`.
+- 8. Dashboard consulta endpoints de citas/pagos (ya reflejan pago confirmado).
   "estado": "confirmada",
   "precio": 150.00
 }

@@ -8,6 +8,20 @@
                 <h3>Nuevo Horario</h3>
                 <form (ngSubmit)="agregarHorario()" #horarioForm="ngForm">
 
+                    <div class="field fancy-date">
+                        <label>Fecha específica</label>
+                        <div class="date-input-wrapper">
+                            <span class="icon">📅</span>
+                            <input
+                              type="date"
+                              [(ngModel)]="fechaSeleccionada"
+                              name="fechaSeleccionada"
+                              [min]="hoy"
+                              (change)="onFechaChange()" />
+                        </div>
+                        <small>Solo puedes elegir desde hoy en adelante.</small>
+                    </div>
+
                     <div class="field">
                         <label>Día</label>
                         <select [(ngModel)]="diaSeleccionado" name="dia" required>
@@ -33,6 +47,15 @@
                         <select [(ngModel)]="nuevoHorario.tipo" name="tipo" required>
                             @for (tipo of tiposHorario; track tipo.value) {
                                 <option [value]="tipo.value">{{ tipo.label }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Duración por Consulta</label>
+                        <select [(ngModel)]="nuevoHorario.duracionMinutos" name="duracion" required>
+                            @for (duracion of opcionesDuracion; track duracion.value) {
+                                <option [value]="duracion.value">{{ duracion.label }}</option>
                             }
                         </select>
                     </div>
@@ -113,6 +136,7 @@
                                 <div class="schedule-info">
                                     <span class="time">{{ horario.horaInicio }} - {{ horario.horaFin }}</span>
                                     <span class="type">{{ obtenerLabelTipo(horario.tipo) }}</span>
+                                    <span class="duration">⏱️ {{ horario.duracionMinutos }}min</span>
                                 </div>
                                 <button class="delete-btn" (click)="eliminarHorario(dia.id, horario.id)">×</button>
                             </div>
