@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { Medico } from '../../../../../core/models/users/medico';
 import { MedicoService } from '../../../../../core/services/rol/medico.service';
-
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 @Component({
   selector: 'app-gestion-medicos',
   standalone: true,
@@ -20,7 +20,7 @@ export class GestionMedicosComponent implements OnInit {
   doctorActual: DoctorVM | null = null;
   modoEdicion = false;
   
-  constructor(private medicoService: MedicoService) {}
+  constructor(private medicoService: MedicoService, private reportesService: ReportesService) {}
 
   columns: TableColumn[] = [
   { key: 'id', label: 'ID', sortable: true },
@@ -316,6 +316,27 @@ private mapVMToUpdate(vm: DoctorVM): any {
         }
       });
     }
+  }
+
+  // Descargar reporte PDF con la lista o información de médicos
+  descargarReporteMedicosPDF(): void {
+    this.reportesService.descargarMedicos('pdf').subscribe({
+      next: (blob: Blob) => {
+        const filename = 'reporte-medicos.pdf';
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err: any) => {
+        console.error('Error descargando reporte de médicos:', err);
+        alert('No se pudo descargar el reporte de médicos. Revisa la consola.');
+      }
+    });
   }
 
   onSortChange(event: { column: string, direction: 'asc' | 'desc' }): void {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
 import { CitaCompleta, EstadoCita } from '../../../../../core/models/common/cita';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 
 @Component({
     selector: 'app-gestion-citas',
@@ -13,7 +14,7 @@ import { CitaService } from '../../../../../core/services/logic/cita.service';
     styleUrl: './gestion-citas.component.css'
 })
 export class GestionCitasComponent implements OnInit {
-    constructor(private citaService: CitaService) {}
+    constructor(private citaService: CitaService, private reportesService: ReportesService) {}
     guardarCita(): void {
         if (!this.citaActual) return;
         this.citaService.guardarCita(this.citaActual);
@@ -174,5 +175,26 @@ export class GestionCitasComponent implements OnInit {
     onSortChange(event: { column: string, direction: 'asc' | 'desc' }): void {
         console.log('🔄 Ordenar por:', event.column, event.direction);
         // El DataTableComponent maneja el ordenamiento internamente
+    }
+
+    // Descargar reporte de citas (PDF) desde Gestión de Citas
+    descargarReporteCitasPDF(): void {
+        this.reportesService.descargarCitasPDF().subscribe({
+            next: (blob: Blob) => {
+                const filename = 'reporte_citas.pdf';
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err: any) => {
+                console.error('Error descargando reporte de citas:', err);
+                alert('No se pudo descargar el reporte de citas. Revisar consola');
+            }
+        });
     }
 }

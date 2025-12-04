@@ -6,6 +6,7 @@ import { Usuario } from '../../../../../core/models/users/usuario';
 import { Persona } from '../../../../../core/models/users/persona';
 import { Rol } from '../../../../../core/models/users/rol';
 import { UsuarioService } from '../../../../../core/services/rol/usuario.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 
 @Component({
     selector: 'app-gestion-usuarios',
@@ -17,7 +18,7 @@ import { UsuarioService } from '../../../../../core/services/rol/usuario.service
 export class GestionUsuariosComponent implements OnInit {
     usuarios: UsuarioVM[] = [];
     isLoading = false;
-    constructor(private usuarioService: UsuarioService) { }
+    constructor(private usuarioService: UsuarioService, private reportesService: ReportesService) { }
     mostrarFormulario = false;
     modoEdicion = false;
     usuarioActual: UsuarioVM | null = null;
@@ -280,6 +281,27 @@ export class GestionUsuariosComponent implements OnInit {
                 }
             });
         }
+    }
+
+    // Descargar reporte de usuarios en PDF (Gestión de Usuarios)
+    descargarReporteUsuariosPDF(): void {
+        this.reportesService.descargarUsuariosPDF().subscribe({
+            next: (blob: Blob) => {
+                const filename = 'reporte_usuarios.pdf';
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err: any) => {
+                console.error('Error descargando reporte de usuarios:', err);
+                alert('No se pudo descargar el reporte de usuarios. Revisa la consola.');
+            }
+        });
     }
 
     onSortChange(event: { column: string, direction: 'asc' | 'desc' }): void {

@@ -5,6 +5,7 @@ import { DataTableComponent, TableColumn, TableAction } from '../../../../../sha
 import { Usuario } from '../../../../../core/models/users/usuario';
 import { Paciente } from '../../../../../core/models/users/paciente';
 import { PacienteService } from '../../../../../core/services/rol/paciente.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 
 @Component({
     selector: 'app-gestion-pacientes',
@@ -19,7 +20,7 @@ export class GestionPacientesComponent implements OnInit {
     mostrarModalVer = false;
     pacienteActual: PacienteVM | null = null;
     modoEdicion = false;
-    constructor(private pacienteService: PacienteService) { }
+    constructor(private pacienteService: PacienteService, private reportesService: ReportesService) { }
 
     columns: TableColumn[] = [
         { key: 'id', label: 'ID', sortable: true },
@@ -403,6 +404,27 @@ private mapVMToPaciente(vm: PacienteVM): any {
             localStorage.setItem('usuarios', JSON.stringify(usuarios));
         }
         this.postSaveCleanup();
+    }
+
+    // Descargar PDF con la lista completa de pacientes
+    descargarReportePacientesPDF(): void {
+        this.reportesService.descargarPacientes('pdf').subscribe({
+            next: (blob: Blob) => {
+                const filename = 'reporte-pacientes.pdf';
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err: any) => {
+                console.error('Error descargando reporte de pacientes:', err);
+                alert('No se pudo descargar el reporte de pacientes. Revisa la consola.');
+            }
+        });
     }
 }
 
