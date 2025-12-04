@@ -7,6 +7,7 @@ export const MENU_DASHBOARD: Record<string, MenuItem[]> = {
         { label: 'Gestión Admins', route: '/admin/gestion-admins', icon: 'fa fa-user-shield' },
         { label: 'Gestión Citas', route: '/admin/gestion-citas', icon: 'fa fa-calendar' },
         { label: 'Gestión Médicos', route: '/admin/gestion-medicos', icon: 'fa fa-user-md' },
+        { label: 'Gestión Horarios', route: '/admin/gestion-horarios', icon: 'fa fa-clock' },
         { label: 'Gestión Pacientes', route: '/admin/gestion-pacientes', icon: 'fa fa-users' },
         { label: 'Gestión Usuarios', route: '/admin/gestion-usuarios', icon: 'fa fa-user-cog' },
         { label: 'Reportes', route: '/admin/reportes', icon: 'fa fa-chart-line' }

@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataTableComponent, TableColumn, TableAction } from '../../../../../shared/components/data-table/data-table.component';
-import { Usuario } from '../../../../../core/models/users/usuario';
 import { Paciente } from '../../../../../core/models/users/paciente';
 import { PacienteService } from '../../../../../core/services/rol/paciente.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 
 @Component({
     selector: 'app-gestion-pacientes',
@@ -15,11 +15,17 @@ import { PacienteService } from '../../../../../core/services/rol/paciente.servi
 })
 export class GestionPacientesComponent implements OnInit {
     pacientes: PacienteVM[] = [];
+    pacientesLocales: PacienteVM[] = []; // Solo pacientes locales
     isLoading = false;
     mostrarModalVer = false;
+    mostrarFormulario = false; // Para mostrar formulario de agregar/editar
     pacienteActual: PacienteVM | null = null;
     modoEdicion = false;
-    constructor(private pacienteService: PacienteService) { }
+    
+    constructor(
+        private pacienteService: PacienteService, 
+        private reportesService: ReportesService
+    ) { }
 
     columns: TableColumn[] = [
         { key: 'id', label: 'ID', sortable: true },
@@ -38,119 +44,88 @@ export class GestionPacientesComponent implements OnInit {
         { icon: 'fas fa-trash', label: 'Eliminar', action: 'delete', class: 'btn-delete' }
     ];
 
+    generos = [
+        { value: 'masculino', label: 'Masculino' },
+        { value: 'femenino', label: 'Femenino' },
+        { value: 'otro', label: 'Otro' }
+    ];
+
+    tiposDocumento = [
+        { value: 'DNI', label: 'DNI' },
+        { value: 'CE', label: 'Carné Extranjería' },
+        { value: 'PAS', label: 'Pasaporte' }
+    ];
+
     ngOnInit(): void {
-        this.cargarPacientes();
+        this.cargarPacientesBackend();
+        this.cargarPacientesLocales();
     }
 
-    cargarPacientes(): void {
+    // Cargar pacientes desde backend
+    cargarPacientesBackend(): void {
         this.isLoading = true;
         this.pacienteService.getAll().subscribe({
             next: (lista: Paciente[]) => {
-                this.pacientes = (lista || []).map(p => this.mapPacienteToVM(p));
+                const pacientesBackend = (lista || []).map(p => this.mapPacienteToVM(p));
+                this.pacientes = [...pacientesBackend];
+                // Combinar con locales
+                this.combinarPacientes();
                 this.isLoading = false;
             },
-            error: _ => {
-                // Fallback a localStorage 'usuarios'
-                const usuarios = this.obtenerUsuarios();
-                const pacientesLS = usuarios.filter(u => this.esPaciente(u));
-                this.pacientes = pacientesLS.map(u => this.mapUsuarioToVM(u));
-                if (this.pacientes.length === 0) {
-                    this.agregarPacientesEjemplo();
-                }
+            error: (error) => {
+                console.error('Error cargando pacientes del backend:', error);
+                // Solo cargar locales si falla backend
+                this.pacientes = [...this.pacientesLocales];
                 this.isLoading = false;
             }
         });
     }
 
-    private obtenerUsuarios(): any[] {
-        const usuariosStr = localStorage.getItem('usuarios');
-        return usuariosStr ? JSON.parse(usuariosStr) : [];
-    }
-
-    private agregarPacientesEjemplo(): void {
-        const usuarios = this.obtenerUsuarios();
-        const currentIds = usuarios.map((u: any) => u.id ?? u.idUsuario ?? 0);
-        const maxId = currentIds.length ? Math.max(...currentIds) : 0;
-        const nextId = maxId + 1;
-
-        const pacientesEjemplo: PacienteVM[] = [
-            {
-                id: nextId,
-                nombre: 'Ana María',
-                email: 'ana.rodriguez@email.com',
-                telefono: '987654321',
-                tipoDocumento: 'DNI',
-                numeroDocumento: '11223344',
-                apellidoPaterno: 'Rodríguez',
-                apellidoMaterno: 'García',
-                fechaNacimiento: '1990-05-15',
-                genero: 'femenino',
-                domicilio: 'Av. Larco 123'
-            },
-            {
-                id: nextId + 1,
-                nombre: 'Carlos Eduardo',
-                email: 'carlos.mendoza@email.com',
-                telefono: '956789123',
-                tipoDocumento: 'DNI',
-                numeroDocumento: '55667788',
-                apellidoPaterno: 'Mendoza',
-                apellidoMaterno: 'Silva',
-                fechaNacimiento: '1985-08-22',
-                genero: 'masculino',
-                domicilio: 'Calle Real 456'
-            },
-            {
-                id: nextId + 2,
-                nombre: 'Sofía Elena',
-                email: 'sofia.torres@email.com',
-                telefono: '912345678',
-                tipoDocumento: 'DNI',
-                numeroDocumento: '99887766',
-                apellidoPaterno: 'Torres',
-                apellidoMaterno: 'Vega',
-                fechaNacimiento: '1992-12-10',
-                genero: 'femenino',
-                domicilio: 'Jr. Las Flores 789'
-            },
-            {
-                id: nextId + 3,
-                nombre: 'Miguel Ángel',
-                email: 'miguel.herrera@email.com',
-                telefono: '923456789',
-                tipoDocumento: 'DNI',
-                numeroDocumento: '44556677',
-                apellidoPaterno: 'Herrera',
-                apellidoMaterno: 'Ruiz',
-                fechaNacimiento: '1968-03-20',
-                genero: 'masculino',
-                domicilio: 'Av. Universidad 321'
+    // Cargar pacientes locales
+    private cargarPacientesLocales(): void {
+        const pacientesStr = localStorage.getItem('pacientes_locales');
+        if (pacientesStr) {
+            try {
+                this.pacientesLocales = JSON.parse(pacientesStr);
+                this.pacientesLocales.forEach(p => {
+                    p.esLocal = true;
+                    // Asegurar que los IDs sean positivos
+                    if (p.id <= 0) {
+                        p.id = 1; // Convertir negativos o cero a 1
+                    }
+                });
+            } catch (e) {
+                console.error('Error parsing pacientes_locales:', e);
+                this.pacientesLocales = [];
             }
-        ];
-
-        const nuevos = pacientesEjemplo.map(p => ({
-            id: p.id,
-            rol: 'paciente',
-            nombre: p.nombre,
-            apellidoPaterno: p.apellidoPaterno,
-            apellidoMaterno: p.apellidoMaterno,
-            email: p.email,
-            telefono: p.telefono,
-            tipoDocumento: p.tipoDocumento,
-            numeroDocumento: p.numeroDocumento,
-            genero: p.genero,
-            fechaNacimiento: p.fechaNacimiento,
-            domicilio: p.domicilio
-        }));
-        const actualizados = [...usuarios, ...nuevos];
-        localStorage.setItem('usuarios', JSON.stringify(actualizados));
-        this.pacientes = pacientesEjemplo;
+        }
     }
 
+    // Guardar pacientes locales
+    private guardarPacientesLocales(): void {
+        localStorage.setItem('pacientes_locales', JSON.stringify(this.pacientesLocales));
+    }
+
+    // Combinar pacientes del backend con locales
+    private combinarPacientes(): void {
+        const idsBackend = this.pacientes.filter(p => !p.esLocal).map(p => p.id);
+        this.pacientesLocales = this.pacientesLocales.filter(local => 
+            !idsBackend.includes(local.id)
+        );
+        
+        const todosPacientes = [
+            ...this.pacientes.filter(p => !p.esLocal),
+            ...this.pacientesLocales
+        ];
+        
+        this.pacientes = todosPacientes;
+    }
+
+    // Botón de agregar paciente - FUNCIONA LOCALMENTE
     agregarPaciente(): void {
         this.modoEdicion = false;
         this.pacienteActual = {
-            id: 0,
+            id: this.generarNuevoId(),
             nombre: '',
             email: '',
             telefono: '',
@@ -160,8 +135,28 @@ export class GestionPacientesComponent implements OnInit {
             apellidoMaterno: '',
             fechaNacimiento: '',
             genero: 'otro',
-            domicilio: ''
+            domicilio: '',
+            esLocal: true // IMPORTANTE: Marcar como local
         };
+        this.mostrarFormulario = true;
+    }
+
+    // ✅ CORREGIDO: Generar ID único ascendente
+    private generarNuevoId(): number {
+        // Encontrar todos los IDs existentes (backend + locales)
+        const todosIds = this.obtenerTodosLosIds();
+        
+        if (todosIds.length === 0) return 1; // Primer ID si no hay pacientes
+        
+        const maxId = Math.max(...todosIds);
+        return maxId + 1; // Siguiente ID ascendente
+    }
+
+    // Obtener todos los IDs de pacientes
+    private obtenerTodosLosIds(): number[] {
+        const idsBackend = this.pacientes.filter(p => !p.esLocal).map(p => p.id);
+        const idsLocales = this.pacientesLocales.map(p => p.id);
+        return [...idsBackend, ...idsLocales].filter(id => id > 0); // Solo IDs positivos
     }
 
     onTableAction(event: { action: string, item: any }): void {
@@ -193,108 +188,136 @@ export class GestionPacientesComponent implements OnInit {
     private editarPaciente(paciente: PacienteVM): void {
         this.modoEdicion = true;
         this.pacienteActual = { ...paciente };
+        this.mostrarFormulario = true;
     }
 
-guardarPaciente(): void {
-  if (!this.pacienteActual) return;
-  if (!this.pacienteActual.email || String(this.pacienteActual.email).trim().length === 0) {
-    alert('El email es obligatorio.');
-    return;
-  }
+    // Guardar paciente (LOCAL para nuevos, según origen para ediciones)
+    guardarPaciente(): void {
+        if (!this.pacienteActual) return;
+        
+        // Validar campos obligatorios
+        if (!this.pacienteActual.email || String(this.pacienteActual.email).trim().length === 0) {
+            alert('El email es obligatorio.');
+            return;
+        }
+        
+        if (!this.pacienteActual.nombre || String(this.pacienteActual.nombre).trim().length === 0) {
+            alert('El nombre es obligatorio.');
+            return;
+        }
 
-  const payload = this.mapVMToPaciente(this.pacienteActual);
-
-  if (this.modoEdicion && this.pacienteActual.id) {
-    // ✅ EDITAR - actualizar en la lista INMEDIATAMENTE
-    this.pacientes = this.pacientes.map(p =>
-      p.id === this.pacienteActual?.id 
-        ? { ...this.pacienteActual! }
-        : p
-    );
-
-    // Intentar sincronizar con backend (opcional)
-    this.pacienteService.update(this.pacienteActual.id, payload).subscribe({
-      next: _ => console.log("✅ Paciente actualizado en backend"),
-      error: _ => {
-        console.warn("⚠️ No se sincronizó con backend");
-        this.saveLocalFallback(); // guardar en localStorage
-      }
-    });
-
-    alert("✅ Paciente actualizado");
-    this.cancelarFormulario();
-  } else {
-    // ✅ CREAR - agregar a la lista INMEDIATAMENTE
-    const nuevoPaciente: PacienteVM = { ...this.pacienteActual };
-    
-    // Asignar ID local si no tiene
-    if (nuevoPaciente.id === 0) {
-      const maxId = this.pacientes.length > 0 
-        ? Math.max(...this.pacientes.map(p => p.id)) 
-        : 0;
-      nuevoPaciente.id = maxId + 1;
+        if (this.modoEdicion) {
+            // EDITAR paciente
+            if (this.pacienteActual.esLocal) {
+                // Actualizar en lista local
+                this.pacientesLocales = this.pacientesLocales.map(p =>
+                    p.id === this.pacienteActual?.id 
+                        ? { ...this.pacienteActual! }
+                        : p
+                );
+                
+                this.guardarPacientesLocales();
+                alert("✅ Paciente local actualizado");
+            } else {
+                // Intentar actualizar en backend
+                this.actualizarEnBackend();
+                return;
+            }
+            
+        } else {
+            // ✅ CREAR nuevo paciente LOCAL (NO se envía al backend)
+            const idNuevo = this.generarNuevoId();
+            const nuevoPaciente: PacienteVM = { 
+                ...this.pacienteActual,
+                id: idNuevo,
+                esLocal: true
+            };
+            
+            // Agregar a lista local
+            this.pacientesLocales.push(nuevoPaciente);
+            this.guardarPacientesLocales();
+            
+            alert(`✅ Paciente agregado localmente (ID: ${idNuevo})`);
+        }
+        
+        // Actualizar lista combinada
+        this.combinarPacientes();
+        
+        // Limpiar formulario
+        this.cancelarFormulario();
     }
 
-    // ✅ Agregar a la tabla inmediatamente
-    this.pacientes = [...this.pacientes, nuevoPaciente];
+    private actualizarEnBackend(): void {
+        if (!this.pacienteActual) return;
 
-    // Intentar guardar en backend (opcional)
-    this.pacienteService.add(payload).subscribe({
-      next: _ => console.log("✅ Paciente guardado en backend"),
-      error: _ => {
-        console.warn("⚠️ No se guardó en backend, pero aparece en el front");
-        this.saveLocalFallback(true); // guardar en localStorage
-      }
-    });
+        const payload = this.mapVMToPaciente(this.pacienteActual);
+        
+        this.pacienteService.update(this.pacienteActual.id, payload).subscribe({
+            next: () => {
+                // Actualizar en lista local
+                this.pacientes = this.pacientes.map(p =>
+                    p.id === this.pacienteActual?.id 
+                        ? { ...this.pacienteActual! }
+                        : p
+                );
+                
+                alert("✅ Paciente actualizado en el sistema");
+                this.cancelarFormulario();
+                
+                // Recargar desde backend
+                setTimeout(() => this.cargarPacientesBackend(), 500);
+            },
+            error: (error) => {
+                console.error('Error actualizando en backend:', error);
+                alert("⚠️ No se pudo actualizar en el sistema. Los cambios son locales.");
+                
+                // Actualizar localmente como fallback
+                this.pacientes = this.pacientes.map(p =>
+                    p.id === this.pacienteActual?.id 
+                        ? { ...this.pacienteActual! }
+                        : p
+                );
+                
+                this.cancelarFormulario();
+            }
+        });
+    }
 
-    alert("✅ Paciente agregado");
-    this.cancelarFormulario();
-  }
-}
-
+    // Eliminar paciente
     private eliminarPaciente(paciente: PacienteVM): void {
         const confirmacion = confirm(`¿Estás seguro de eliminar al paciente ${paciente.nombre}?`);
 
-        if (confirmacion) {
+        if (!confirmacion) return;
+
+        if (paciente.esLocal) {
+            // Eliminar local
+            this.pacientesLocales = this.pacientesLocales.filter(p => p.id !== paciente.id);
+            this.guardarPacientesLocales();
+            this.combinarPacientes();
+            alert("✅ Paciente local eliminado");
+        } else {
+            // Eliminar del backend
             this.pacienteService.delete(paciente.id).subscribe({
-                next: _ => this.cargarPacientes(),
-                error: _ => {
-                    const usuarios = this.obtenerUsuarios();
-                    const filtrados = usuarios.filter((u: any) => (u.id ?? u.idUsuario) !== paciente.id);
-                    localStorage.setItem('usuarios', JSON.stringify(filtrados));
-                    this.cargarPacientes();
+                next: () => {
+                    this.pacientes = this.pacientes.filter(p => p.id !== paciente.id);
+                    alert("✅ Paciente eliminado del sistema");
+                },
+                error: (error) => {
+                    console.error('Error eliminando paciente:', error);
+                    alert("❌ Error al eliminar el paciente");
                 }
             });
         }
     }
 
     cancelarFormulario(): void {
+        this.mostrarFormulario = false;
         this.mostrarModalVer = false;
         this.pacienteActual = null;
+        this.modoEdicion = false;
     }
 
-    // Utilidades y mapeos
-    private esPaciente(u: any): boolean {
-        const rol = (typeof u.rol === 'string') ? u.rol : u.rol?.nombre;
-        return String(rol || '').toLowerCase() === 'paciente';
-    }
-
-    private mapUsuarioToVM(u: any): PacienteVM {
-        return {
-            id: (u.id ?? u.idUsuario ?? 0),
-            nombre: (u.nombre ?? u.persona?.nombre1 ?? ''),
-            apellidoPaterno: (u.apellidoPaterno ?? u.persona?.apellidoPaterno ?? ''),
-            apellidoMaterno: (u.apellidoMaterno ?? u.persona?.apellidoMaterno ?? ''),
-            email: (u.email ?? u.correo ?? u.persona?.usuario?.correo ?? ''),
-            telefono: (u.telefono ?? u.persona?.telefono ?? ''),
-            tipoDocumento: (u.tipoDocumento ?? u.persona?.tipoDocumento ?? ''),
-            numeroDocumento: (u.numeroDocumento ?? u.persona?.dni ?? ''),
-            genero: (u.genero ?? u.persona?.genero ?? ''),
-            fechaNacimiento: (u.fechaNacimiento ?? u.persona?.fechaNacimiento ?? ''),
-            domicilio: (u.domicilio ?? u.persona?.direccion ?? '')
-        };
-    }
-
+    // Mapeo desde modelo Paciente del backend
     private mapPacienteToVM(p: Paciente): PacienteVM {
         return {
             id: p.idPaciente || 0,
@@ -308,101 +331,105 @@ guardarPaciente(): void {
             numeroDocumento: p.persona?.dni || '',
             genero: p.persona?.genero || '',
             fechaNacimiento: (p.persona?.fechaNacimiento as any) || '',
-            domicilio: p.persona?.direccion || ''
+            domicilio: p.persona?.direccion || '',
+            esLocal: false // Viene del backend
         };
     }
 
-private mapVMToPaciente(vm: PacienteVM): any {
-  return {
-    // idPersona obligatorio para el backend
-    idPersona: vm.idPersona && vm.idPersona > 0 ? vm.idPersona : (vm.id || 0),
-
-    tipoSangre: null,
-    peso: null,
-    altura: null,
-    contactoEmergenciaNombre: null,
-    contactoEmergenciaRelacion: null,
-    contactoEmergenciaTelefono: null,
-
-    email: vm.email,
-
-    persona: {
-      // incluir idPersona dentro de persona si tu DTO lo espera
-      idPersona: vm.idPersona && vm.idPersona > 0 ? vm.idPersona : null,
-      tipoDocumento: vm.tipoDocumento || 'DNI',
-      dni: vm.numeroDocumento || '',
-      nombre1: vm.nombre || '',
-      nombre2: '',
-      apellidoPaterno: vm.apellidoPaterno || '',
-      apellidoMaterno: vm.apellidoMaterno || '',
-      fechaNacimiento: vm.fechaNacimiento || null,
-      genero: vm.genero || null,
-      pais: 'PE',
-      departamento: null,
-      provincia: null,
-      distrito: null,
-      direccion: vm.domicilio || null,
-      telefono: vm.telefono || null
-    },
-
-    // objeto para UsuarioEditRequestDTO
-    usuarioAgrego: {
-      correo: vm.email || null,
-      telefono: vm.telefono || null
-    }
-  };
-}
-
-    private postSaveCleanup() {
-        this.pacienteActual = null;
-        this.modoEdicion = false;
-        this.cargarPacientes();
-    }
-
-    private saveLocalFallback(isCreate = false) {
-        const usuarios = this.obtenerUsuarios();
-        if (this.pacienteActual) {
-            if (this.modoEdicion) {
-                const idx = usuarios.findIndex((u: any) => (u.id ?? u.idUsuario) === this.pacienteActual!.id);
-                if (idx > -1) {
-                    usuarios[idx] = {
-                        ...usuarios[idx],
-                        id: this.pacienteActual.id,
-                        rol: usuarios[idx].rol ?? 'paciente',
-                        nombre: this.pacienteActual.nombre,
-                        apellidoPaterno: this.pacienteActual.apellidoPaterno,
-                        apellidoMaterno: this.pacienteActual.apellidoMaterno,
-                        email: this.pacienteActual.email,
-                        telefono: this.pacienteActual.telefono,
-                        tipoDocumento: this.pacienteActual.tipoDocumento,
-                        numeroDocumento: this.pacienteActual.numeroDocumento,
-                        genero: this.pacienteActual.genero,
-                        fechaNacimiento: this.pacienteActual.fechaNacimiento,
-                        domicilio: this.pacienteActual.domicilio
-                    };
-                }
-            } else if (isCreate) {
-                const currentIds = usuarios.map((u: any) => u.id ?? u.idUsuario ?? 0);
-                const maxId = currentIds.length ? Math.max(...currentIds) : 0;
-                const nuevo: any = {
-                    id: maxId + 1,
-                    rol: 'paciente',
-                    nombre: this.pacienteActual.nombre,
-                    apellidoPaterno: this.pacienteActual.apellidoPaterno,
-                    apellidoMaterno: this.pacienteActual.apellidoMaterno,
-                    email: this.pacienteActual.email,
-                    telefono: this.pacienteActual.telefono,
-                    tipoDocumento: this.pacienteActual.tipoDocumento,
-                    numeroDocumento: this.pacienteActual.numeroDocumento,
-                    genero: this.pacienteActual.genero,
-                    fechaNacimiento: this.pacienteActual.fechaNacimiento,
-                    domicilio: this.pacienteActual.domicilio
-                };
-                usuarios.push(nuevo);
+    // Mapeo para enviar al backend
+    private mapVMToPaciente(vm: PacienteVM): any {
+        return {
+            idPersona: vm.idPersona || null,
+            tipoSangre: null,
+            peso: null,
+            altura: null,
+            contactoEmergenciaNombre: null,
+            contactoEmergenciaRelacion: null,
+            contactoEmergenciaTelefono: null,
+            email: vm.email,
+            persona: {
+                idPersona: vm.idPersona || null,
+                tipoDocumento: vm.tipoDocumento || 'DNI',
+                dni: vm.numeroDocumento || '',
+                nombre1: vm.nombre || '',
+                nombre2: '',
+                apellidoPaterno: vm.apellidoPaterno || '',
+                apellidoMaterno: vm.apellidoMaterno || '',
+                fechaNacimiento: vm.fechaNacimiento || null,
+                genero: vm.genero || null,
+                pais: 'PE',
+                departamento: null,
+                provincia: null,
+                distrito: null,
+                direccion: vm.domicilio || null,
+                telefono: vm.telefono || null
+            },
+            usuarioAgrego: {
+                correo: vm.email || null,
+                telefono: vm.telefono || null
             }
-            localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        }
-        this.postSaveCleanup();
+        };
+    }
+
+    // FUNCIÓN DE DESCARGAR PDF - SE MANTIENE IGUAL
+    descargarReportePacientesPDF(): void {
+        this.reportesService.descargarPacientes('pdf').subscribe({
+            next: (blob: Blob) => {
+                const filename = 'reporte-pacientes.pdf';
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            },
+            error: (err: any) => {
+                console.error('Error descargando reporte de pacientes:', err);
+                alert('No se pudo descargar el reporte de pacientes. Revisa la consola.');
+            }
+        });
+    }
+
+    // Cargar pacientes de ejemplo si no hay datos
+    private cargarPacientesEjemplo(): PacienteVM[] {
+        const pacientesEjemplo: PacienteVM[] = [
+            {
+                id: 1,
+                nombre: 'Ana María',
+                email: 'ana.rodriguez@email.com',
+                telefono: '987654321',
+                tipoDocumento: 'DNI',
+                numeroDocumento: '11223344',
+                apellidoPaterno: 'Rodríguez',
+                apellidoMaterno: 'García',
+                fechaNacimiento: '1990-05-15',
+                genero: 'femenino',
+                domicilio: 'Av. Larco 123',
+                esLocal: true
+            },
+            {
+                id: 2,
+                nombre: 'Carlos Eduardo',
+                email: 'carlos.mendoza@email.com',
+                telefono: '956789123',
+                tipoDocumento: 'DNI',
+                numeroDocumento: '55667788',
+                apellidoPaterno: 'Mendoza',
+                apellidoMaterno: 'Silva',
+                fechaNacimiento: '1985-08-22',
+                genero: 'masculino',
+                domicilio: 'Calle Real 456',
+                esLocal: true
+            }
+        ];
+
+        this.pacientesLocales = pacientesEjemplo;
+        this.guardarPacientesLocales();
+        this.combinarPacientes();
+        
+        return pacientesEjemplo;
     }
 }
 
@@ -419,4 +446,5 @@ interface PacienteVM {
     genero: string;
     fechaNacimiento: string | Date;
     domicilio: string;
+    esLocal?: boolean;
 }

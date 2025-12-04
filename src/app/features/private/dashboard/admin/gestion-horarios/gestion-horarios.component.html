@@ -1,0 +1,219 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <h2>Gestión de Horarios</h2>
+      <p>Administra los horarios y bloques de citas de los médicos</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="agregarHorario()">
+        <i class="fas fa-plus"></i>
+        Agregar Horario
+      </button>
+    </div>
+  </div>
+
+  <app-data-table 
+    [data]="horarios" 
+    [columns]="columns" 
+    [actions]="actions" 
+    [searchable]="true" 
+    [loading]="isLoading"
+    emptyMessage="No hay horarios registrados" 
+    [paginated]="true" [pageSize]="5" [pageSizeOptions]="[5,10,20,50]"
+    (actionClicked)="onTableAction($event)"
+    (sortChanged)="onSortChange($event)">
+  </app-data-table>
+
+  <!-- MODAL AGREGAR/EDITAR HORARIO -->
+  @if (mostrarModal && horarioActual) {
+  <div class="horario-form-modal">
+    <form (ngSubmit)="guardarHorario()" #formHorario="ngForm">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()" aria-label="Cerrar">&times;</button>
+      
+      <h3>{{ modoEdicion ? 'Editar Horario' : 'Nuevo Horario' }}</h3>
+
+      <!-- SELECTOR DE MÉDICO -->
+      <div class="form-group">
+        <label>Médico *</label>
+        <select [(ngModel)]="horarioActual.idMedico" name="idMedico" required>
+          <option [value]="0" disabled>Seleccione un médico</option>
+          <option *ngFor="let medico of medicos" [value]="medico.id">
+            {{ medico.nombre }} - {{ medico.especialidad }}
+          </option>
+        </select>
+      </div>
+
+      <!-- SELECTOR DE DÍAS DE LA SEMANA -->
+      <div class="form-group">
+        <label>Días de la semana *</label>
+        <div class="dias-selector">
+          <button 
+            *ngFor="let dia of ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']"
+            type="button"
+            class="dia-btn"
+            [class.selected]="isDiaSeleccionado(dia)"
+            (click)="toggleDia(dia)">
+            {{ dia.substring(0, 3) }}
+          </button>
+        </div>
+      </div>
+
+      <!-- RANGO DE HORAS -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hora Inicio *</label>
+          <input type="time" [(ngModel)]="horarioActual.horaInicio" name="horaInicio" required>
+        </div>
+        <div class="form-group">
+          <label>Hora Fin *</label>
+          <input type="time" [(ngModel)]="horarioActual.horaFin" name="horaFin" required>
+        </div>
+      </div>
+
+      <!-- DURACIÓN DE CADA BLOQUE -->
+      <div class="form-group">
+        <label>Duración por bloque (minutos) *</label>
+        <select [(ngModel)]="horarioActual.duracionBloque" name="duracionBloque" required>
+          <option [value]="15">15 minutos</option>
+          <option [value]="20">20 minutos</option>
+          <option [value]="25">25 minutos</option>
+          <option [value]="30">30 minutos</option>
+          <option [value]="45">45 minutos</option>
+          <option [value]="60">60 minutos</option>
+        </select>
+      </div>
+
+      <!-- RANGO DE FECHAS -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha Inicio *</label>
+          <input type="date" [(ngModel)]="horarioActual.fechaInicio" name="fechaInicio" required>
+        </div>
+        <div class="form-group">
+          <label>Fecha Fin *</label>
+          <input type="date" [(ngModel)]="horarioActual.fechaFin" name="fechaFin" required>
+        </div>
+      </div>
+
+      <!-- BOTÓN GENERAR VISTA PREVIA -->
+      <button type="button" class="btn btn-secondary" (click)="generarVistaPrevia()">
+        <i class="fas fa-eye"></i>
+        Generar Vista Previa ({{ bloquesGenerados.length }} bloques)
+      </button>
+
+      <!-- VISTA PREVIA DE BLOQUES -->
+      @if (bloquesGenerados.length > 0) {
+      <div class="bloques-preview">
+        <h4>
+          <i class="fas fa-calendar-check"></i>
+          Vista Previa de Bloques
+        </h4>
+        <div class="bloques-stats">
+          <span><strong>Total de bloques:</strong> {{ bloquesGenerados.length }}</span>
+          <span><strong>Médico:</strong> {{ medicoSeleccionado?.nombre }}</span>
+        </div>
+        
+        <div class="bloques-grid">
+          @for (grupo of bloquesAgrupadosPorDia.slice(0, 7); track grupo.fecha) {
+          <div class="dia-bloques">
+            <div class="dia-header">
+              <strong>{{ grupo.diaSemana }}</strong>
+              <span>{{ grupo.fecha }}</span>
+            </div>
+            <div class="bloques-lista">
+              @for (bloque of grupo.bloques; track bloque.id) {
+              <span class="bloque-hora">{{ bloque.horaInicio }}</span>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        
+        @if (bloquesAgrupadosPorDia.length > 7) {
+        <p class="bloques-info">
+          <i class="fas fa-info-circle"></i>
+          Mostrando primeros 7 días. Total: {{ bloquesAgrupadosPorDia.length }} días
+        </p>
+        }
+      </div>
+      }
+
+      <!-- ACCIONES -->
+      <div class="form-actions">
+        <button type="submit" [disabled]="formHorario.invalid || bloquesGenerados.length === 0">
+          <i class="fas fa-save"></i>
+          Guardar Horario
+        </button>
+        <button type="button" (click)="cancelarFormulario()">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+
+  <!-- MODAL VER BLOQUES COMPLETO -->
+  @if (mostrarBloques && bloquesGenerados.length > 0) {
+  <div class="bloques-modal">
+    <div class="bloques-content">
+      <button type="button" class="close-btn" (click)="cancelarFormulario()">&times;</button>
+      
+      <h3>
+        <i class="fas fa-calendar-alt"></i>
+        Bloques Generados - {{ medicoSeleccionado?.nombre }}
+      </h3>
+
+      <div class="bloques-stats-large">
+        <div class="stat-card">
+          <i class="fas fa-calendar-day"></i>
+          <div>
+            <strong>{{ bloquesAgrupadosPorDia.length }}</strong>
+            <span>Días</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-clock"></i>
+          <div>
+            <strong>{{ bloquesGenerados.length }}</strong>
+            <span>Bloques totales</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-hourglass-half"></i>
+          <div>
+            <strong>{{ horarioActual?.duracionBloque }}</strong>
+            <span>Minutos/bloque</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bloques-completo">
+        @for (grupo of bloquesAgrupadosPorDia; track grupo.fecha) {
+        <div class="dia-card">
+          <div class="dia-card-header">
+            <h4>{{ grupo.diaSemana }}</h4>
+            <span class="fecha-badge">{{ grupo.fecha }}</span>
+          </div>
+          <div class="bloques-grid-compact">
+            @for (bloque of grupo.bloques; track bloque.id) {
+            <div class="bloque-item" [class.disponible]="bloque.disponible">
+              <i class="fas fa-clock"></i>
+              <span>{{ bloque.horaInicio }} - {{ bloque.horaFin }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelarFormulario()">
+          <i class="fas fa-times"></i>
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

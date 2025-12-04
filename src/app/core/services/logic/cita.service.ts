@@ -1,15 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { CitaCompleta } from '../../models/common/cita';
+import { CitaCompleta, CitaCompletaFull, CrearCitaRequestDTO, CrearCitaResponoseDTO, DatosCitaBasicos } from '../../models/common/cita';
+import { HorarioService } from './horario.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CitaService {
     private http = inject(HttpClient);
+    private horarioService = inject(HorarioService);
     private apiBase = `${environment.apiUrl}/citas`;
+
     obtenerCitaPorId(id: number): CitaCompleta | undefined {
         return this.obtenerCitas().find(c => c.id === id);
     }
@@ -17,6 +20,7 @@ export class CitaService {
     limpiarCitas(): void {
         localStorage.removeItem(this.storageKey);
     }
+    
     private storageKey = 'citas';
 
     obtenerCitas(): CitaCompleta[] {
@@ -50,75 +54,6 @@ export class CitaService {
         return citas.length ? Math.max(...citas.map(c => c.id)) + 1 : 1;
     }
 
-    // ========= DEMO/SEEDING =========
-    seedIfEmptyForDoctor(doctorNombre: string, especialidad?: string): void {
-        const existentes = this.obtenerCitas();
-        if (existentes.length > 0) return;
-        const seed = this.generarCitasDemo(doctorNombre, especialidad);
-        localStorage.setItem(this.storageKey, JSON.stringify(seed));
-    }
-
-    private generarCitasDemo(doctorNombre: string, especialidad?: string): CitaCompleta[] {
-        const hoy = new Date();
-        const yyyy = hoy.getFullYear();
-        const mm = (hoy.getMonth() + 1).toString().padStart(2, '0');
-        const dd = hoy.getDate().toString().padStart(2, '0');
-        const hoyISO = `${yyyy}-${mm}-${dd}`;
-
-        const manana = new Date(hoy);
-        manana.setDate(hoy.getDate() + 1);
-        const mananaISO = `${manana.getFullYear()}-${(manana.getMonth() + 1).toString().padStart(2, '0')}-${manana.getDate().toString().padStart(2, '0')}`;
-
-        const pacientes = [
-            { nombre: 'María García López', email: 'maria.garcia@example.com', tel: '999111222' },
-            { nombre: 'Carlos Rodríguez Méndez', email: 'carlos.rodriguez@example.com', tel: '999222333' },
-            { nombre: 'Ana Martínez Silva', email: 'ana.martinez@example.com', tel: '999333444' },
-            { nombre: 'Luis Fernández Castro', email: 'luis.fernandez@example.com', tel: '999444555' },
-            { nombre: 'Patricia Jiménez Vega', email: 'patricia.jimenez@example.com', tel: '999555666' },
-            { nombre: 'Roberto Sánchez Torres', email: 'roberto.sanchez@example.com', tel: '999666777' },
-            { nombre: 'Carmen Delgado Ruiz', email: 'carmen.delgado@example.com', tel: '999777888' },
-            { nombre: 'Javier Morales Díaz', email: 'javier.morales@example.com', tel: '999888999' },
-            { nombre: 'Isabella Torres Muñoz', email: 'isabella.torres@example.com', tel: '999000111' },
-            { nombre: 'Diego Rivas Paredes', email: 'diego.rivas@example.com', tel: '999000222' }
-        ];
-
-        const tipos = especialidad && especialidad.toLowerCase().includes('cardio')
-            ? ['Control Cardiológico', 'Electrocardiograma', 'Ecocardiograma', 'Consulta Urgente']
-            : ['Consulta General', 'Control', 'Chequeo Preventivo', 'Urgencia'];
-
-        const horasHoy = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30'];
-        const horasManana = ['08:00', '08:30', '09:00', '09:30'];
-
-        let id = 1;
-        const ahora = new Date();
-        const mkEstado = (fecha: string, hora: string): CitaCompleta['estado'] => {
-            const dt = new Date(`${fecha}T${hora}:00`);
-            if (dt < ahora) return 'completada';
-            return (id % 4 === 0) ? 'cancelada' : (id % 2 === 0 ? 'confirmada' : 'pendiente');
-        };
-
-        const build = (fecha: string, hora: string, pIdx: number): CitaCompleta => ({
-            id: id++,
-            pacienteNombre: pacientes[pIdx % pacientes.length].nombre,
-            doctorNombre,
-            especialidad: especialidad || 'Medicina General',
-            fecha,
-            hora,
-            estado: mkEstado(fecha, hora),
-            pacienteEmail: pacientes[pIdx % pacientes.length].email,
-            pacienteTelefono: pacientes[pIdx % pacientes.length].tel,
-            tipoConsulta: tipos[pIdx % tipos.length],
-            motivoConsulta: 'Consulta de demostración',
-            fechaCreacion: new Date().toISOString(),
-            duracionEstimada: [30, 45, 60][pIdx % 3]
-        });
-
-        const result: CitaCompleta[] = [];
-        horasHoy.forEach((h, i) => result.push(build(hoyISO, h, i)));
-        horasManana.forEach((h, i) => result.push(build(mananaISO, h, i + horasHoy.length)));
-        return result;
-    }
-
     // ======= BACKEND STATS (por médico) =======
     contarCitasPorMedico(idMedico: number): Observable<number> {
         return this.http.get<number>(`${this.apiBase}/medico/${idMedico}/totalcitas`);
@@ -127,23 +62,259 @@ export class CitaService {
     contarCitasDelMesActualPorMedico(idMedico: number): Observable<number> {
         return this.http.get<number>(`${this.apiBase}/mes/total/${idMedico}`);
     }
-
     
-
     //========BACKEND STATS CITAS POR MEDICO=========
-
     obtenerCitasDashboardPorMedico(idMedico: number): Observable<any[]> {
         return this.http.get<any[]>(`${this.apiBase}/dashboard/medico/${idMedico}`);
     }
+    
+    /**
+     * Actualiza el estado de una cita por id.
+     * Endpoint esperado: PATCH /citas/{idCita}/estado
+     * Payload: { estado: string }
+     */
+    actualizarEstadoCitas(idCita: number, estado: string): Observable<any> {
+        const payload = { estado };
+        return this.http.patch<any>(`${this.apiBase}/${idCita}/estado`, payload);
+    }
+
      // Obtener horas totales y promedio de minutos por médico (stats)
     obtenerHorasPromedioPorMedico(idMedico: number): Observable<{ horasTotales: number; promedioMinutos: number }> {
         return this.http.get<{ horasTotales: number; promedioMinutos: number }>(`${this.apiBase}/dashboard/medico/${idMedico}/horas-promedio`);
     }
 
+
+    // Obtener detalles completos de una cita desde el backend: GET /citas/{id}
+    obtenerCitaPorIdFull(id: number): Observable<CitaCompletaFull> {
+        return this.http.get<CitaCompletaFull>(`${this.apiBase}/${id}`);
+    }
+
+    
      // ======== HISTORIAL CITAS POR MEDICO =========
     // Endpoint: GET /api/historial/citas/medico/{id_medico}
     obtenerHistorialCitasPorMedico(idMedico: number): Observable<any[]> {
         return this.http.get<any[]>(`${environment.apiUrl}/api/historial/citas/medico/${idMedico}`);
     }
+    
+    
 
+ // ======== NUEVOS ENDPOINTS BACKEND =========
+    
+    // Crear nueva cita usando tu endpoint POST /agregar
+    crearCitaBackend(requestData: CrearCitaRequestDTO): Observable<CrearCitaResponoseDTO> {
+        return this.http.post<CrearCitaResponoseDTO>(`${this.apiBase}/agregar`, requestData);
+    }
+
+    // Obtener cita por ID usando tu endpoint GET /obtenerCita/{id}
+    obtenerCitaBackendPorId(id: number): Observable<CrearCitaResponoseDTO> {
+        return this.http.get<CrearCitaResponoseDTO>(`${this.apiBase}/obtenerCita/${id}`);
+    }
+
+    // Listar todas las citas usando tu endpoint GET /todos
+    listarTodasLasCitas(): Observable<CrearCitaResponoseDTO[]> {
+        return this.http.get<CrearCitaResponoseDTO[]>(`${this.apiBase}/todos`);
+    }
+
+    // Obtener citas por paciente (cuando tengas el endpoint específico)
+    obtenerCitasPorPaciente(idPaciente: number): Observable<CrearCitaResponoseDTO[]> {
+        return this.http.get<CrearCitaResponoseDTO[]>(`${this.apiBase}/paciente/${idPaciente}`);
+    }
+
+    // Actualizar estado de una cita
+    actualizarEstadoCita(idCita: number, nuevoEstado: string): Observable<any> {
+        return this.http.put(`${this.apiBase}/actualizar-estado/${idCita}`, { estado: nuevoEstado });
+    }
+
+    // ======== MÉTODOS DE RESOLUCIÓN DE IDS =========
+    
+    // Resolver ID del médico desde el nombre completo
+    resolverIdMedico(nombreCompleto: string): Observable<number> {
+        // Endpoint: GET /api/medicos/buscar-por-nombre?nombre={nombre}
+        const params = { nombre: nombreCompleto.trim() };
+        return this.http.get<{idMedico: number}>(`${environment.apiUrl}/medicos/buscar-por-nombre`, { params })
+            .pipe(
+                map(response => response.idMedico)
+            );
+    }
+    
+    // Resolver ID de bloque basado en médico, fecha y hora
+    resolverIdBloque(idMedico: number, fecha: string, hora: string): Observable<number> {
+        return new Observable(observer => {
+            this.horarioService.buscarBloqueEspecifico(idMedico, fecha, hora).subscribe({
+                next: (bloque) => {
+                    observer.next(bloque.idBloque);
+                    observer.complete();
+                },
+                error: (err) => {
+                    console.error('Error resolviendo ID de bloque:', err);
+                    observer.error(err);
+                }
+            });
+        });
+    }
+
+    // Resolver ID de médico-especialidad (necesitarás un endpoint en el backend)
+    resolverMedicoEspecialidad(doctorNombre: string, especialidad: string): Observable<number> {
+        // Endpoint que debes crear en el backend: GET /api/medico-especialidad/buscar
+        const params = { medicoNombre: doctorNombre, especialidad: especialidad };
+        return this.http.get<{idMedicoEspecialidad: number}>(`${environment.apiUrl}/medico-especialidad/buscar`, { params })
+            .pipe(
+                map(response => response.idMedicoEspecialidad)
+            );
+    }
+
+
+    
+    crearCitaCompleta(datosBasicos: DatosCitaBasicos): Observable<CrearCitaResponoseDTO> {
+        return new Observable(observer => {
+            // PASO 1: Resolver ID del médico desde el nombre
+            this.resolverIdMedico(datosBasicos.doctorNombre).subscribe({
+                next: (idMedico) => {
+                    console.log('✅ ID Médico resuelto:', idMedico);
+                    
+                    // PASO 2: Resolver médico-especialidad
+                    this.resolverMedicoEspecialidad(datosBasicos.doctorNombre, datosBasicos.especialidad).subscribe({
+                        next: (idMedicoEspecialidad) => {
+                            console.log('✅ ID Médico-Especialidad resuelto:', idMedicoEspecialidad);
+                            
+                            // PASO 3: Resolver bloque horario usando el ID del médico resuelto
+                            this.resolverIdBloque(idMedico, datosBasicos.fecha, datosBasicos.hora).subscribe({
+                                next: (idBloque) => {
+                                    console.log('✅ ID Bloque resuelto:', idBloque);
+                                    
+                                    // PASO 4: Crear la cita con todos los IDs resueltos
+                                    const request: CrearCitaRequestDTO = {
+                                        idPaciente: datosBasicos.idPaciente,
+                                        idMedicoEspecialidad: idMedicoEspecialidad,
+                                        idSubEspecialidad: datosBasicos.idSubEspecialidad,
+                                        idBloque: idBloque,
+                                        motivoConsulta: datosBasicos.motivoConsulta
+                                    };
+
+                                    console.log('📤 Enviando request al backend:', request);
+
+                                    this.crearCitaBackend(request).subscribe({
+                                        next: (citaCreada) => {
+                                            console.log('✅ Cita creada exitosamente:', citaCreada);
+                                            observer.next(citaCreada);
+                                            observer.complete();
+                                        },
+                                        error: (err) => {
+                                            console.error('❌ Error creando cita en backend:', err);
+                                            observer.error(err);
+                                        }
+                                    });
+                                },
+                                error: (err) => {
+                                    console.error('❌ Error resolviendo ID de bloque:', err);
+                                    observer.error(err);
+                                }
+                            });
+                        },
+                        error: (err) => {
+                            console.error('❌ Error resolviendo médico-especialidad:', err);
+                            observer.error(err);
+                        }
+                    });
+                },
+                error: (err) => {
+                    console.error('❌ Error resolviendo ID del médico:', err);
+                    observer.error(err);
+                }
+            });
+        });
+    }
+    
+
+
+
+
+
+
+
+
+// Crear cita completa usando el endpoint /citas/reservar (alternativa al /agregar)
+crearCitaReservar(datosBasicos: DatosCitaBasicos): Observable<CrearCitaResponoseDTO> {
+    return new Observable(observer => {
+        // PASO 1: Resolver ID del médico desde el nombre
+        this.resolverIdMedico(datosBasicos.doctorNombre).subscribe({
+            next: (idMedico) => {
+                console.log('✅ ID Médico resuelto:', idMedico);
+                
+                // PASO 2: Resolver ID de médico-especialidad
+                this.resolverMedicoEspecialidad(datosBasicos.doctorNombre, datosBasicos.especialidad).subscribe({
+                    next: (idMedicoEspecialidad) => {
+                        console.log('✅ ID Médico-Especialidad resuelto:', idMedicoEspecialidad);
+                        
+                        // PASO 3: Resolver ID de bloque usando el ID resuelto
+                        this.resolverIdBloque(idMedico, datosBasicos.fecha, datosBasicos.hora).subscribe({
+                            next: (idBloque) => {
+                                console.log('✅ ID Bloque resuelto:', idBloque);
+                                
+                                // PASO 4: Construir request completo
+                                const request: CrearCitaRequestDTO = {
+                                    idPaciente: datosBasicos.idPaciente,
+                                    idMedicoEspecialidad: idMedicoEspecialidad,
+                                    idSubEspecialidad: datosBasicos.idSubEspecialidad,
+                                    idBloque: idBloque,
+                                    motivoConsulta: datosBasicos.motivoConsulta
+                                };
+
+                                console.log('📤 Enviando request al endpoint /reservar:', request);
+
+                                // PASO 5: Llamar al endpoint POST /citas/reservar
+                                this.http.post<CrearCitaResponoseDTO>(`${this.apiBase}/reservar`, request)
+                                    .subscribe({
+                                        next: (citaCreada) => {
+                                            console.log('✅ Cita reservada exitosamente:', citaCreada);
+                                            observer.next(citaCreada);
+                                            observer.complete();
+                                        },
+                                        error: (err) => {
+                                            console.error('❌ Error reservando cita:', err);
+                                            observer.error(err);
+                                        }
+                                    });
+                            },
+                            error: (err) => {
+                                console.error('❌ Error resolviendo ID de bloque:', err);
+                                observer.error(err);
+                            }
+                        });
+                    },
+                    error: (err) => {
+                        console.error('❌ Error resolviendo médico-especialidad:', err);
+                        observer.error(err);
+                    }
+                });
+            },
+            error: (err) => {
+                console.error('❌ Error resolviendo ID del médico:', err);
+                observer.error(err);
+            }
+        });
+    });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+}
+

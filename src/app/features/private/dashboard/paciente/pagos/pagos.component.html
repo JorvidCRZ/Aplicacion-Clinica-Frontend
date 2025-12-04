@@ -67,8 +67,11 @@
                 </div>
                 <div class="pago-monto">
                     <span class="monto">S/ {{ factura.total.toFixed(2) }}</span>
-                    <button class="btn-descargar" (click)="descargarFactura(factura)"><i
-                            class="fas fa-download"></i></button>
+                    <!-- Condicionamos la aparición del botón de descarga solo si está pagado -->
+                    @if (factura.estado === 'pagado') {
+                        <button class="btn-descargar" (click)="descargarFactura(factura)"><i
+                                class="fas fa-download"></i></button>
+                    }
                 </div>
             </div>
             }

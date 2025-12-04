@@ -1,0 +1,145 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║             NUEVO ENDPOINT REQUERIDO: BUSCAR MÉDICO POR NOMBRE               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📋 RESUMEN
+─────────────────────────────────────────────────────────────────────────────
+Endpoint necesario para resolver el ID del médico a partir de su nombre 
+completo. Este endpoint es crítico para el flujo de reserva de citas en el
+checkout.
+
+
+📍 ENDPOINT
+─────────────────────────────────────────────────────────────────────────────
+GET /api/medicos/buscar-por-nombre
+
+
+📥 REQUEST
+─────────────────────────────────────────────────────────────────────────────
+Query Parameters:
+  - nombre (string, required): Nombre completo del médico
+
+Ejemplo:
+  GET /api/medicos/buscar-por-nombre?nombre=Dr. Juan Pérez López
+
+
+📤 RESPONSE
+─────────────────────────────────────────────────────────────────────────────
+Success (200 OK):
+{
+  "idMedico": 5
+}
+
+Error (404 Not Found):
+{
+  "error": "Médico no encontrado",
+  "mensaje": "No existe un médico con el nombre: Dr. Juan Pérez López"
+}
+
+
+💾 SQL QUERY
+─────────────────────────────────────────────────────────────────────────────
+SELECT m.id_medico
+FROM medico m
+INNER JOIN persona p ON m.id_persona = p.id_persona
+WHERE LOWER(
+    TRIM(
+        CONCAT_WS(' ', 
+            p.nombre1, 
+            p.nombre2, 
+            p.apellido_paterno, 
+            p.apellido_materno
+        )
+    )
+) = LOWER(TRIM(?))
+LIMIT 1;
+
+
+🔧 IMPLEMENTACIÓN (Spring Boot)
+─────────────────────────────────────────────────────────────────────────────
+// Repository
+@Query(value = """
+    SELECT m.id_medico 
+    FROM medico m
+    INNER JOIN persona p ON m.id_persona = p.id_persona
+    WHERE LOWER(
+        TRIM(
+            CONCAT_WS(' ', 
+                p.nombre1, 
+                p.nombre2, 
+                p.apellido_paterno, 
+                p.apellido_materno
+            )
+        )
+    ) = LOWER(TRIM(:nombre))
+    LIMIT 1
+    """, nativeQuery = true)
+Optional<Integer> buscarIdMedicoPorNombre(@Param("nombre") String nombre);
+
+// Service
+public Integer buscarIdMedicoPorNombre(String nombre) {
+    return medicoRepository.buscarIdMedicoPorNombre(nombre)
+        .orElseThrow(() -> new EntityNotFoundException(
+            "No existe un médico con el nombre: " + nombre
+        ));
+}
+
+// Controller
+@GetMapping("/buscar-por-nombre")
+public ResponseEntity<Map<String, Integer>> buscarPorNombre(
+    @RequestParam String nombre
+) {
+    Integer idMedico = medicoService.buscarIdMedicoPorNombre(nombre);
+    return ResponseEntity.ok(Map.of("idMedico", idMedico));
+}
+
+
+🔄 FLUJO DE USO
+─────────────────────────────────────────────────────────────────────────────
+1. Usuario selecciona doctor en UI (nombre visible: "Dr. Juan Pérez López")
+2. Checkout construye DatosCitaBasicos con doctorNombre
+3. CitaService.crearCitaCompleta() ejecuta:
+   
+   PASO 1: resolverIdMedico("Dr. Juan Pérez López")
+           → GET /api/medicos/buscar-por-nombre?nombre=Dr. Juan Pérez López
+           → Response: { "idMedico": 5 }
+   
+   PASO 2: resolverMedicoEspecialidad("Dr. Juan Pérez López", "Cardiología")
+           → GET /api/medico-especialidad/buscar?medicoNombre=Dr. Juan Pérez López&especialidad=Cardiología
+           → Response: { "idMedicoEspecialidad": 12 }
+   
+   PASO 3: resolverIdBloque(5, "2025-12-15", "10:00")
+           → GET /api/horarios/buscar?idMedico=5&fecha=2025-12-15&hora=10:00
+           → Response: { "idBloque": 89 }
+   
+   PASO 4: crearCitaBackend()
+           → POST /api/citas/agregar
+           → Body: {
+               "idPaciente": 3,
+               "idMedicoEspecialidad": 12,
+               "idBloque": 89,
+               "motivoConsulta": "Consulta vía checkout"
+             }
+
+
+⚠️  CONSIDERACIONES IMPORTANTES
+─────────────────────────────────────────────────────────────────────────────
+1. La búsqueda debe ser case-insensitive (LOWER())
+2. Debe ignorar espacios extras (TRIM())
+3. El nombre puede incluir título (Dr., Dra.) o no
+4. Si no se encuentra el médico, devolver 404
+5. Si hay múltiples coincidencias, devolver el primero (LIMIT 1)
+
+
+✅ VALIDACIÓN
+─────────────────────────────────────────────────────────────────────────────
+Probar con estos casos:
+- ✓ "Dr. Juan Pérez López" → debe encontrar id_medico
+- ✓ "juan pérez lópez" (sin título, lowercase) → debe encontrar
+- ✓ "  Dr.   Juan   Pérez  " (espacios extras) → debe encontrar
+- ✗ "Médico Inexistente" → debe retornar 404
+
+
+📌 PRIORIDAD
+─────────────────────────────────────────────────────────────────────────────
+🔴 CRÍTICA - Sin este endpoint, el flujo de checkout NO puede crear citas

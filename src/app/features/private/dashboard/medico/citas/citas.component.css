@@ -388,40 +388,68 @@
     max-width: 200px;
 }
 
-/* Estados - Pills modernos */
-.estado-pill {
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: inline-block;
+
+/* Modal global crear historial (overlay encima de todo) */
+.crear-historial-global-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    z-index: 20001; /* mucho más alto que la modal de detalles (10000) */
+    padding: 1.5rem;
+    pointer-events: auto;
 }
 
-.estado-pill.estado-programada {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
-    border: 1px solid #c3e6cb;
+.crear-historial-card {
+    width: 760px;
+    max-width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(2,6,23,0.35);
+    overflow: hidden;
+    position: relative;
+    z-index: 20002; /* asegurarse de que la tarjeta esté por encima del overlay/otras modales */
 }
 
-.estado-pill.estado-completada {
-    background: linear-gradient(135deg, #cce5ff 0%, #b3d9ff 100%);
-    color: #004085;
-    border: 1px solid #b3d9ff;
+.crear-historial-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(90deg,#ffffff,#f7f9fc);
+    border-bottom: 1px solid #eef2f6;
 }
 
-.estado-pill.estado-cancelada {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+.crear-historial-card .card-body {
+    padding: 1rem 1.25rem;
+    max-height: 60vh;
+    overflow: auto;
 }
 
-.estado-pill.estado-no-show {
-    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-    color: #8b6914;
-    border: 1px solid #fdcb6e;
+.crear-historial-card .card-footer {
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    border-top: 1px solid #eef2f6;
+    background: #fff;
 }
+
+.crear-historial-card .meta-ids small {
+    color: #6c757d;
+    margin-right: 6px;
+}
+
+.crear-historial-card .close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
 
 /* Botones de acción */
 .acciones-celda {
@@ -647,39 +675,7 @@
     margin-left: 1.5rem;
 }
 
-/* 🏷️ Estado */
-.estado-badge {
-    margin-bottom: 1rem;
-}
-
-.badge {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge-programada {
-    background: #d4edda;
-    color: #155724;
-}
-
-.badge-completada {
-    background: #d1ecf1;
-    color: #0c5460;
-}
-
-.badge-cancelada {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.badge-no-show {
-    background: #e2e3e5;
-    color: #383d41;
-}
+/* Estado visuals removed from this component (clean) */
 
 /* ⚡ Acciones */
 .acciones {
@@ -903,6 +899,42 @@
     transition: all 0.2s ease;
 }
 
+/* Texto para valores faltantes en el modal: más pequeño y cursivo */
+.missing {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #6c757d;
+}
+
+/* Sección Horario: color cálido / acento naranja */
+/* Sección Horario: acento rojo */
+.horario-section {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, rgba(255,245,245,0.95), #fff);
+    border-left: 6px solid #ef4444; /* rojo */
+    color: #1f2937;
+}
+.horario-section h5 {
+    margin-top: 0;
+    color: #b91c1c; /* texto rojo oscuro */
+}
+
+/* Sección Precios: color fresco / acento verde */
+.precios-section {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, rgba(240,255,250,0.95), #fff);
+    border-left: 6px solid #10b981;
+    color: #0f172a;
+}
+.precios-section h5 {
+    margin-top: 0;
+    color: #047857;
+}
+
 .registros-select:focus {
     outline: none;
     border-color: var(--azul);
@@ -1075,3 +1107,230 @@
         padding: 0.5rem;
     }
 }
+
+/* ------------------ Modal de detalles ------------------ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* asegurar que esté por encima */
+    padding: 1rem;
+    pointer-events: auto;
+}
+
+.modal-dialog {
+    width: 100%;
+    max-width: 920px;
+    background: var(--blanco);
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(15, 41, 77, 0.12);
+    /* Usar layout flex para que header/body/footer se distribuyan y el body sea el que haga scroll */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: hidden; /* para que el borde redondeado recorte el contenido */
+    animation: modalIn 200ms cubic-bezier(.2,.9,.3,1);
+    position: relative;
+    z-index: 10000; /* colocar el diálogo por encima del overlay/páginas */
+    pointer-events: auto;
+}
+
+@keyframes modalIn {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: none;
+    background: linear-gradient(90deg, var(--azul) 0%, var(--azul-medio) 100%);
+    color: var(--blanco);
+    position: relative;
+}
+
+.modal-header h4 {
+    margin: 0;
+    color: var(--blanco);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.close-btn {
+    background: var(--blanco);
+    border: none;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--azul);
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    z-index: 2000;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgba(15, 41, 77, 0.08);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.close-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(15,41,77,0.12); }
+
+.modal-body {
+    padding: 1.25rem 1.5rem;
+    /* El body debe crecer y ser el contenedor desplazable dentro del dialog */
+    flex: 1 1 auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: Inter, 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #0f172a;
+}
+
+/* Grid del modal: fecha a la izquierda, detalles a la derecha */
+.modal-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.left-col { text-align: center; }
+.date-card {
+    background: linear-gradient(180deg, #f7fbff 0%, #ffffff 100%);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 18px rgba(11, 55, 110, 0.06);
+}
+.date-day { font-size: 2.2rem; font-weight: 700; color: #1a4e8d; }
+.date-month { font-size: 0.95rem; color: #4b5563; margin-top: 4px; }
+.date-meta { margin-top: 0.5rem; color: #374151; font-weight: 600; }
+
+.right-col .section { margin-bottom: 1rem; border-bottom: 1px solid #f1f3f5; padding: 0.75rem; background: transparent; border-radius: 8px; }
+.right-col .section h5 { margin: 0 0 0.5rem 0; color: var(--azul-oscuro); font-size: 1rem; }
+.paciente-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem 1rem; }
+.paciente-grid .full { grid-column: 1 / -1; }
+
+/* Cada campo en su 'card' pequeña para mejor separación */
+.paciente-grid > div {
+    background: rgba(255,255,255,0.0);
+    padding: 0.45rem 0.5rem;
+    border-radius: 6px;
+}
+.paciente-grid .label { display:block; font-size:0.75rem; color:#6b7280; margin-bottom:6px; }
+.paciente-grid div > div { font-weight:600; color:#0f172a; }
+
+/* Row visual spacing */
+.field-row { padding: 0.35rem 0; margin-bottom: 0.35rem; }
+
+/* Secciones coloreadas (sutiles) */
+.paciente-section { background: rgba(35,99,185,0.04); border-left: 4px solid var(--azul); }
+.consulta-section { background: rgba(34,197,94,0.03); border-left: 4px solid #22c55e; }
+.medico-section { background: rgba(59,130,246,0.03); border-left: 4px solid #3b82f6; }
+.precios-section { background: rgba(245,158,11,0.03); border-left: 4px solid #f59e0b; }
+
+/* Mejor separación dentro de cada sección */
+.right-col .section { padding: 1rem; }
+.right-col .section .consulta-line,
+.right-col .section .paciente-row,
+.right-col .section .medico-row { margin-bottom: 0.6rem; }
+
+/* Aumentar gap en la grid general para respirar */
+.modal-grid { gap: 1.5rem; }
+
+/* Asegurar que los elementos del modal tengan suficiente line-height */
+.modal-body, .modal-body * { line-height: 1.35; }
+
+/* Ajustes para pantallas pequeñas - cada campo ocupa su línea */
+@media (max-width: 700px) {
+    .paciente-grid { grid-template-columns: 1fr; }
+    .date-card { margin-bottom: 0.5rem; }
+}
+.label { color: #6b7280; font-size: 0.78rem; display:block; }
+.paciente-nombre { font-weight:700; font-size:1.05rem; margin-bottom: 0.25rem; color:#0f172a; }
+
+.estado-badge { margin-top: 0.5rem; }
+.badge { background: #e6f0ff; color: var(--azul); display: inline-block; padding: 0.35rem 0.7rem; border-radius: 999px; font-weight:700; }
+
+.medico-section small { color: #6b7280; }
+
+.precios-section div { margin-top: 0.4rem; }
+
+/* Personalizar scrollbar del modal en Webkit (Chrome/Edge) */
+.modal-body::-webkit-scrollbar { width: 10px; }
+.modal-body::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 6px; }
+.modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+.modal-body::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Scrollbar para Firefox */
+.modal-body { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9; }
+
+/* Responsive: en pantallas pequeñas llevar a una sola columna */
+@media (max-width: 700px) {
+    .modal-grid { grid-template-columns: 1fr; }
+    .left-col { order: 2; }
+    .right-col { order: 1; }
+    .date-card { display: flex; justify-content: space-between; align-items: center; }
+}
+
+.modal-body.debug {
+    background: #f8f9fb;
+    border-top: 1px dashed #e9ecef;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid #eef2f6;
+    background: #fff;
+}
+
+.modal-footer .footer-left { display:flex; align-items:center; gap:0.5rem; }
+.modal-footer .footer-right { display:flex; align-items:center; gap:0.5rem; }
+
+.acciones-dropdown { position: relative; }
+.acciones-dropdown .acciones-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    background: white;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 0.25rem;
+    z-index: 1300;
+    min-width: 200px;
+}
+.acciones-dropdown .menu-item {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+}
+.acciones-dropdown .menu-item:hover { background: #f7f9fb; }
+
+.modal-card { padding: 0; border: none; box-shadow: none; }
+.modal-card .cita-datetime { padding: 1rem; border-bottom: 1px solid #f1f3f4; }
+.modal-card .paciente-info, .modal-card .consulta-info, .modal-card .info-adicional { padding: 1rem; }
+
+.badge { padding: 0.5rem 0.75rem; border-radius: 12px; font-weight: 700; }
+
+@media (max-width: 600px) {
+    .modal-dialog { max-width: 95%; }
+    .modal-footer { flex-direction: column; align-items: stretch; }
+}
+
+/* Fin modal */

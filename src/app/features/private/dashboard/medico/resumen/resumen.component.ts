@@ -434,12 +434,7 @@ export class ResumenComponent implements OnInit {
 
   // 📥 Cargar data base para el dashboard
   private cargarDatos(): void {
-    // Obtener todas las citas
-    // Seed si no hay citas para mostrar demo coherente
-    if (this.doctorActual) {
-      const nombreDoctor = `${this.doctorActual.nombre} ${this.doctorActual.apellidoPaterno || ''}`.trim();
-      this.citasSrv.seedIfEmptyForDoctor(nombreDoctor, this.doctorActual.especialidad);
-    }
+    // Obtener todas las citas desde el servicio
     this.citas = this.citasSrv.obtenerCitas();
     // Filtrar a las del doctor actual (por especialidad o nombre del médico)
     this.citasDoctor = this.filtrarCitasPorDoctor(this.citas);

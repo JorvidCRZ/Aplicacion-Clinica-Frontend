@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { BuscadorComponent } from '../../../../shared/components/buscador/buscador.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { HORARIOS_POR_DIA, DIAS_DISPONIBLES, DiaDisponible } from './citas.data';
 import { MedicoService } from '../../../../core/services/rol/medico.service';
 import { SubespecialidadService, Subespecialidad } from '../../../../core/services/pages/subespecialidad.service';
 import { EspecialidadService, Especialidad } from '../../../../core/services/pages/especialidad.service';
+import { HorarioService } from '../../../../core/services/logic/horario.service';
+import { DiaHorario, HorariosMedicoResponse } from '../../../../core/models/common/cita';
 
 @Component({
   selector: 'app-citas',
@@ -24,6 +25,7 @@ export class CitasComponent implements OnInit {
   private subespService = inject(SubespecialidadService);
   private espService = inject(EspecialidadService);
   private medicoService = inject(MedicoService);
+  private horarioService = inject(HorarioService);
 
   mostrarModal = false;
   citaParaReservar: any = null;
@@ -44,6 +46,9 @@ export class CitasComponent implements OnInit {
   ngOnInit(): void {
     this.resultadosBuscadorDoctor = [];
     this.resultadosBuscadorEspecialidad = [];
+
+    // Cargar horarios ocupados desde localStorage
+    this.cargarHorariosOcupados();
 
     this.route.paramMap.subscribe(params => {
       const idEspecialidadParam = params.get('idEspecialidad');
@@ -73,11 +78,15 @@ export class CitasComponent implements OnInit {
   resultadosBuscadorDoctor: any[] = [];
   resultadosBuscadorEspecialidad: any[] = [];
 
-  cardStates: { [doctorName: string]: { diaSeleccionado: string, horarioSeleccionado: string } } = {};
-
-  horariosPorDia: Record<string, string[]> = HORARIOS_POR_DIA;
-
-  diasDisponibles: DiaDisponible[] = DIAS_DISPONIBLES;
+  // =================================================== 
+  // HORARIOS DINÁMICOS POR MÉDICO (REEMPLAZA ESTÁTICOS)
+  // ===================================================
+  horariosMedico: Record<number, HorariosMedicoResponse> = {};
+  diaSeleccionadoPorMedico: Record<number, string> = {};
+  horarioSeleccionadoPorMedico: Record<number, string> = {};
+  
+  // Almacén de horarios ocupados para evitar doble reserva
+  horariosOcupados: Record<string, string[]> = {};
 
   // Perfil modal
   mostrarPerfilModal = false;
@@ -92,16 +101,21 @@ export class CitasComponent implements OnInit {
     this.errorMedicos = null;
     this.medicoService.getMedicos().subscribe({
       next: (lista: any[]) => {
-        // Mapear la respuesta del API a la estructura Cita usada en la UI
+
         this.citas = (lista || []).map(m => {
           const persona = m.persona || {};
           const nombre = [persona.nombre1, persona.apellidoPaterno].filter(Boolean).join(' ') || persona.nombre1 || persona.apellidoPaterno || m.colegiatura || 'Dr.';
+          
+          if (m.idMedico) {
+            this.cargarHorariosMedico(m.idMedico);
+          }
+          
           return {
             doctor: nombre,
             especialidad: m.especialidad || 'Medicina General',
             paciente: '',
             disponibilidad: [],
-            medico: m // keep original medico object for details (colegiatura, email, etc.)
+            medico: m
           };
         });
         this.cargandoMedicos = false;
@@ -113,6 +127,247 @@ export class CitasComponent implements OnInit {
         this.citas = [];
       }
     });
+  }
+
+  // =================================================== 
+  // MÉTODOS PARA HORARIOS DINÁMICOS
+  // ===================================================
+  private cargarHorariosMedico(idMedico: number) {
+    this.horarioService.getHorariosPorMedico(idMedico).subscribe({
+      next: (resp: HorariosMedicoResponse) => {
+        this.horariosMedico[idMedico] = resp;
+        
+        // Seleccionar automáticamente el primer día disponible futuro
+        if (resp.dias && resp.dias.length > 0) {
+          // Filtrar usando lógica local para evitar problemas de zona horaria
+          const diasFuturos = resp.dias.filter(dia => !this.esFechaPasada(dia.fecha));
+
+          if (diasFuturos.length > 0) {
+            // Ordenar por fecha y seleccionar el primero
+            diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+            this.diaSeleccionadoPorMedico[idMedico] = diasFuturos[0].fecha;
+          }
+        }
+      },
+      error: (err) => {
+        console.error(`Error cargando horarios para médico ${idMedico}:`, err);
+      }
+    });
+  }
+
+  getDiasDelMedico(idMedico: number): DiaHorario[] {
+    return this.horariosMedico[idMedico]?.dias || [];
+  }
+
+  // Método para compatibilidad con el template
+  getDiasDisponibles(cita: any): DiaHorario[] {
+    const idMedico = cita.medico?.idMedico;
+    return idMedico ? this.getDiasDelMedico(idMedico) : [];
+  }
+
+  // ===================================================
+  // FORMATO DE FECHAS Y SEMANA ACTUAL
+  // ===================================================
+  
+  // Formatear fecha con día y mes corto (ej: "15 nov")
+  formatearFechaCorta(fecha: string): string {
+    const fechaObj = this.parsearFechaLocal(fecha);
+    const dia = fechaObj.getDate();
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 
+                   'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const mesCorto = meses[fechaObj.getMonth()];
+    return `${dia} ${mesCorto}`;
+  }
+
+  // Formatear día de la semana corto (ej: "Lun", "Mar")
+  formatearDiaSemana(fecha: string): string {
+    const fechaObj = this.parsearFechaLocal(fecha);
+    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    return dias[fechaObj.getDay()];
+  }
+
+  // Obtener fechas próximas (desde hoy hacia adelante)
+  private obtenerProximosDias(diasAMostrar: number = 14): string[] {
+    const hoy = new Date();
+    const fechasProximas: string[] = [];
+    
+    for (let i = 0; i < diasAMostrar; i++) {
+      const dia = new Date(hoy);
+      dia.setDate(hoy.getDate() + i);
+      fechasProximas.push(dia.toLocaleDateString('en-CA'));
+    }
+    
+    return fechasProximas;
+  }
+
+  // Mantener método original para compatibilidad
+  private obtenerSemanaActual(): string[] {
+    return this.obtenerProximosDias(7);
+  }
+
+  // Obtener días disponibles próximos (no limitado a semana actual)
+  getDiasDisponiblesSemana(cita: any): any[] {
+    const idMedico = cita.medico?.idMedico;
+    if (!idMedico) return [];
+
+    const diasMedico = this.getDiasDelMedico(idMedico);
+
+    // Ordenar siempre por fecha
+    diasMedico.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    // Mapear para UI
+    return diasMedico.map(dia => ({
+      fecha: dia.fecha,
+      diaSemana: this.formatearDiaSemana(dia.fecha),
+      fechaCorta: this.formatearFechaCorta(dia.fecha),
+      horarios: this.filtrarHorariosDelDia(idMedico, dia.fecha, dia.horarios),
+      esSeleccionado: this.diaSeleccionadoPorMedico[idMedico] === dia.fecha,
+      bloqueado: this.esFechaPasada(dia.fecha)
+    }));
+  }
+
+  // Verificar si hay horarios próximos disponibles
+  tieneHorariosSemanaActual(cita: any): boolean {
+    return this.getDiasDisponiblesSemana(cita).length > 0;
+  }
+
+  // ===================================================
+  // GESTIÓN DE HORARIOS OCUPADOS
+  // ===================================================
+  
+  // Marcar un horario como ocupado
+  private marcarHorarioOcupado(idMedico: number, fecha: string, horario: string): void {
+    const key = `${idMedico}-${fecha}`;
+    if (!this.horariosOcupados[key]) {
+      this.horariosOcupados[key] = [];
+    }
+    if (!this.horariosOcupados[key].includes(horario)) {
+      this.horariosOcupados[key].push(horario);
+    }
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('horariosOcupados', JSON.stringify(this.horariosOcupados));
+  }
+
+  // Verificar si un horario está ocupado
+  private esHorarioOcupado(idMedico: number, fecha: string, horario: string): boolean {
+    const key = `${idMedico}-${fecha}`;
+    return this.horariosOcupados[key]?.includes(horario) || false;
+  }
+
+  // Cargar horarios ocupados desde localStorage
+  private cargarHorariosOcupados(): void {
+    const horariosGuardados = localStorage.getItem('horariosOcupados');
+    if (horariosGuardados) {
+      try {
+        this.horariosOcupados = JSON.parse(horariosGuardados);
+      } catch (e) {
+        console.warn('Error cargando horarios ocupados:', e);
+        this.horariosOcupados = {};
+      }
+    }
+  }
+
+  // ===================================================
+  // UTILS DE FECHAS
+  // ===================================================
+  
+  // Parsear fecha en zona local (evita desfase por UTC)
+  private parsearFechaLocal(fecha: string): Date {
+    const [year, month, day] = fecha.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+  
+  // Saber si una fecha ya pasó
+  private esFechaPasada(fecha: string): boolean {
+    // Obtener fecha actual en formato YYYY-MM-DD local
+    const ahora = new Date();
+    const hoyString = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+    
+    const hoy = this.parsearFechaLocal(hoyString);
+    hoy.setHours(0, 0, 0, 0);
+
+    const fechaAComparar = this.parsearFechaLocal(fecha);
+    fechaAComparar.setHours(0, 0, 0, 0);
+
+    return fechaAComparar < hoy;
+  }
+
+  // Saber si la fecha es hoy
+  private esHoy(fecha: string): boolean {
+    const ahora = new Date();
+    const hoyString = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+    return fecha === hoyString;
+  }
+
+  // Filtrar horarios válidos:
+  private filtrarHorariosDelDia(idMedico: number, fecha: string, horarios: string[]): string[] {
+    
+    // 1) Si el día ya pasó → no mostrar ninguno
+    if (this.esFechaPasada(fecha)) {
+      return []; // día bloqueado
+    }
+
+    // 2) Si es hoy → remover horarios pasados
+    if (this.esHoy(fecha)) {
+      const ahora = new Date();
+      const horaActual = ahora.toTimeString().substring(0, 5); // HH:mm
+
+      horarios = horarios.filter(h => h > horaActual);
+    }
+
+    // 3) Remover horarios ocupados del localStorage
+    return this.filtrarHorariosDisponibles(idMedico, fecha, horarios);
+  }
+
+  // Filtrar horarios disponibles (excluir ocupados)
+  private filtrarHorariosDisponibles(idMedico: number, fecha: string, horarios: string[]): string[] {
+    return horarios.filter(horario => !this.esHorarioOcupado(idMedico, fecha, horario));
+  }
+
+  private getHorariosDelDiaInterno(idMedico: number, fecha: string): string[] {
+    const dias = this.getDiasDelMedico(idMedico);
+    const dia = dias.find(d => d.fecha === fecha);
+    return dia?.horarios || [];
+  }
+
+  seleccionarDiaCard(idMedico: number, fecha: string) {
+    if (this.esFechaPasada(fecha)) {
+      console.log("Día pasado → no se puede seleccionar");
+      return; // bloqueado
+    }
+
+    this.diaSeleccionadoPorMedico[idMedico] = fecha;
+    this.horarioSeleccionadoPorMedico[idMedico] = ''; // Reset horario al cambiar día
+    
+    // Debug: verificar que los datos estén sincronizados
+    console.log(`Día seleccionado para médico ${idMedico}:`, fecha);
+    console.log(`Horarios disponibles:`, this.getHorariosDelDiaInterno(idMedico, fecha));
+  }
+
+  seleccionarHorarioCard(idMedico: number, horario: string) {
+    this.horarioSeleccionadoPorMedico[idMedico] = horario;
+    
+    // Debug: verificar selección de horario
+    console.log(`Horario seleccionado para médico ${idMedico}:`, horario);
+  }
+
+  // Método para forzar actualización de vista si es necesario
+  actualizarVistaMedico(idMedico: number) {
+    const diasDisponibles = this.getDiasDelMedico(idMedico);
+    if (diasDisponibles.length > 0 && !this.diaSeleccionadoPorMedico[idMedico]) {
+      // Usar comparación local segura para seleccionar el primer día futuro
+      const diasFuturos = diasDisponibles.filter(dia => !this.esFechaPasada(dia.fecha));
+      
+      if (diasFuturos.length > 0) {
+        diasFuturos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+        this.diaSeleccionadoPorMedico[idMedico] = diasFuturos[0].fecha;
+      }
+    }
+  }
+
+  getHorariosDelDiaSeleccionado(idMedico: number): string[] {
+    const fechaSeleccionada = this.diaSeleccionadoPorMedico[idMedico];
+    return fechaSeleccionada ? this.getHorariosDelDiaInterno(idMedico, fechaSeleccionada) : [];
   }
 
   onBuscarEspecialidad(resultados: any[]) {
@@ -145,35 +400,50 @@ export class CitasComponent implements OnInit {
     this.selectedEspecialidad = especialidad;
   }
 
-  getCardState(doctorName: string) {
-    if (!this.cardStates[doctorName]) {
-      this.cardStates[doctorName] = {
-        diaSeleccionado: 'jueves',
-        horarioSeleccionado: ''
-      };
+  // ===================================================
+  // MÉTODOS ADAPTADOS AL NUEVO SISTEMA
+  // ===================================================
+  getCardState(cita: any) {
+    const idMedico = cita.medico?.idMedico;
+    if (!idMedico) return { diaSeleccionado: '', horarioSeleccionado: '' };
+    
+    // Asegurar que hay un día seleccionado si hay días disponibles
+    const diasDisponibles = this.getDiasDisponiblesSemana(cita);
+    if (diasDisponibles.length > 0 && !this.diaSeleccionadoPorMedico[idMedico]) {
+      this.diaSeleccionadoPorMedico[idMedico] = diasDisponibles[0].fecha;
     }
-    return this.cardStates[doctorName];
+    
+    return {
+      diaSeleccionado: this.diaSeleccionadoPorMedico[idMedico] || '',
+      horarioSeleccionado: this.horarioSeleccionadoPorMedico[idMedico] || ''
+    };
   }
 
-  seleccionarDiaCard(doctorName: string, dia: string) {
-    const state = this.getCardState(doctorName);
-    state.diaSeleccionado = dia;
-    state.horarioSeleccionado = ''; 
+  getHorariosDelDia(cita: any): string[] {
+    const idMedico = cita.medico?.idMedico;
+    if (!idMedico) return [];
+
+    const fechaSeleccionada = this.diaSeleccionadoPorMedico[idMedico];
+    if (!fechaSeleccionada) return [];
+
+    const dias = this.getDiasDisponiblesSemana(cita);
+
+    const dia = dias.find(d => d.fecha === fechaSeleccionada);
+    if (!dia) return [];
+
+    // Si el día está bloqueado → no mostrar horarios
+    if (dia.bloqueado) return [];
+
+    return dia.horarios;
   }
 
-  seleccionarHorarioCard(doctorName: string, horario: string) {
-    const state = this.getCardState(doctorName);
-    state.horarioSeleccionado = horario;
-  }
-
-  getHorariosDelDia(doctorName: string): string[] {
-    const state = this.getCardState(doctorName);
-    return this.horariosPorDia[state.diaSeleccionado] || [];
-  }
-
-  getDiaActual(doctorName: string) {
-    const state = this.getCardState(doctorName);
-    return this.diasDisponibles.find(d => d.codigo === state.diaSeleccionado);
+  getDiaActual(cita: any) {
+    const idMedico = cita.medico?.idMedico;
+    if (!idMedico) return null;
+    
+    const fechaSeleccionada = this.diaSeleccionadoPorMedico[idMedico];
+    const dias = this.getDiasDelMedico(idMedico);
+    return dias.find(d => d.fecha === fechaSeleccionada);
   }
 
   onBuscarResultados(resultados: any[]) {
@@ -204,17 +474,24 @@ export class CitasComponent implements OnInit {
   }
 
   reservarCita(cita: any) {
-    const state = this.getCardState(cita.doctor);
-    if (!state.horarioSeleccionado) {
-      alert('Por favor selecciona un horario primero');
+    const idMedico = cita.medico?.idMedico;
+    if (!idMedico) {
+      alert('Error: No se puede identificar al médico');
+      return;
+    }
+    
+    const diaSeleccionado = this.diaSeleccionadoPorMedico[idMedico];
+    const horarioSeleccionado = this.horarioSeleccionadoPorMedico[idMedico];
+    
+    if (!diaSeleccionado || !horarioSeleccionado) {
+      alert('Por favor selecciona un día y un horario');
       return;
     }
 
     this.citaParaReservar = cita;
-    this.horarioParaReservar = state.horarioSeleccionado;
+    this.horarioParaReservar = horarioSeleccionado;
     this.mostrarModal = true;
 
-    // Resolver subespecialidades para la especialidad de la tarjeta
     this.resolverIdEspecialidadPorNombre(cita.especialidad);
   }
 
@@ -264,13 +541,25 @@ export class CitasComponent implements OnInit {
     const usuario = this.authService.currentUser;
     console.log('Usuario:', usuario);
     console.log('Cita:', this.citaParaReservar);
+    
     if (usuario?.rol?.nombre === 'Paciente' && this.citaParaReservar) {
+      const idMedico = this.citaParaReservar.medico?.idMedico;
+      const fechaSeleccionada = this.diaSeleccionadoPorMedico[idMedico];
+      const horarioSeleccionado = this.horarioSeleccionadoPorMedico[idMedico];
+      
+      // Marcar horario como ocupado ANTES de ir al checkout
+      if (idMedico && fechaSeleccionada && horarioSeleccionado) {
+        this.marcarHorarioOcupado(idMedico, fechaSeleccionada, horarioSeleccionado);
+        // Limpiar selección para forzar actualización visual
+        this.horarioSeleccionadoPorMedico[idMedico] = '';
+      }
+      
       this.router.navigate(['/checkout'], {
         queryParams: {
           doctor: this.citaParaReservar.doctor,
           especialidad: this.citaParaReservar.especialidad,
-          fecha: new Date().toISOString().split('T')[0],
-          hora: this.horarioParaReservar,
+          fecha: fechaSeleccionada,
+          hora: horarioSeleccionado,
           idEspecialidad: this.idEspecialidadResuelta ?? undefined,
           idSubespecialidad: this.subespecialidadSeleccionadaId ?? undefined
         }

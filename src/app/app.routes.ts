@@ -87,6 +87,7 @@ export const routes: Routes = [
             { path: 'gestion-admins', loadComponent: () => import('./features/private/dashboard/admin/gestion-admins/gestion-admins.component').then(m => m.GestionAdminsComponent) },
             { path: 'gestion-citas', loadComponent: () => import('./features/private/dashboard/admin/gestion-citas/gestion-citas.component').then(m => m.GestionCitasComponent) },
             { path: 'gestion-medicos', loadComponent: () => import('./features/private/dashboard/admin/gestion-medicos/gestion-medicos.component').then(m => m.GestionMedicosComponent) },
+            { path: 'gestion-horarios', loadComponent: () => import('./features/private/dashboard/admin/gestion-horarios/gestion-horarios.component').then(m => m.GestionHorariosComponent) },
             { path: 'gestion-pacientes', loadComponent: () => import('./features/private/dashboard/admin/gestion-pacientes/gestion-pacientes.component').then(m => m.GestionPacientesComponent) },
             { path: 'gestion-usuarios', loadComponent: () => import('./features/private/dashboard/admin/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent) },
             { path: 'reportes', loadComponent: () => import('./features/private/dashboard/admin/reportes/reportes.component').then(m => m.ReportesComponent) },

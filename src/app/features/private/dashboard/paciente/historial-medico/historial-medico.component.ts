@@ -71,8 +71,15 @@ export class HistorialMedicoComponent implements OnInit, OnDestroy {
 
     private cargarHistorialMedico(): void {
         if (this.usuarioActual) {
-            // Generar historial médico profesional y confidencial
-            this.registrosMedicos = this.generarHistorialProfesional();
+            // TODO: Conectar con backend real cuando esté disponible
+            // Por ahora, mostrar historial vacío hasta que se implemente
+            this.registrosMedicos = [];
+            
+            // Descomentar cuando el backend esté listo:
+            // this.historialService.obtenerHistorialPorPaciente(this.usuarioActual.idUsuario)
+            //     .subscribe(historial => {
+            //         this.registrosMedicos = historial;
+            //     });
         }
     }
 

@@ -21,7 +21,6 @@ export class EspecialidadesComponent implements OnInit {
     this.especialidadService.getEspecialidades().subscribe((data: Especialidad[]) => {
       this.especialidades = data;
       this.especialidadesFiltradas = [...this.especialidades];
-      // Debug de las URLs de imagen
       this.especialidades.forEach(e => console.log('URL icono:', e.urlImgIcono));
     });
   }

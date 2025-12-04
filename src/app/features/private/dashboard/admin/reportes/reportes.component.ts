@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { CitaService } from '../../../../../core/services/logic/cita.service';
 import { PagosService, Factura as FacturaLocal } from '../../../../../core/services/logic/pagos.service';
 import { environment } from '../../../../../../environments/environment';
-import { ReportesService } from '../../../../../core/services/reportes.service';
+import { ReportesService } from '../../../../../core/services/logic/reportes.service';
 import { CitaCompleta } from '../../../../../core/models/common/cita';
 
 // 📊 Interfaces para Reportes
@@ -52,10 +50,11 @@ interface DatoGrafico {
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })
+
 export class ReportesComponent implements OnInit {
   constructor(
     private citaService: CitaService,
@@ -279,7 +278,53 @@ export class ReportesComponent implements OnInit {
 
   // 📥 Exportar reporte (llama al backend y descarga el archivo)
   exportarReporte(formato: 'pdf' | 'excel' | 'csv'): void {
-    const tipoFiltro = this.filtro.tipo; // 'pacientes' | 'doctores' expected
+    const tipoFiltro = this.filtro.tipo;
+    const desde = this.filtro.fechaInicio || undefined;
+    const hasta = this.filtro.fechaFin || undefined;
+
+    if (tipoFiltro === 'general' && formato === 'pdf') {
+      // Exportar reporte general en PDF usando el endpoint del backend
+      this.reportesService.descargarGeneralPDF(desde, hasta, 5).subscribe({
+        next: (blob: Blob) => {
+          const filename = 'reporte_general.pdf';
+          const urlBlob = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = urlBlob;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(urlBlob);
+        },
+        error: (err: any) => {
+          console.error('Error al descargar el reporte general:', err);
+          alert('No se pudo descargar el reporte general. Revise la consola para más detalles.');
+        }
+      });
+      return;
+    }
+
+    // Si es reporte de citas en PDF, usar endpoint específico
+    if (tipoFiltro === 'citas' && formato === 'pdf') {
+      this.reportesService.descargarCitasPDF().subscribe({
+        next: (blob: Blob) => {
+          const filename = 'reporte_citas.pdf';
+          const urlBlob = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = urlBlob;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(urlBlob);
+        },
+        error: (err: any) => {
+          console.error('Error al descargar el reporte de citas:', err);
+          alert('No se pudo descargar el reporte de citas. Revise la consola para más detalles.');
+        }
+      });
+      return;
+    }
 
     let basePath = '';
     if (tipoFiltro === 'pacientes') basePath = '/reportes/pacientes';
@@ -289,29 +334,22 @@ export class ReportesComponent implements OnInit {
       return;
     }
 
-    // Determinar extensión y headers según formato
     const ext = formato === 'pdf' ? 'pdf' : (formato === 'excel' ? 'xlsx' : 'csv');
-    const acceptHeader = formato === 'pdf'
-      ? 'application/pdf'
-      : (formato === 'excel'
-        ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        : 'text/csv');
-
-    // Construir URL con filtros de fechas (si el backend los soporta se usarán)
-    const url = `${environment.apiUrl}${basePath}/${formato}`;
-    const params = new URLSearchParams();
-    if (this.filtro.fechaInicio) params.set('desde', this.filtro.fechaInicio);
-    if (this.filtro.fechaFin) params.set('hasta', this.filtro.fechaFin);
-    const fetchUrl = params.toString() ? `${url}?${params.toString()}` : url;
-
-    const desde = this.filtro.fechaInicio || undefined;
-    const hasta = this.filtro.fechaFin || undefined;
-
     let obs;
     if (tipoFiltro === 'pacientes') {
-      obs = this.reportesService.descargarPacientes(formato, desde, hasta);
+      // Si el formato es PDF usamos el endpoint específico de estadísticas de pacientes
+      if (formato === 'pdf') {
+        obs = this.reportesService.descargarEstadisticaPacientesPDF();
+      } else {
+        obs = this.reportesService.descargarPacientes(formato, desde, hasta);
+      }
     } else {
-      obs = this.reportesService.descargarMedicos(formato, desde, hasta);
+      // Si estamos en 'doctores' y pidieron PDF, usar el endpoint de rendimiento de doctores
+      if (tipoFiltro === 'doctores' && formato === 'pdf') {
+        obs = this.reportesService.descargarRendimientoDoctoresPDF();
+      } else {
+        obs = this.reportesService.descargarMedicos(formato, desde, hasta);
+      }
     }
 
     obs.subscribe({

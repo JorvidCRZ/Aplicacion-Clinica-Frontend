@@ -28,6 +28,29 @@
     text-align: center;
 }
 
+/* No hay horarios disponibles */
+.no-horarios-disponibles {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--gris-oscuro);
+    border: 2px dashed var(--plomo);
+    border-radius: 12px;
+    background: var(--gris-claro);
+    margin: 16px 0;
+}
+
+.no-horarios-disponibles i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--azul-medio);
+}
+
+.no-horarios-disponibles p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 /* Contenido principal */
 .card-content-clean {
     display: flex;
@@ -150,6 +173,21 @@
     background: var(--azul-medio);
     border-color: var(--azul-medio);
     color: var(--blanco);
+}
+
+/* Estilos para días bloqueados (pasados) */
+.dia-btn-clean.bloqueado {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.dia-btn-clean.bloqueado:hover {
+    border-color: #e2e8f0;
+    background: #f1f5f9;
+    transform: none;
 }
 
 .dia-info {

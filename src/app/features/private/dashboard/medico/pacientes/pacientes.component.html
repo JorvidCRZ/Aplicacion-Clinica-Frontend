@@ -285,3 +285,276 @@
     </div>
 
 </div>
+<!-- Modal: Historiales del paciente -->
+@if (mostrarModalHistorial) {
+<div class="modal-overlay" (click)="$event.stopPropagation()">
+    <div class="modal-dialog modal-lg panel-dinamico">
+        <div class="modal-header modal-header-modern">
+            <div class="modal-header-avatar" aria-hidden="true">
+                <div class="avatar-initials">{{ (pacienteSeleccionado?.nombre || '') | slice:0:2 | uppercase }}</div>
+            </div>
+
+            <div class="modal-header-center">
+                <div class="modal-title-row">
+                    <h4 class="modal-title">Historial médico</h4>
+                    <div class="meta-pill" *ngIf="pacienteSeleccionado?.edad">{{ pacienteSeleccionado?.edad }} años</div>
+                </div>
+                <div class="patient-name">{{ pacienteSeleccionado?.nombre }}</div>
+                <div *ngIf="pacienteSeleccionado?.documento" class="patient-doc">CC: {{ pacienteSeleccionado?.documento }}</div>
+            </div>
+
+            <div class="modal-header-actions">
+                <!-- botón de cierre del header eliminado; usar botón 'Cerrar' en el pie del modal -->
+            </div>
+        </div>
+
+        <div class="modal-body" (wheel)="onModalWheel($event)" (touchstart)="onModalTouchStart($event)" (touchmove)="onModalTouchMove($event)">
+            <div class="modal-body-inner">
+                <div class="modal-main">
+                    <div *ngIf="historialLoading" class="loader">Cargando historiales...</div>
+                    <div *ngIf="historialError" class="alert alert-danger">{{ historialError }}</div>
+
+                    @if (historiales && historiales.length === 0 && !historialLoading) {
+                    <div class="empty-state">
+                        <i class="fas fa-notes-medical"></i>
+                        <h4>No se encontraron historiales</h4>
+                        <p>El paciente no tiene entradas de historial registradas.</p>
+                    </div>
+                    } @else {
+
+                    <div class="historial-list" *ngIf="!selectedHistorial">
+                        @for (hist of historiales; track hist.idHistorial) {
+                        <div class="historial-card" style="--accent: {{ getEspecialidadAccent(hist) }};" >
+
+                            <div class="hist-header">
+                                <div class="hist-left">
+                                    <div class="hist-icon" title="Tipo">
+                                        <i class="fas fa-stethoscope"></i>
+                                    </div>
+                                </div>
+
+                                <div class="hist-center">
+                                    <div class="hist-title">
+                                        <div class="especialidad">{{ hist.cita?.detalleCita?.subEspecialidad?.nombre || 'General' }}</div>
+                                        <div class="subespecialidad" *ngIf="hist.cita?.detalleCita?.medicoEspecialidad?.especialidad?.nombre">{{ hist.cita?.detalleCita?.medicoEspecialidad?.especialidad?.nombre }}</div>
+                                    </div>
+                                    <div class="hist-fecha small">{{ formatFecha(hist.fecha) }}</div>
+                                </div>
+
+                                <div class="hist-actions">
+                                    <button class="btn btn-sm btn-outline" (click)="openHistorialDetalle(hist.idHistorial)" title="Ver más">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Ver más
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="hist-summary">
+                                <div class="line"><strong>Diagnóstico:</strong> {{ hist.diagnostico || 'No encontrado' }}</div>
+                                <div class="line"><strong>Receta:</strong> {{ hist.receta || 'No encontrado' }}</div>
+                                <div class="line small"><strong>Médico:</strong> {{ formatPersonaNombre(hist.medico?.persona) }}</div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Vista detalle dentro del modal -->
+                    <div class="historial-detalle-page" *ngIf="selectedHistorial">
+                        <div class="detalle-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button class="btn btn-sm btn-outline-secondary" (click)="volverALaLista()"><i class="fas fa-arrow-left"></i> Volver</button>
+                                <h4 style="margin:0 0 0 8px;">Historial #{{ selectedHistorial.idHistorial || '' }}</h4>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <div class="detalle-meta">{{ formatFecha(selectedHistorial.fecha) }}</div>
+                                <button class="btn btn-sm btn-outline-warning" (click)="startEditHistorial()" title="Editar">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel de edición -->
+                        <div *ngIf="editingHistorial" class="edit-panel">
+                            <div class="edit-header">
+                                <div class="edit-title"><i class="fas fa-pen"></i> Editar Historial - HM-{{ selectedHistorial.idHistorial }}</div>
+                                <button class="close-btn" (click)="cancelEditHistorial()">×</button>
+                            </div>
+                            <div class="edit-body">
+                                <label>Fecha</label>
+                                <input type="date" class="form-control" [(ngModel)]="editForm.fecha">
+
+                                <label style="margin-top:8px;">Diagnóstico</label>
+                                <div class="field-card editable diagnosis-edit">
+                                    <div class="field-header small"><i class="fas fa-search"></i><span>Diagnóstico</span></div>
+                                    <textarea class="form-control field-input" rows="2" [(ngModel)]="editForm.diagnostico"></textarea>
+                                </div>
+
+                                <label style="margin-top:8px;">Observaciones</label>
+                                <div class="field-card editable observations-edit">
+                                    <div class="field-header small"><i class="fas fa-file-medical"></i><span>Observaciones</span></div>
+                                    <textarea class="form-control field-input" rows="4" [(ngModel)]="editForm.observaciones"></textarea>
+                                </div>
+
+                                <label style="margin-top:8px;">Receta</label>
+                                <div class="field-card editable recipe-edit">
+                                    <div class="field-header small"><i class="fas fa-pills"></i><span>Receta</span></div>
+                                    <textarea class="form-control field-input" rows="3" [(ngModel)]="editForm.receta"></textarea>
+                                </div>
+
+                                <div class="edit-actions" style="margin-top:10px; display:flex; gap:8px; justify-content:flex-end; position:relative;">
+                                    <button class="btn btn-secondary" (click)="cancelEditHistorial()" [disabled]="editLoading">Cancelar</button>
+                                    <button class="btn btn-primary" (click)="confirmSaveRequest()" [disabled]="editLoading">
+                                        <i *ngIf="editLoading" class="fas fa-spinner fa-spin"></i> Guardar
+                                    </button>
+
+                                    <!-- Confirm dialog inline -->
+                                    <div class="confirm-save" *ngIf="showSaveConfirm">
+                                        <div class="confirm-body">
+                                            <div class="confirm-text">¿Estás seguro que deseas guardar los cambios?</div>
+                                            <div class="confirm-actions">
+                                                <button class="btn btn-sm btn-outline-secondary" (click)="cancelConfirmSave()">Cancelar</button>
+                                                <button class="btn btn-sm btn-primary" (click)="confirmSaveHistorial()">Confirmar</button>
+                                            </div>
+                                        </div>
+                                        </div>
+                                </div>
+                                <div *ngIf="editError" class="alert alert-danger" style="margin-top:8px;">{{ editError }}</div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="!editingHistorial" class="detalle-body" style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+
+                            <!-- Resumen rápido (colocado primero) -->
+                            <div class="field-card info-overview">
+                                <div class="field-header"><i class="fas fa-info-circle"></i><span>Resumen</span></div>
+                                <div class="field-content">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">Médico</div>
+                                            <div class="info-value">{{ formatPersonaNombre(selectedHistorial.medico?.persona) }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Subespecialidad</div>
+                                            <div class="info-value">{{ selectedHistorial.cita?.detalleCita?.subEspecialidad?.nombre || 'No encontrado' }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Precio consulta</div>
+                                            <div class="info-value">{{ selectedHistorial.cita?.detalleCita?.precioConsulta ?? 'No encontrado' }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Precio total</div>
+                                            <div class="info-value">{{ selectedHistorial.cita?.detalleCita?.precioTotal ?? 'No encontrado' }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Paciente</div>
+                                            <div class="info-value">{{ formatPersonaNombre(selectedHistorial.paciente?.persona) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Diagnóstico (tarjeta) -->
+                            <div class="field-card diagnosis">
+                                <div class="field-header"><i class="fas fa-search"></i><span>Diagnóstico</span></div>
+                                <div class="field-content">{{ selectedHistorial.diagnostico || 'No encontrado' }}</div>
+                            </div>
+
+                            <!-- Receta (tarjeta) -->
+                            <div class="field-card recipe">
+                                <div class="field-header"><i class="fas fa-pills"></i><span>Receta</span></div>
+                                <div class="field-content">{{ selectedHistorial.receta || 'No encontrado' }}</div>
+                            </div>
+
+                            <!-- Observaciones (tarjeta) -->
+                            <div class="field-card observations">
+                                <div class="field-header">
+                                    <i class="fas fa-file-medical"></i>
+                                    <span>Observaciones Médicas</span>
+                                </div>
+                                <div class="field-content mono">{{ selectedHistorial.observaciones || 'No encontrado' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    }
+                </div>
+
+                <!-- Aside: información rápida del paciente y acciones -->
+                <aside class="modal-aside">
+                    <ng-container *ngIf="pacienteSeleccionado">
+                        <div class="patient-card">
+                            <div class="patient-avatar"><i class="fas fa-user-md"></i></div>
+                            <div class="patient-info">
+                                <div class="patient-name">{{ pacienteSeleccionado.nombre }}</div>
+                                <div *ngIf="pacienteSeleccionado.documento" class="patient-doc">CC: {{ pacienteSeleccionado.documento }}</div>
+                                <div class="patient-meta">{{ pacienteSeleccionado.edad }} años • {{ pacienteSeleccionado.genero }}</div>
+                            </div>
+                        </div>
+
+                        <div class="patient-contact">
+                            <div><strong>Tel:</strong> {{ pacienteSeleccionado.telefono || 'No registrado' }}</div>
+                            <div><strong>Email:</strong> {{ pacienteSeleccionado.email || 'No registrado' }}</div>
+                        </div>
+
+                        <div class="patient-actions">
+                            <button class="btn btn-primary" (click)="nuevaCita(pacienteSeleccionado)"><i class="fas fa-calendar-plus"></i> Nueva cita</button>
+                            <button class="btn btn-outline-secondary" (click)="contactarPaciente(pacienteSeleccionado)"><i class="fas fa-phone"></i> Contactar</button>
+                        </div>
+
+                        <div class="patient-stats">
+                            <div class="stat"><span class="num">{{ historiales.length || 0 }}</span><span class="label">Entradas</span></div>
+                            <div class="stat"><span class="num">{{ pacienteSeleccionado.ultimaCita ? (pacienteSeleccionado.ultimaCita | date:'short') : '—' }}</span><span class="label">Últ. cita</span></div>
+                        </div>
+                    </ng-container>
+                </aside>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="cerrarModalHistorial()">Cerrar</button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Contact modal (rediseñado) -->
+<div *ngIf="contactModalVisible" class="contact-modal-overlay" (click)="cerrarContactModal()" role="dialog" aria-modal="true">
+    <div class="contact-modal-card modern" (click)="$event.stopPropagation()">
+        <button class="contact-close" aria-label="Cerrar" (click)="cerrarContactModal()">×</button>
+
+        <div class="contact-header">
+            <div class="contact-avatar">
+                <i class="fas fa-phone"></i>
+            </div>
+            <div class="contact-headline">
+                <div class="contact-title">Contactar a</div>
+                <div class="contact-name">{{ contactName }}</div>
+            </div>
+        </div>
+
+        <div class="contact-body">
+            <div class="contact-number">{{ contactNumber || 'No disponible' }}</div>
+            <div *ngIf="contactEmail" class="contact-email">{{ contactEmail }}</div>
+
+            <div class="contact-buttons">
+                <button class="action-btn call" (click)="llamarContacto()" [disabled]="!contactNumber" title="Llamar">
+                    <div class="icon"><i class="fas fa-phone"></i></div>
+                    <div class="label">Llamar</div>
+                </button>
+
+                <button class="action-btn wa" (click)="abrirWhatsApp()" [disabled]="!contactNumber" title="Abrir WhatsApp">
+                    <div class="icon"><i class="fab fa-whatsapp"></i></div>
+                    <div class="label">WhatsApp</div>
+                </button>
+
+                <button class="action-btn copy" (click)="copiarNumero()" title="Copiar número">
+                    <div class="icon"><i class="fas fa-copy"></i></div>
+                    <div class="label">Copiar</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast pequeño al copiar -->
+        <div class="contact-toast" *ngIf="contactCopied">Número copiado al portapapeles</div>
+    </div>
+</div>

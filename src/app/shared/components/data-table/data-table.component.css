@@ -160,6 +160,19 @@ body {
   color: #e53e3e;
 }
 
+/* Estados de disponibilidad */
+.status-disponible {
+  background: #d1fae5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.status-no-disponible {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
 .actions-column {
   width: 200px;
   text-align: center;
@@ -230,6 +243,15 @@ body {
 .action-btn.btn-delete {
   background-color: var(--rojo);
   color: #fff;
+}
+
+.action-btn.btn-toggle {
+  background-color: #8b5cf6;
+  color: #fff;
+}
+
+.action-btn.btn-toggle:hover {
+  background-color: #7c3aed;
 }
 
 .action-btn.btn-warning {

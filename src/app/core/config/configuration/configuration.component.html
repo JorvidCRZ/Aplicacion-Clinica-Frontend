@@ -1,60 +1,407 @@
-<div class="configuracion-container">
-    <div class="header">
-        <h2>⚙️ Configuración</h2>
-        <p>Seguridad y notificaciones</p>
-    </div>
+<div *ngIf="seccionActiva === 'seguridad'" class="seccion">
+    <h3>🔐 Seguridad</h3>
 
-    <div class="tabs">
-        <button class="tab" [class.activo]="seccionActiva === 'seguridad'" (click)="cambiarSeccion('seguridad')">
-            🔐 Seguridad
+    <div class="item">
+        <div class="info">
+            <h4>Cambiar Contraseña</h4>
+            <p>Actualiza tu contraseña de forma segura</p>
+        </div>
+        <button class="btn" (click)="abrirModalContrasena()">🔑 Cambiar Contraseña</button>
+    </div>
+    <div class="item">
+        <div class="info">
+            <h4>Autenticación de Dos Factores</h4>
+            <p>{{ auth2FAActivado ? 'Protección adicional activada' : 'Agrega una capa extra de seguridad' }}</p>
+        </div>
+        <button class="btn" [ngClass]="auth2FAActivado ? 'btn-success' : 'btn-primary'" (click)="configurarAutenticacion()">
+            <i class="fas" [ngClass]="auth2FAActivado ? 'fa-check-circle' : 'fa-lock'"></i>
+            {{ auth2FAActivado ? 'Configurar' : 'Activar' }}
         </button>
-        <button class="tab" [class.activo]="seccionActiva === 'notificaciones'"
-            (click)="cambiarSeccion('notificaciones')">
-            📧 Notificaciones
-        </button>
     </div>
 
-    <div *ngIf="seccionActiva === 'seguridad'" class="seccion">
-        <h3>🔐 Seguridad</h3>
-
-        <div class="item">
-            <div class="info">
-                <h4>Cambiar Contraseña</h4>
-                <p>Actualiza tu contraseña</p>
-            </div>
-            <button class="btn" (click)="cambiarContrasena()">🔑 Cambiar</button>
+    <div class="item">
+        <div class="info">
+            <h4>Historial de Sesiones</h4>
+            <p>Ver inicios de sesión</p>
         </div>
-
-        <div class="item">
-            <div class="info">
-                <h4>Autenticación de Dos Factores</h4>
-                <p>Seguridad adicional</p>
-            </div>
-            <button class="btn" (click)="configurarAutenticacion()">🔒 Activar</button>
-        </div>
-
-        <div class="item">
-            <div class="info">
-                <h4>Historial de Sesiones</h4>
-                <p>Ver inicios de sesión</p>
-            </div>
-            <button class="btn" (click)="verHistorialSesiones()">📋 Ver</button>
-        </div>
+        <button class="btn" (click)="verHistorialSesiones()">📋 Ver</button>
     </div>
+</div>
 
-    <div *ngIf="seccionActiva === 'notificaciones'" class="seccion">
-        <h3>📧 Notificaciones por Email</h3>
-
-        <div class="item">
-            <div class="info">
-                <h4>Recibir notificaciones por email</h4>
-                <p>Citas, resultados y recordatorios</p>
+<!-- 🔐 MODAL CAMBIAR CONTRASEÑA -->
+<div *ngIf="mostrarModalContrasena" class="modal-overlay" (click)="cerrarModal($event)">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-lock"></i>
+                <h3>Cambiar Contraseña</h3>
             </div>
-            <label class="switch">
-                <input type="checkbox" [(ngModel)]="notificacionEmail">
-                <span class="slider"></span>
-            </label>
+            <button class="modal-close" (click)="cerrarModalContrasena()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="cambiarPasswordForm" (ngSubmit)="onCambiarContrasena()">
+                <div class="form-group">
+                    <label for="actual">
+                        <i class="fas fa-key"></i>
+                        Contraseña Actual
+                    </label>
+                    <div class="input-wrapper">
+                        <input [type]="mostrarPasswordActual ? 'text' : 'password'" id="actual" formControlName="actual"
+                            placeholder="Ingresa tu contraseña actual"
+                            [class.error]="cambiarPasswordForm.get('actual')?.invalid && cambiarPasswordForm.get('actual')?.touched" />
+                        <button type="button" class="toggle-password" (click)="togglePasswordVisibility('actual')">
+                            <i class="fas" [ngClass]="mostrarPasswordActual ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="error-message"
+                        *ngIf="cambiarPasswordForm.get('actual')?.invalid && cambiarPasswordForm.get('actual')?.touched">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        La contraseña debe tener al menos 6 caracteres
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nueva">
+                        <i class="fas fa-lock"></i>
+                        Nueva Contraseña
+                    </label>
+                    <div class="input-wrapper">
+                        <input [type]="mostrarPasswordNueva ? 'text' : 'password'" id="nueva" formControlName="nueva"
+                            placeholder="Ingresa tu nueva contraseña"
+                            [class.error]="cambiarPasswordForm.get('nueva')?.invalid && cambiarPasswordForm.get('nueva')?.touched" />
+                        <button type="button" class="toggle-password" (click)="togglePasswordVisibility('nueva')">
+                            <i class="fas" [ngClass]="mostrarPasswordNueva ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="error-message"
+                        *ngIf="cambiarPasswordForm.get('nueva')?.invalid && cambiarPasswordForm.get('nueva')?.touched">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        La contraseña debe tener al menos 6 caracteres
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmar">
+                        <i class="fas fa-check-circle"></i>
+                        Confirmar Nueva Contraseña
+                    </label>
+                    <div class="input-wrapper">
+                        <input [type]="mostrarPasswordConfirmar ? 'text' : 'password'" id="confirmar"
+                            formControlName="confirmar" placeholder="Confirma tu nueva contraseña"
+                            [class.error]="cambiarPasswordForm.get('confirmar')?.invalid && cambiarPasswordForm.get('confirmar')?.touched" />
+                        <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirmar')">
+                            <i class="fas" [ngClass]="mostrarPasswordConfirmar ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    <div class="error-message"
+                        *ngIf="cambiarPasswordForm.get('confirmar')?.invalid && cambiarPasswordForm.get('confirmar')?.touched">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Las contraseñas no coinciden
+                    </div>
+                </div>
+
+                <div class="password-strength">
+                    <div class="strength-label">
+                        <i class="fas fa-shield-alt"></i>
+                        Seguridad de la contraseña:
+                    </div>
+                    <div class="strength-bar">
+                        <div class="strength-fill" [ngClass]="passwordStrength"></div>
+                    </div>
+                    <span class="strength-text" [ngClass]="passwordStrength">
+                        {{ passwordStrengthText }}
+                    </span>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModalContrasena()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="button" class="btn-primary" (click)="onCambiarContrasena()"
+                [disabled]="cambiarPasswordForm.invalid || cargandoCambio" [class.loading]="cargandoCambio">
+                <i class="fas" [ngClass]="cargandoCambio ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+                {{ cargandoCambio ? 'Cambiando...' : 'Cambiar Contraseña' }}
+            </button>
         </div>
     </div>
 </div>
 
+<!-- 📋 MODAL HISTORIAL DE SESIONES -->
+<div *ngIf="mostrarModalHistorial" class="modal-overlay" (click)="mostrarModalHistorial = false">
+    <div class="modal-container historial-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-history"></i>
+                <h3>Historial de Sesiones</h3>
+            </div>
+            <button class="modal-close" (click)="cerrarModalHistorial()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body historial-body">
+            <!-- Control de activación -->
+            <div class="historial-control">
+                <div class="control-info">
+                    <h4>
+                        <i class="fas fa-shield-alt"></i>
+                        Registro de Actividad
+                    </h4>
+                    <p>{{ historialActivado ? 'El sistema está registrando tus inicios de sesión' : 'El registro de actividad está desactivado' }}</p>
+                </div>
+                <div class="toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" [checked]="historialActivado" (change)="toggleHistorialActivado()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-status" [ngClass]="historialActivado ? 'activado' : 'desactivado'">
+                        {{ historialActivado ? 'Activado' : 'Desactivado' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Lista de sesiones -->
+            <div class="sesiones-lista" *ngIf="historialActivado && sesionesRecientes.length > 0">
+                <h4>
+                    <i class="fas fa-clock"></i>
+                    Sesiones Recientes
+                </h4>
+                <div class="sesion-item" *ngFor="let sesion of sesionesRecientes; trackBy: trackBySesion">
+                    <div class="sesion-icon">
+                        <i class="fas" [ngClass]="obtenerIconoDispositivo(sesion.dispositivo)"></i>
+                    </div>
+                    <div class="sesion-info">
+                        <div class="sesion-dispositivo">{{ sesion.dispositivo }}</div>
+                        <div class="sesion-detalles">
+                            <span class="fecha">{{ formatearFecha(sesion.fecha) }}</span>
+                            <span class="ubicacion">{{ sesion.ubicacion }}</span>
+                            <span class="ip">IP: {{ sesion.ip }}</span>
+                        </div>
+                    </div>
+                    <div class="sesion-estado" [ngClass]="sesion.estado.toLowerCase()">
+                        <i class="fas" [ngClass]="sesion.estado === 'Activa' ? 'fa-circle' : 'fa-check-circle'"></i>
+                        {{ sesion.estado }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje cuando está desactivado -->
+            <div class="historial-desactivado" *ngIf="!historialActivado">
+                <div class="mensaje-desactivado">
+                    <i class="fas fa-eye-slash"></i>
+                    <h4>Registro Desactivado</h4>
+                    <p>El historial de sesiones no se está registrando. Actívalo para monitorear tu actividad de inicio de sesión.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrarModalHistorial()">
+                <i class="fas fa-times"></i>
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 🔐 MODAL AUTENTICACIÓN DE DOS FACTORES -->
+<div *ngIf="mostrarModalAuth2FA" class="modal-overlay" (click)="cerrarModalAuth2FA()">
+    <div class="modal-container auth2fa-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Autenticación de Dos Factores</h3>
+            </div>
+            <button class="modal-close" (click)="cerrarModalAuth2FA()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body auth2fa-body">
+            <!-- Paso 1: Introducción -->
+            <div *ngIf="pasoActual2FA === 1" class="paso-2fa">
+                <div class="paso-header">
+                    <div class="paso-icono intro">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h4>{{ auth2FAActivado ? 'Gestionar 2FA' : 'Activar Autenticación 2FA' }}</h4>
+                    <p>{{ auth2FAActivado ? 'Tu cuenta ya tiene 2FA activado. Puedes gestionar la configuración.' : 'Agrega una capa extra de seguridad a tu cuenta usando una aplicación autenticadora.' }}</p>
+                </div>
+
+                <div *ngIf="!auth2FAActivado" class="aplicaciones-recomendadas">
+                    <h5><i class="fas fa-mobile-alt"></i> Aplicaciones Recomendadas:</h5>
+                    <div class="apps-grid">
+                        <div class="app-item">
+                            <i class="fab fa-google"></i>
+                            <span>Google Authenticator</span>
+                        </div>
+                        <div class="app-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Microsoft Authenticator</span>
+                        </div>
+                        <div class="app-item">
+                            <i class="fas fa-lock"></i>
+                            <span>Authy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="auth2FAActivado" class="estado-2fa-activo">
+                    <div class="estado-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h5>2FA Activado</h5>
+                            <p>Tu cuenta está protegida con autenticación de dos factores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 2: Configurar App -->
+            <div *ngIf="pasoActual2FA === 2" class="paso-2fa">
+                <div class="paso-header">
+                    <div class="paso-icono config">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h4>Escanear Código QR</h4>
+                    <p>Escanea este código QR con tu aplicación autenticadora o introduce manualmente el código secreto.</p>
+                </div>
+
+                <div class="qr-container">
+                    <div class="qr-placeholder">
+                        <i class="fas fa-qrcode"></i>
+                        <div class="qr-info">
+                            <p><strong>Código QR</strong></p>
+                            <p class="qr-note">Escanea con tu app</p>
+                        </div>
+                    </div>
+                    
+                    <div class="codigo-manual">
+                        <h5>Código Manual:</h5>
+                        <div class="codigo-secreto">
+                            <code>{{ codigoQR }}</code>
+                            <button type="button" class="btn-copiar" (click)="copiarCodigoSecreto()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 3: Verificar Código -->
+            <div *ngIf="pasoActual2FA === 3" class="paso-2fa">
+                <div class="paso-header">
+                    <div class="paso-icono verify">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h4>Verificar Código</h4>
+                    <p>Introduce el código de 6 dígitos que aparece en tu aplicación autenticadora.</p>
+                </div>
+
+                <div class="verificacion-form">
+                    <div class="codigo-input-container">
+                        <label>Código de Verificación:</label>
+                        <input 
+                            type="text" 
+                            [(ngModel)]="codigoVerificacion" 
+                            placeholder="000000"
+                            maxlength="6"
+                            class="codigo-input"
+                            [class.error]="codigoVerificacion.length > 0 && codigoVerificacion.length !== 6"
+                        >
+                        <small class="input-help">Introduce los 6 dígitos de tu app</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 4: Completado -->
+            <div *ngIf="pasoActual2FA === 4" class="paso-2fa">
+                <div class="paso-header">
+                    <div class="paso-icono success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>¡2FA Activado Correctamente!</h4>
+                    <p>Tu cuenta ahora está protegida con autenticación de dos factores.</p>
+                </div>
+
+                <div class="codigos-recuperacion">
+                    <h5><i class="fas fa-life-ring"></i> Códigos de Recuperación</h5>
+                    <p class="warning-text">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Guarda estos códigos en un lugar seguro. Te permitirán acceder si pierdes tu dispositivo.
+                    </p>
+                    
+                    <div class="codigos-grid">
+                        <div *ngFor="let codigo of codigosRecuperacion; trackBy: trackByCodigo" class="codigo-recovery">
+                            <span>{{ codigo }}</span>
+                            <button type="button" class="btn-copiar-small" (click)="copiarCodigo(codigo)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="codigos-actions">
+                        <button type="button" class="btn-download" (click)="descargarCodigosRecuperacion()">
+                            <i class="fas fa-download"></i>
+                            Descargar Códigos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer auth2fa-footer">
+            <!-- Navegación para pasos -->
+            <div *ngIf="!auth2FAActivado && pasoActual2FA < 4" class="pasos-navegacion">
+                <button type="button" class="btn-secondary" (click)="retrocederPaso2FA()" [disabled]="pasoActual2FA === 1">
+                    <i class="fas fa-arrow-left"></i>
+                    Anterior
+                </button>
+                
+                <div class="pasos-indicador">
+                    <span class="paso" [class.activo]="pasoActual2FA === 1">1</span>
+                    <span class="paso" [class.activo]="pasoActual2FA === 2">2</span>
+                    <span class="paso" [class.activo]="pasoActual2FA === 3">3</span>
+                    <span class="paso" [class.activo]="pasoActual2FA === 4">4</span>
+                </div>
+
+                <button 
+                    type="button" 
+                    class="btn-primary" 
+                    (click)="pasoActual2FA === 3 ? verificarCodigo2FA() : avanzarPaso2FA()"
+                    [disabled]="(pasoActual2FA === 3 && codigoVerificacion.length !== 6) || cargandoActivacion2FA"
+                    [class.loading]="cargandoActivacion2FA && pasoActual2FA === 3"
+                >
+                    <i class="fas" [ngClass]="cargandoActivacion2FA ? 'fa-spinner fa-spin' : (pasoActual2FA === 3 ? 'fa-check' : 'fa-arrow-right')"></i>
+                    {{ pasoActual2FA === 3 ? (cargandoActivacion2FA ? 'Verificando...' : 'Verificar') : 'Siguiente' }}
+                </button>
+            </div>
+
+            <!-- Botones para estado activado -->
+            <div *ngIf="auth2FAActivado" class="acciones-2fa-activo">
+                <button type="button" class="btn-danger" (click)="desactivar2FA()">
+                    <i class="fas fa-times"></i>
+                    Desactivar 2FA
+                </button>
+                <button type="button" class="btn-secondary" (click)="cerrarModalAuth2FA()">
+                    <i class="fas fa-check"></i>
+                    Cerrar
+                </button>
+            </div>
+
+            <!-- Botón para completado -->
+            <div *ngIf="pasoActual2FA === 4" class="acciones-completado">
+                <button type="button" class="btn-primary" (click)="cerrarModalAuth2FA()">
+                    <i class="fas fa-check"></i>
+                    Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

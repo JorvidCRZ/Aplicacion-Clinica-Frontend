@@ -13,3 +13,8 @@ export interface LoginResponse {
     apellidoMaterno?: string;
     token?: string;
 }
+
+export interface CambiarPasswordRequest {
+    actual: string;
+    nueva: string;
+}

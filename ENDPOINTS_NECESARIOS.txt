@@ -1,0 +1,321 @@
+================================================================================
+    ENDPOINTS NECESARIOS PARA EL FLUJO COMPLETO DE CITAS Y PAGOS
+================================================================================
+
+1. RESOLVER MÉDICO-ESPECIALIDAD
+Endpoint:
+
+Query SQL:
+SELECT me.id_medico_especialidad 
+FROM medico_especialidad me
+
+NOTAS CLAVE (alineadas al frontend actual)
+--------------------------------------------------------------------------------
+Desde el modal "Reservar Cita" en el frontend ya se recoge: médico, especialidad,
+fecha, hora, subespecialidad, precio, motivo, tipo de consulta y observaciones.
+Para cerrar el flujo end‑to‑end se requiere:
+1) Resolver `idMedicoEspecialidad` y `idBloque` en el backend.
+2) Crear la cita (detalle + cita + marcar bloque + resumen).
+3) Crear el pago (o disparar checkout externo y registrar pago vía webhook).
+4) Exponer listados para el dashboard del paciente (citas y pagos).
+JOIN persona p ON m.id_persona = p.id_persona
+WHERE CONCAT(p.nombre1, ' ', p.apellido_paterno) = ? 
+  AND e.nombre = ?
+
+Response esperado:
+
+Sugerencia de respuesta ampliada (útil para siguientes pasos):
+{
+  "idMedicoEspecialidad": 5,
+  "idMedico": 123,
+  "idEspecialidad": 3
+}
+  "idMedicoEspecialidad": 5
+
+--------------------------------------------------------------------------------
+2. RESOLVER ID DE BLOQUE HORARIO
+--------------------------------------------------------------------------------
+
+Endpoint:
+GET /api/horarios/bloque?idMedico={id}&fecha={YYYY-MM-DD}&hora={HH:mm}
+
+Índices recomendados:
+- CREATE UNIQUE INDEX ux_horario_bloque_disp_fecha_hora ON horario_bloque(id_disponibilidad, fecha, hora_inicio);
+- CREATE INDEX ix_horario_bloque_fecha ON horario_bloque(fecha);
+Query SQL:
+FROM horario_bloque hb
+JOIN disponibilidad_medico dm ON hb.id_disponibilidad = dm.id_disponibilidad
+WHERE dm.id_medico = ?
+  AND hb.fecha = ?
+  AND hb.hora_inicio = ?
+  AND hb.disponible = TRUE
+LIMIT 1
+
+Response esperado:
+{
+  "idBloque": 123,
+  "horaInicio": "10:00",
+  "horaFin": "10:30",
+
+Validaciones recomendadas:
+- Verificar que el bloque sigue `disponible = TRUE` antes de marcarlo.
+- Usar transacción para asegurar atomicidad de los 4 pasos.
+- Si se integrará checkout externo, permitir estado `pendiente_pago` y confirmar luego.
+}
+--------------------------------------------------------------------------------
+3. CREAR CITA (Ajustar el existente)
+--------------------------------------------------------------------------------
+
+Endpoint:
+POST /api/citas/agregar
+
+Request Body:
+{
+  "idPaciente": 1,
+  "idMedicoEspecialidad": 5,
+  "idSubEspecialidad": null,
+  "idBloque": 123,
+  "motivoConsulta": "Dolor de pecho"
+
+Nota:
+- El mapeo `usuario → persona → paciente` está contemplado; mantener consistencia.
+
+
+--- Paso 1: Insertar detalle_cita ---
+INSERT INTO detalle_cita (id_medico_especialidad, id_subespecialidad, precio_consulta, precio_total)
+VALUES (?, ?, 150.00, 150.00)
+RETURNING id_detalle_cita;
+
+--- Paso 2: Insertar cita ---
+INSERT INTO cita (id_paciente, id_detalle_cita, id_disponibilidad, fecha_cita, hora_cita, estado, motivo_consulta)
+VALUES (?, ?, (SELECT id_disponibilidad FROM horario_bloque WHERE id_bloque = ?), ?, ?, 'confirmada', ?)
+
+Alternativa con pasarela externa:
+- Usar `POST /api/pagos/crear-checkout` que genere `urlCheckout` o `sessionId`.
+- Registrar pago solo cuando el webhook confirme (estado `completado`).
+
+UPDATE horario_bloque 
+SET disponible = FALSE, id_cita = ? 
+WHERE id_bloque = ?;
+
+--- Paso 4: Insertar cita_resumen ---
+INSERT INTO cita_resumen (id_cita, fecha, hora, estado, id_medico, especialidad, tipo, duracion_minutos, precio, motivo)
+SELECT 
+    c.id_cita,
+    c.fecha_cita,
+    c.hora_cita,
+    c.estado,
+    m.id_medico,
+    e.nombre,
+    COALESCE(se.nombre, 'Consulta General'),
+    dm.duracion_minutos,
+    dc.precio_total,
+    c.motivo_consulta
+FROM cita c
+JOIN detalle_cita dc ON c.id_detalle_cita = dc.id_detalle_cita
+JOIN medico_especialidad me ON dc.id_medico_especialidad = me.id_medico_especialidad
+JOIN medico m ON me.id_medico = m.id_medico
+JOIN especialidad e ON me.id_especialidad = e.id_especialidad
+LEFT JOIN sub_especialidad se ON dc.id_subespecialidad = se.id_subespecialidad
+JOIN horario_bloque hb ON c.id_disponibilidad = (SELECT id_disponibilidad FROM horario_bloque WHERE id_bloque = ?)
+
+Opcional (pasarela externa):
+  5. POST /api/pagos/crear-checkout
+  6. POST /api/pagos/webhook
+JOIN disponibilidad_medico dm ON hb.id_disponibilidad = dm.id_disponibilidad
+WHERE c.id_cita = ?;
+
+Response esperado:
+{
+  "idCita": 15,
+  "fecha": "2025-12-03",
+5. Frontend llama a POST /api/citas/agregar (con los IDs resueltos)
+6. Frontend llama a POST /api/pagos/crear
+  "especialidad": "Cardiología",
+  "subEspecialidad": null,
+  "motivoConsulta": "Dolor de pecho",
+
+Variación con checkout externo:
+- 6. Frontend llama a POST /api/pagos/crear-checkout y redirige a `urlCheckout`.
+- 7. Pasarela llama a POST /api/pagos/webhook → backend marca `pago` y `cita`.
+- 8. Dashboard consulta endpoints de citas/pagos (ya reflejan pago confirmado).
+  "estado": "confirmada",
+  "precio": 150.00
+}
+
+--------------------------------------------------------------------------------
+4. OBTENER CITAS DEL PACIENTE (Mejorar el existente)
+--------------------------------------------------------------------------------
+
+Endpoint:
+GET /api/citas/paciente/{idUsuario}
+
+Query SQL:
+SELECT 
+    c.id_cita,
+    c.fecha_cita AS fecha,
+    c.hora_cita AS hora,
+    c.estado,
+    c.motivo_consulta,
+    CONCAT(p.nombre1, ' ', p.apellido_paterno) AS medico_nombre,
+    e.nombre AS especialidad,
+    se.nombre AS sub_especialidad,
+    dc.precio_total AS precio,
+    hb.hora_inicio,
+    hb.hora_fin
+FROM cita c
+JOIN paciente pac ON c.id_paciente = pac.id_paciente
+JOIN usuario u ON pac.id_persona = (SELECT id_persona FROM persona WHERE id_persona = u.id_persona)
+JOIN detalle_cita dc ON c.id_detalle_cita = dc.id_detalle_cita
+JOIN medico_especialidad me ON dc.id_medico_especialidad = me.id_medico_especialidad
+JOIN medico m ON me.id_medico = m.id_medico
+JOIN persona p ON m.id_persona = p.id_persona
+JOIN especialidad e ON me.id_especialidad = e.id_especialidad
+LEFT JOIN sub_especialidad se ON dc.id_subespecialidad = se.id_subespecialidad
+LEFT JOIN horario_bloque hb ON c.id_disponibilidad = hb.id_disponibilidad
+WHERE u.id_usuario = ?
+ORDER BY c.fecha_cita DESC, c.hora_cita DESC;
+
+Response esperado:
+[
+  {
+    "idCita": 15,
+    "fecha": "2025-12-03",
+    "hora": "10:00:00",
+    "estado": "confirmada",
+    "motivoConsulta": "Dolor de pecho",
+    "medicoNombre": "Carla Méndez",
+    "especialidad": "Cardiología",
+    "subEspecialidad": null,
+    "precio": 150.00
+  }
+]
+
+--------------------------------------------------------------------------------
+5. CREAR PAGO (NUEVO - FALTA IMPLEMENTAR)
+--------------------------------------------------------------------------------
+
+Endpoint:
+POST /api/pagos/crear
+
+Request Body:
+{
+  "idCita": 15,
+  "metodoPago": "Tarjeta de Crédito",
+  "numeroTransaccion": "TXN-ABC123"
+}
+
+Proceso SQL (3 pasos):
+
+--- Paso 1: Crear registro de pago ---
+INSERT INTO pago (monto_total, metodo, estado, fecha_pago)
+VALUES (0, ?, 'completado', NOW())
+RETURNING id_pago;
+
+--- Paso 2: Obtener precio de la cita ---
+SELECT dc.precio_total 
+FROM cita c
+JOIN detalle_cita dc ON c.id_detalle_cita = dc.id_detalle_cita
+WHERE c.id_cita = ?;
+
+--- Paso 3: Crear detalle de pago ---
+INSERT INTO pago_detalle (id_cita, monto_asociado, id_pago)
+VALUES (?, ?, ?);
+
+NOTA: El trigger trg_actualizar_monto_total que ya tienes en tu BD actualizará 
+automáticamente el monto_total en la tabla pago
+
+Response esperado:
+{
+  "idPago": 42,
+  "montoPagado": 150.00,
+  "metodoPago": "Tarjeta de Crédito",
+  "estado": "completado",
+  "fechaPago": "2025-12-03T15:30:00",
+  "numeroTransaccion": "TXN-ABC123"
+}
+
+--------------------------------------------------------------------------------
+6. OBTENER PAGOS DEL PACIENTE (NUEVO - FALTA IMPLEMENTAR)
+--------------------------------------------------------------------------------
+
+Endpoint:
+GET /api/pagos/paciente/{idUsuario}
+
+Query SQL:
+SELECT 
+    p.id_pago,
+    p.monto_total,
+    p.metodo AS metodo_pago,
+    p.estado,
+    p.fecha_pago,
+    c.id_cita,
+    c.fecha_cita,
+    c.hora_cita,
+    CONCAT(per.nombre1, ' ', per.apellido_paterno) AS medico_nombre,
+    e.nombre AS especialidad,
+    se.nombre AS sub_especialidad,
+    c.motivo_consulta
+FROM pago p
+JOIN pago_detalle pd ON p.id_pago = pd.id_pago
+JOIN cita c ON pd.id_cita = c.id_cita
+JOIN paciente pac ON c.id_paciente = pac.id_paciente
+JOIN usuario u ON pac.id_persona = (SELECT id_persona FROM persona WHERE id_persona = u.id_persona)
+JOIN detalle_cita dc ON c.id_detalle_cita = dc.id_detalle_cita
+JOIN medico_especialidad me ON dc.id_medico_especialidad = me.id_medico_especialidad
+JOIN medico m ON me.id_medico = m.id_medico
+JOIN persona per ON m.id_persona = per.id_persona
+JOIN especialidad e ON me.id_especialidad = e.id_especialidad
+LEFT JOIN sub_especialidad se ON dc.id_subespecialidad = se.id_subespecialidad
+WHERE u.id_usuario = ?
+ORDER BY p.fecha_pago DESC;
+
+Response esperado:
+[
+  {
+    "idPago": 42,
+    "montoTotal": 150.00,
+    "metodoPago": "Tarjeta de Crédito",
+    "estado": "completado",
+    "fechaPago": "2025-12-03T15:30:00",
+    "idCita": 15,
+    "fechaCita": "2025-12-03",
+    "horaCita": "10:00:00",
+    "medicoNombre": "Carla Méndez",
+    "especialidad": "Cardiología",
+    "motivoConsulta": "Dolor de pecho"
+  }
+]
+
+================================================================================
+RESUMEN DE IMPLEMENTACIÓN
+================================================================================
+
+ENDPOINTS QUE YA TIENES (necesitan ajustes):
+  1. POST /api/citas/agregar - Ajustar para incluir paso 4 (cita_resumen)
+  2. GET /api/citas/paciente/{id} - Mejorar el query SQL
+
+ENDPOINTS QUE FALTAN IMPLEMENTAR (NUEVOS):
+  1. GET /api/medico-especialidad/buscar
+  2. GET /api/horarios/bloque
+  3. POST /api/pagos/crear
+  4. GET /api/pagos/paciente/{id}
+
+Con estos 4 endpoints adicionales y los 2 ajustes, el flujo completo funcionará 
+desde el frontend hasta persistir correctamente en tu base de datos PostgreSQL.
+
+================================================================================
+FLUJO COMPLETO
+================================================================================
+
+1. Usuario selecciona médico, fecha y hora en el frontend
+2. Frontend llama a GET /api/medico-especialidad/buscar
+3. Frontend llama a GET /api/horarios/bloque
+4. Usuario completa checkout y confirma pago
+5. Frontend llama a POST /api/citas/agregar (con los IDs resueltos)
+6. Frontend llama a POST /api/pagos/crear
+7. La cita aparece en GET /api/citas/paciente/{id}
+8. El pago aparece en GET /api/pagos/paciente/{id}
+9. Dashboard muestra todo correctamente
+
+================================================================================

@@ -6,6 +6,7 @@ import { AuthService, AuthState } from '../../../../../core/services/auth/auth.s
 import { Usuario } from '../../../../../core/models/users/usuario';
 import { UserService } from '../../../../../core/services/auth/user.service';
 import { PacienteService } from '../../../../../core/services/rol/paciente.service';
+import { CitaService } from '../../../../../core/services/logic/cita.service';
 
 interface Cita {
     id: number;
@@ -40,7 +41,8 @@ export class MiResumenComponent implements OnInit, OnDestroy {
         private router: Router,
         private authService: AuthService,
         private userService: UserService,
-        private pacienteService: PacienteService
+        private pacienteService: PacienteService,
+        private citaService: CitaService
     ) { }
 
     ngOnInit(): void {
@@ -65,31 +67,61 @@ export class MiResumenComponent implements OnInit, OnDestroy {
     private cargarDatosPaciente(): void {
         if (!this.currentUser) return;
 
-    // Modo visual: valores simulados si backend no está listo
-    this.totalCitas = 5;
-    this.saldoPendiente = 0;
-    this.pagosRealizados = 8;
-
-        this.proximaCita = {
-            id: 1,
-            fecha: new Date('2024-12-15'),
-            doctor: 'María González',
-            especialidad: 'Cardiología'
-        };
-
-        // Intentar complementar con datos de Paciente si el endpoint está disponible
         const idUsuario = this.currentUser.idUsuario || 0;
-        if (idUsuario) {
-            this.pacienteService.getByUsuario(idUsuario)
-                .pipe(catchError(() => of(null)))
-                .subscribe((paciente) => {
-                    if (paciente) {
-                        // Aquí podrías ajustar totalCitas/saldo/proximaCita si tu API los provee
-                    }
-                });
-        }
+
+        // Cargar citas reales del backend
+        this.citaService.obtenerCitasPorPaciente(idUsuario)
+            .pipe(catchError(() => of([])))
+            .subscribe((citas: any[]) => {
+                // Contar citas completadas
+                this.totalCitas = citas.filter(c => c.estado?.toLowerCase() === 'completada').length;
+                
+                // Contar pagos realizados (citas completadas con pago confirmado)
+                this.pagosRealizados = citas.filter(c => 
+                    c.estado?.toLowerCase() === 'completada' && c.precio > 0
+                ).length;
+
+                // Buscar próxima cita (confirmada o pendiente, fecha futura)
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0); // Resetear a medianoche para comparación de solo fecha
+                
+                const citasFuturas = citas
+                    .filter(c => {
+                        const estadosValidos = ['confirmada', 'pendiente', 'programada', 'agendada'];
+                        const fechaCita = this.parsearFechaLocal(c.fecha);
+                        fechaCita.setHours(0, 0, 0, 0);
+                        return estadosValidos.includes(c.estado?.toLowerCase()) && fechaCita >= hoy;
+                    })
+                    .sort((a, b) => {
+                        const fechaA = this.parsearFechaLocal(a.fecha);
+                        const fechaB = this.parsearFechaLocal(b.fecha);
+                        return fechaA.getTime() - fechaB.getTime();
+                    });
+
+                console.log('Citas futuras encontradas:', citasFuturas);
+
+                if (citasFuturas.length > 0) {
+                    const proximaCitaBackend = citasFuturas[0];
+                    this.proximaCita = {
+                        id: proximaCitaBackend.idCita,
+                        fecha: this.parsearFechaLocal(proximaCitaBackend.fecha),
+                        doctor: proximaCitaBackend.medicoNombre || 'Doctor Asignado',
+                        especialidad: proximaCitaBackend.especialidad || 'Consulta General'
+                    };
+                    console.log('Próxima cita asignada:', this.proximaCita);
+                } else {
+                    this.proximaCita = null;
+                    console.log('No se encontraron citas futuras');
+                }
+            });
 
         console.log('Datos del usuario logueado:', this.currentUser);
+    }
+
+    private parsearFechaLocal(fechaStr: string): Date {
+        // Parsear "YYYY-MM-DD" en zona horaria local
+        const [year, month, day] = fechaStr.split('-').map(Number);
+        return new Date(year, month - 1, day);
     }
 
     agendarCita(): void {

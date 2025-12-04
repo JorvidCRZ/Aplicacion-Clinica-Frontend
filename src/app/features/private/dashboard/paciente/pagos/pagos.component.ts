@@ -6,6 +6,9 @@ import { AuthService, AuthState } from '../../../../../core/services/auth/auth.s
 import { Usuario } from '../../../../../core/models/users/usuario';
 import { UserService } from '../../../../../core/services/auth/user.service';
 import { PagosService, Factura as FacturaLocal } from '../../../../../core/services/logic/pagos.service';
+// IMPORTAR EL SERVICIO DE REPORTES
+import { ReportesService } from '../../../../../core/services/logic/reportes.service'; 
+
 
 interface Factura {
     id: string;
@@ -78,7 +81,12 @@ export class PagosComponent implements OnInit, OnDestroy {
     totalPagado: number = 0;
     totalVencido: number = 0;
 
-    constructor(private authService: AuthService, public userService: UserService, private pagosService: PagosService) { }
+    constructor(
+        private authService: AuthService, 
+        public userService: UserService, 
+        private pagosService: PagosService,
+        private reportesService: ReportesService // <-- INYECTAR EL NUEVO SERVICIO
+    ) { }
 
     ngOnInit(): void {
         this.authSubscription = this.authService.authState$.subscribe((authState: AuthState) => {
@@ -117,11 +125,11 @@ export class PagosComponent implements OnInit, OnDestroy {
         descripcion: f.descripcion,
         doctor: f.doctor,
         especialidad: f.especialidad,
-    subespecialidad: f.subespecialidad,
-            // Normalizar: sin IGV en la UI. Mostrar siempre total = subtotal
-            subtotal: f.subtotal,
-            igv: 0,
-            total: f.subtotal,
+        subespecialidad: f.subespecialidad,
+        // Normalizar: sin IGV en la UI. Mostrar siempre total = subtotal
+        subtotal: f.subtotal,
+        igv: 0,
+        total: f.subtotal,
         estado: f.estado,
         metodoPago: f.metodoPago,
         fechaPago: f.fechaPago ? new Date(f.fechaPago) : undefined,
@@ -381,7 +389,8 @@ export class PagosComponent implements OnInit, OnDestroy {
             this.vistaActiva = 'facturas';
 
             // Mostrar mensaje de éxito
-            alert('¡Pago procesado exitosamente!');
+            // Reemplazado alert por console.log, siguiendo las directrices de no usar alert en iframes
+            console.log('¡Pago procesado exitosamente!');
         }, 3000);
     }
 
@@ -412,9 +421,43 @@ export class PagosComponent implements OnInit, OnDestroy {
         return iconos[estado as keyof typeof iconos] || 'fas fa-file';
     }
 
+    /**
+     * Llama al servicio de reportes para descargar el PDF de la factura.
+     * @param factura El objeto Factura que contiene el ID.
+     */
     descargarFactura(factura: Factura): void {
-        // Simular descarga de factura
-        alert(`Descargando factura ${factura.numeroFactura}`);
+        // Validación: Solo se puede descargar si la factura está pagada
+        if (factura.estado !== 'pagado') {
+            console.warn(`La factura ${factura.numeroFactura} no está pagada. No se puede descargar el comprobante.`);
+            // En un entorno real, mostrarías un modal o snackbar.
+            return;
+        }
+
+        console.log(`Iniciando descarga de factura ${factura.numeroFactura} (ID: ${factura.id})...`);
+
+        this.reportesService.descargarReportePago(factura.id).subscribe({
+            next: (data: Blob) => {
+                // Logica para forzar la descarga del PDF
+                const fileURL = URL.createObjectURL(data);
+                const link = document.createElement('a');
+                link.href = fileURL;
+                
+                // Usamos el número de factura para el nombre del archivo
+                link.download = `${factura.numeroFactura}_Comprobante.pdf`; 
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(fileURL);
+                
+                console.log('PDF descargado exitosamente.');
+            },
+            error: (err) => {
+                console.error('Error al descargar el PDF:', err);
+                // Aquí podrías usar tu propio sistema de notificación (snackbars/modales)
+                console.error('Hubo un error al generar el reporte de pago. Verifique el log del servidor.');
+            }
+        });
     }
 
 }

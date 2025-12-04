@@ -146,6 +146,10 @@ export class DataTableComponent {
             case 'status':
                 return this.getStatusDisplay(value);
             default:
+                // Auto-detectar si es columna de estado
+                if (column.key === 'estado' && value) {
+                    return value; // El HTML se encargará del estilo
+                }
                 return value || '-';
         }
     }
@@ -153,11 +157,22 @@ export class DataTableComponent {
     private getStatusDisplay(status: string): string {
         const statusMap: { [key: string]: string } = {
             'activo': 'Activo',
-            'inactivo': ' Inactivo',
-            'pendiente': ' Pendiente',
-            'completado': ' Completado',
-            'cancelado': ' Cancelado'
+            'inactivo': 'Inactivo',
+            'pendiente': 'Pendiente',
+            'completado': 'Completado',
+            'cancelado': 'Cancelado',
+            'disponible': 'Disponible',
+            'no disponible': 'No Disponible'
         };
         return statusMap[status?.toLowerCase()] || status;
+    }
+    
+    isEstadoColumn(columnKey: string): boolean {
+        return columnKey === 'estado';
+    }
+    
+    getEstadoClass(value: string): string {
+        const normalizado = value?.toLowerCase().replace(/\s+/g, '-');
+        return `status-${normalizado}`;
     }
 }

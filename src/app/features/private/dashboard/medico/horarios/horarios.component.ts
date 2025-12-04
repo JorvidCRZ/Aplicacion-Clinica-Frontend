@@ -14,6 +14,7 @@ interface HorarioBloque {
   horaFin: string;
   tipo: 'consulta' | 'urgencias' | 'procedimiento' | 'descanso';
   activo: boolean;
+  duracionMinutos: number; // Duración promedio de cada consulta
 }
 
 interface DiaSemana {
@@ -66,35 +67,56 @@ export class HorariosComponent implements OnInit {
     { value: 'descanso', label: 'Descanso', color: 'secondary' },
   ];
 
+  opcionesDuracion = [
+    { value: 15, label: '15 minutos' },
+    { value: 20, label: '20 minutos' },
+    { value: 25, label: '25 minutos' },
+    { value: 30, label: '30 minutos' },
+    { value: 35, label: '35 minutos' },
+    { value: 40, label: '40 minutos' },
+    { value: 45, label: '45 minutos' },
+    { value: 60, label: '60 minutos' },
+  ];
+
   nuevoHorario: HorarioBloque = {
     id: 0,
     horaInicio: '08:00',
     horaFin: '09:00',
     tipo: 'consulta',
     activo: true,
+    duracionMinutos: 30,
   };
 
   diaSeleccionado: number = 1;
 
-  
-  solicitudEspecial: SolicitudHorarioRequest = {
-    medicoId: 0,
-    fecha: '',
-    horaInicio: '',
-    horaFin: '',
-    motivo: ''
-  };
+  // Fecha mínima (hoy) para inputs de tipo date
+  hoy: string = '';
+  fechaSeleccionada: string = '';
+
+  // --- Variables para solicitudes especiales ---
   misSolicitudesEspeciales: SolicitudHorarioResponse[] = [];
   loadingSolicitud: boolean = false;
   mensajeSolicitud: string = '';
+  solicitudEspecial: SolicitudHorarioRequest = { medicoId: 0, fecha: '', horaInicio: '', horaFin: '', motivo: '' };
 
   ngOnInit() {
+    const ahora = new Date();
+    this.hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
     this.cargarDoctorActual();
   }
 
-  cargarDoctorActual() {
-    const usuario = this.authService.currentUser as any;
-    if (!usuario) return;
+  onFechaChange() {
+    if (!this.fechaSeleccionada) return;
+    const d = new Date(this.fechaSeleccionada);
+    // JS: 0 = Sunday, 1 = Monday, ... 6 = Saturday
+    const jsDay = d.getDay();
+    const mapped = jsDay === 0 ? 7 : jsDay; // map Sunday=7
+    this.diaSeleccionado = mapped;
+  }
+
+ cargarDoctorActual() {
+  const usuario = this.authService.currentUser as any;
+  if (!usuario) return;
 
     const p = usuario.persona || {};
     const correo = usuario.correo || '';
@@ -193,16 +215,18 @@ export class HorariosComponent implements OnInit {
 
         if (!horariosBackend || horariosBackend.length === 0) return;
 
-        this.diasSemana.forEach(dia => {
-          const horariosDelDia = horariosBackend
-            .filter((h: any) => h.diaSemana === dia.nombre)
-            .map((h: any) => ({
-              id: h.idDisponibilidad,
-              horaInicio: h.horaInicio,
-              horaFin: h.horaFin,
-              tipo: h.nombreTurno as 'consulta' | 'urgencias' | 'procedimiento' | 'descanso',
-              activo: h.diaActivo ?? true
-            }));
+      // Organizamos los horarios por día
+      this.diasSemana.forEach(dia => {
+        const horariosDelDia = horariosBackend
+          .filter((h: any) => h.diaSemana === dia.nombre)
+          .map((h: any) => ({
+            id: h.idDisponibilidad,  // ✅ usamos el ID real del backend
+            horaInicio: h.horaInicio,
+            horaFin: h.horaFin,
+            tipo: h.nombreTurno as 'consulta' | 'urgencias' | 'procedimiento' | 'descanso',
+            activo: h.diaActivo ?? true,
+            duracionMinutos: h.duracionMinutos ?? 30
+          }));
 
           if (horariosDelDia.length > 0) {
             dia.horarios = horariosDelDia;
@@ -229,38 +253,49 @@ export class HorariosComponent implements OnInit {
 
     if (!this.validarHorario(horario, dia)) return;
 
-    const payload = {
-      idMedico: this.doctorActual.id,
-      diaSemana: dia.nombre,
-      horaInicio: horario.horaInicio,
-      horaFin: horario.horaFin,
-      estado: 'Disponible',
-      nombreTurno: horario.tipo,
-      vigencia: true,
-      diaActivo: true,
-      duracionMinutos: 30
-    };
+  // Payload para backend
+  const payload = {
+    idMedico: this.doctorActual.id,
+    diaSemana: dia.nombre,
+    horaInicio: horario.horaInicio,
+    horaFin: horario.horaFin,
+    estado: 'Disponible',
+    nombreTurno: horario.tipo,
+    vigencia: true,
+    diaActivo: true,
+    duracionMinutos: 30
+  };
 
-    this.medicosService.crearDisponibilidad(payload).subscribe({
-      next: (res: any) => {
-        dia.horarios.push({
-          id: res.data.idDisponibilidad,
-          horaInicio: horario.horaInicio,
-          horaFin: horario.horaFin,
-          tipo: horario.tipo,
-          activo: true
-        });
+  this.medicosService.crearDisponibilidad(payload).subscribe({
+    next: (res: any) => {
+      // Agregar horario con el ID real del backend
+      dia.horarios.push({
+        id: res.data.idDisponibilidad,
+        horaInicio: horario.horaInicio,
+        horaFin: horario.horaFin,
+        tipo: horario.tipo,
+        activo: true,
+        duracionMinutos: horario.duracionMinutos
+      });
 
-        dia.horarios.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
-        this.resetearFormulario();
+      // Ordenar horarios por horaInicio
+      dia.horarios.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 
-      },
-      error: (err) => {
-        console.error('Error agregando horario:', err);
-        alert('No se pudo agregar el horario');
-      }
-    });
-  }
+      this.resetearFormulario();
+      localStorage.setItem(this.getHorariosKey(), JSON.stringify(this.diasSemana));
+      console.log('Horario agregado y guardado en backend');
+    },
+    error: (err) => {
+      console.error('Error agregando horario en backend:', err);
+      alert('No se pudo agregar el horario en el backend');
+    }
+  });
+}
+
+
+
+
+
 
   validarHorario(horario: HorarioBloque, dia: DiaSemana): boolean {
     if (horario.horaInicio >= horario.horaFin) {
@@ -309,6 +344,7 @@ export class HorariosComponent implements OnInit {
   guardarHorarios() {
     if (this.doctorActual) {
       this.guardandoHorarios = true;
+
       setTimeout(() => {
         localStorage.setItem(this.getHorariosKey(), JSON.stringify(this.diasSemana));
         this.guardandoHorarios = false;
@@ -324,6 +360,7 @@ export class HorariosComponent implements OnInit {
       horaFin: '09:00',
       tipo: 'consulta',
       activo: true,
+      duracionMinutos: 30,
     };
   }
 
@@ -331,16 +368,18 @@ export class HorariosComponent implements OnInit {
     const origen = this.diasSemana.find(d => d.id === diaOrigen);
     const destino = this.diasSemana.find(d => d.id === diaDestino);
 
-    if (origen && destino) {
-     
-      destino.horarios = origen.horarios.map((h, index) => ({
-        ...h,
-        id: 0 
-      }));
-      destino.activo = true;
-      alert("Horarios copiados. Recuerda guardarlos o agregarlos uno a uno para persistencia.");
+        if (origen && destino) {
+            // Fix: Manejar correctamente cuando destino no tiene horarios
+            const idsExistentesDestino = destino.horarios.map(hr => hr.id);
+            const maxIdDestino = idsExistentesDestino.length > 0 ? Math.max(...idsExistentesDestino) : 0;
+
+            destino.horarios = origen.horarios.map((h, index) => ({
+                ...h,
+                id: maxIdDestino + index + 1
+            }));
+            destino.activo = true;
+        }
     }
-  }
 
   obtenerColorTipo(tipo: string): string {
     const tipoObj = this.tiposHorario.find((t) => t.value === tipo);
